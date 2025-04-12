@@ -7,4 +7,5 @@ export interface Message {
   content: string;
   timestamp: Date;
   isLoading?: boolean;
+  isError?: boolean;
 }

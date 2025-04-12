@@ -13,10 +13,23 @@ export function ChatHistory() {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-4">
-      {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
-      ))}
+    <div className="flex-1 overflow-y-auto">
+      {messages.length === 0 ? (
+        <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto px-4">
+          <h1 className="text-4xl font-bold tracking-tight text-white mb-4">
+            What can I help with?
+          </h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Ask me anything - I'm powered by Gemini AI to provide helpful, accurate responses.
+          </p>
+        </div>
+      ) : (
+        <>
+          {messages.map((message) => (
+            <ChatMessage key={message.id} message={message} />
+          ))}
+        </>
+      )}
       <div ref={messagesEndRef} />
     </div>
   );
