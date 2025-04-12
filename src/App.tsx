@@ -7,23 +7,53 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
 
-const queryClient = new QueryClient();
+// Ensure the uuid package is installed
+// <lov-add-dependency>uuid@11.1.0</lov-add-dependency>
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/app" element={<Index />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+const App = () => {
+  // Fix body height issue that prevents scrolling
+  useEffect(() => {
+    // This ensures the body takes full height and allows scrolling where needed
+    document.body.style.height = '100%';
+    document.body.style.overflowX = 'hidden';
+    document.documentElement.style.height = '100%';
+    
+    // Cleanup function
+    return () => {
+      document.body.style.height = '';
+      document.body.style.overflowX = '';
+      document.documentElement.style.height = '';
+    };
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="min-h-screen w-full">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/app" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

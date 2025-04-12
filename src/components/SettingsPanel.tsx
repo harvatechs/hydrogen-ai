@@ -72,16 +72,16 @@ export function SettingsPanel() {
 
   return (
     <div className="w-full h-full overflow-y-auto p-4 space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Settings</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gemini-yellow">Settings</h2>
       
-      <Accordion type="single" collapsible defaultValue="appearance">
-        <AccordionItem value="appearance">
-          <AccordionTrigger className="text-md font-medium">
+      <Accordion type="single" collapsible defaultValue="appearance" className="bg-black/40 rounded-lg p-2">
+        <AccordionItem value="appearance" className="border-gemini-yellow/20">
+          <AccordionTrigger className="text-md font-medium text-gemini-yellow">
             Appearance
           </AccordionTrigger>
           <AccordionContent className="space-y-4 pt-2">
             <div className="space-y-2">
-              <Label>Theme</Label>
+              <Label className="text-gemini-yellow">Theme</Label>
               <RadioGroup value={theme} onValueChange={setTheme} className="flex flex-col space-y-1">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="dark" id="theme-dark" />
@@ -99,7 +99,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="space-y-2">
-              <Label>Font Size</Label>
+              <Label className="text-gemini-yellow">Font Size</Label>
               <RadioGroup value={fontSize} onValueChange={setFontSize} className="flex flex-col space-y-1">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="small" id="font-small" />
@@ -118,20 +118,20 @@ export function SettingsPanel() {
           </AccordionContent>
         </AccordionItem>
         
-        <AccordionItem value="api">
-          <AccordionTrigger className="text-md font-medium">
+        <AccordionItem value="api" className="border-gemini-yellow/20">
+          <AccordionTrigger className="text-md font-medium text-gemini-yellow">
             API Configuration
           </AccordionTrigger>
           <AccordionContent className="space-y-4 pt-2">
             <div className="space-y-2">
-              <Label htmlFor="api-key">Google Gemini API Key</Label>
+              <Label htmlFor="api-key" className="text-gemini-yellow">Google Gemini API Key</Label>
               <Input
                 id="api-key"
                 type="password"
                 placeholder="API Key"
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
-                className="font-mono text-xs"
+                className="font-mono text-xs bg-black/30 border-gemini-yellow/20"
               />
               <p className="text-xs text-muted-foreground">
                 Get your API key from{" "}
@@ -139,7 +139,7 @@ export function SettingsPanel() {
                   href="https://ai.google.dev/tutorials/setup"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-gemini-purple hover:underline"
+                  className="text-gemini-yellow hover:underline"
                 >
                   Google AI Studio
                 </a>
@@ -147,24 +147,24 @@ export function SettingsPanel() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="api-url">API Endpoint URL</Label>
+              <Label htmlFor="api-url" className="text-gemini-yellow">API Endpoint URL</Label>
               <Input
                 id="api-url"
                 type="text"
                 placeholder="API URL"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="font-mono text-xs"
+                className="font-mono text-xs bg-black/30 border-gemini-yellow/20"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
+              <Label htmlFor="model" className="text-gemini-yellow">Model</Label>
               <Select value={selectedModel} onValueChange={setSelectedModel}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-black/30 border-gemini-yellow/20">
                   <SelectValue placeholder="Select a model" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-black border-gemini-yellow/20">
                   <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash</SelectItem>
                   <SelectItem value="gemini-2.0-pro">Gemini 2.0 Pro</SelectItem>
                   <SelectItem value="gemini-1.5-flash">Gemini 1.5 Flash</SelectItem>
@@ -176,14 +176,14 @@ export function SettingsPanel() {
             <div className="flex space-x-2 pt-2">
               <Button 
                 onClick={handleSaveApiSettings} 
-                className="flex-1 bg-gemini-purple hover:bg-gemini-purple/90"
+                className="flex-1 bg-gemini-yellow text-black hover:bg-gemini-yellow/90"
               >
                 Save API Settings
               </Button>
               <Button 
                 onClick={handleResetApiSettings}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 border-gemini-yellow/20 hover:bg-gemini-yellow/10"
               >
                 Reset to Default
               </Button>
@@ -191,14 +191,14 @@ export function SettingsPanel() {
           </AccordionContent>
         </AccordionItem>
         
-        <AccordionItem value="advanced">
-          <AccordionTrigger className="text-md font-medium">
+        <AccordionItem value="advanced" className="border-gemini-yellow/20">
+          <AccordionTrigger className="text-md font-medium text-gemini-yellow">
             Advanced Settings
           </AccordionTrigger>
           <AccordionContent className="space-y-4 pt-2">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="streaming">Response Streaming</Label>
+                <Label htmlFor="streaming" className="text-gemini-yellow">Response Streaming</Label>
                 <p className="text-xs text-muted-foreground">
                   Receive response tokens in real-time
                 </p>
@@ -208,7 +208,7 @@ export function SettingsPanel() {
             
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="history">Save Chat History</Label>
+                <Label htmlFor="history" className="text-gemini-yellow">Save Chat History</Label>
                 <p className="text-xs text-muted-foreground">
                   Store conversations in local storage
                 </p>
@@ -218,7 +218,7 @@ export function SettingsPanel() {
             
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="citations">Auto Citations</Label>
+                <Label htmlFor="citations" className="text-gemini-yellow">Auto Citations</Label>
                 <p className="text-xs text-muted-foreground">
                   Automatically generate citations for responses
                 </p>
@@ -228,13 +228,13 @@ export function SettingsPanel() {
           </AccordionContent>
         </AccordionItem>
         
-        <AccordionItem value="about">
-          <AccordionTrigger className="text-md font-medium">
+        <AccordionItem value="about" className="border-gemini-yellow/20">
+          <AccordionTrigger className="text-md font-medium text-gemini-yellow">
             About HydroGen
           </AccordionTrigger>
           <AccordionContent className="space-y-4 pt-2">
             <div className="space-y-1">
-              <h3 className="font-semibold">HydroGen</h3>
+              <h3 className="font-semibold text-gemini-yellow">HydroGen</h3>
               <p className="text-sm text-muted-foreground">
                 Version 1.0.0
               </p>
@@ -246,7 +246,7 @@ export function SettingsPanel() {
                 comprehensive answers to your questions.
               </p>
               <div className="pt-4">
-                <Button variant="outline" size="sm" className="w-full">
+                <Button variant="outline" size="sm" className="w-full border-gemini-yellow/20 hover:bg-gemini-yellow/10">
                   Check for Updates
                 </Button>
               </div>

@@ -1,42 +1,41 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 0%;
+    --foreground: 60 100% 96%;
 
     --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 60 100% 96%;
 
     --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 60 100% 96%;
 
-    --primary: 0 0% 98%;
+    --primary: 60 80% 90%;
     --primary-foreground: 240 5.9% 10%;
 
     --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 60 100% 96%;
 
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 60 80% 90%;
+    --accent-foreground: 240 5.9% 10%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --ring: 60 80% 90%;
     --sidebar: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-foreground: 60 100% 96%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-accent-foreground: 60 100% 96%;
     --sidebar-ring: 240 4.9% 83.9%;
 
     --radius: 0.5rem;
@@ -47,9 +46,59 @@
   }
   
   body {
-    @apply bg-background text-foreground antialiased overflow-hidden;
+    @apply bg-background text-foreground antialiased;
+    background-image: linear-gradient(to bottom right, #000000, #222222 70%, #FEF7CD);
+    background-attachment: fixed;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
   }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(254, 247, 205, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(254, 247, 205, 0.6);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(254, 247, 205, 0.4) rgba(0, 0, 0, 0.2);
+}
+
+/* Enable scrolling on main containers */
+.h-screen {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+/* Ensure chat history is scrollable */
+.chat-history {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
 }
 
 .chat-message-content h2 {
@@ -106,5 +155,5 @@
 }
 
 .glass-morphism {
-  @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
+  @apply backdrop-blur-xl bg-black/30 border border-gemini-yellow/20 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
 }

@@ -57,7 +57,9 @@ export default {
 					purple: '#7c3aed',
 					light: '#f3f4f6',
 					dark: '#1f2937',
-					'purple-light': '#a78bfa'
+					'purple-light': '#a78bfa',
+					'yellow': '#FEF7CD',
+					'yellow-light': '#FFFCE8'
 				},
 			},
 			borderRadius: {
@@ -91,6 +93,10 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+			},
+			backgroundImage: {
+				'yellow-gradient': 'linear-gradient(to bottom right, #000000, #222222 70%, #FEF7CD)',
+				'yellow-light-gradient': 'linear-gradient(to bottom right, #222222, #FEF7CD)'
 			}
 		}
 	},

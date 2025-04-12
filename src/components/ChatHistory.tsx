@@ -23,13 +23,13 @@ export function ChatHistory() {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4">
       {messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant") ? (
-        <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto px-4">
-          <h1 className="text-4xl font-bold tracking-tight text-white mb-4">
+        <div className="h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto px-4 py-8">
+          <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-gemini-yellow mb-4">
             What can I help with?
           </h1>
-          <p className="text-lg text-muted-foreground mb-8">
+          <p className="text-md md:text-lg text-muted-foreground mb-8">
             Ask me anything - I'm powered by Gemini AI to provide helpful, accurate responses.
           </p>
           
@@ -38,23 +38,23 @@ export function ChatHistory() {
               <Button
                 key={index}
                 variant="outline"
-                className="h-auto py-3 px-4 justify-start text-left"
+                className="h-auto py-3 px-4 justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
                 onClick={() => sendMessage(starter)}
               >
-                <Sparkles className="h-4 w-4 mr-2 flex-shrink-0" />
+                <Sparkles className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
                 <span className="truncate">{starter}</span>
               </Button>
             ))}
           </div>
         </div>
       ) : (
-        <>
+        <div className="py-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} />
           ))}
-        </>
+          <div ref={messagesEndRef} />
+        </div>
       )}
-      <div ref={messagesEndRef} />
     </div>
   );
 }
