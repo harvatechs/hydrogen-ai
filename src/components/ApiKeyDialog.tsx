@@ -9,16 +9,20 @@ import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 
 export function ApiKeyDialog() {
-  const { apiKey, setApiKey } = useChat();
+  const { apiKey, setApiKey, apiUrl, setApiUrl } = useChat();
   const [key, setKey] = useState(apiKey || "");
+  const [url, setUrl] = useState(apiUrl || "");
   const [open, setOpen] = useState(false);
 
   const handleSave = () => {
     if (key.trim()) {
       setApiKey(key.trim());
+      if (url.trim()) {
+        setApiUrl(url.trim());
+      }
       toast({
-        title: "API Key Saved",
-        description: "Your Google Gemini API key has been saved."
+        title: "API Settings Saved",
+        description: "Your Google Gemini API settings have been saved."
       });
       setOpen(false);
     } else {
@@ -33,13 +37,13 @@ export function ApiKeyDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="h-9 w-9">
+        <Button variant="outline" size="icon" className="h-8 w-8 border-white/10 bg-transparent hover:bg-secondary">
           <Settings className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Google Gemini API Key</DialogTitle>
+          <DialogTitle>Google Gemini API Settings</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2 pb-4">
           <div className="space-y-2">
@@ -50,6 +54,16 @@ export function ApiKeyDialog() {
               placeholder="API Key"
               value={key}
               onChange={(e) => setKey(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="api-url">API Endpoint URL (Optional)</Label>
+            <Input
+              id="api-url"
+              type="text"
+              placeholder="API URL"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
             />
           </div>
           <div className="text-xs text-muted-foreground">
@@ -63,7 +77,7 @@ export function ApiKeyDialog() {
               Google AI Studio
             </a>
           </div>
-          <Button onClick={handleSave} className="w-full bg-gemini-purple hover:bg-gemini-purple/90 text-white">Save API Key</Button>
+          <Button onClick={handleSave} className="w-full bg-gemini-purple hover:bg-gemini-purple/90 text-white">Save API Settings</Button>
         </div>
       </DialogContent>
     </Dialog>

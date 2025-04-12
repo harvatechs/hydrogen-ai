@@ -1,16 +1,40 @@
 
-import { ChatProvider } from "@/context/ChatContext";
+import { useEffect } from "react";
+import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
 import { ChatHistory } from "@/components/ChatHistory";
 import { ChatInput } from "@/components/ChatInput";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider, Sidebar as ShadcnSidebar, SidebarContent, SidebarInset } from "@/components/ui/sidebar";
 
-const Index = () => {
+// Theme application component
+const ThemeHandler = ({ children }: { children: React.ReactNode }) => {
+  const { theme } = useChat();
+  
+  useEffect(() => {
+    // Apply theme to html element
+    const htmlElement = document.documentElement;
+    htmlElement.classList.remove("light", "dark");
+    
+    if (theme === "system") {
+      // Check system preference
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      htmlElement.classList.add(systemPrefersDark ? "dark" : "light");
+    } else {
+      htmlElement.classList.add(theme);
+    }
+  }, [theme]);
+  
+  return <>{children}</>;
+};
+
+const AppContent = () => {
+  const { fontSize } = useChat();
+  
   return (
-    <ChatProvider>
+    <ThemeHandler>
       <SidebarProvider>
-        <div className="flex w-full h-screen bg-background text-foreground">
+        <div className={`flex w-full h-screen bg-background text-foreground font-size-${fontSize}`}>
           <ShadcnSidebar className="hidden md:flex">
             <SidebarContent>
               <Sidebar />
@@ -30,6 +54,14 @@ const Index = () => {
           </SidebarInset>
         </div>
       </SidebarProvider>
+    </ThemeHandler>
+  );
+};
+
+const Index = () => {
+  return (
+    <ChatProvider>
+      <AppContent />
     </ChatProvider>
   );
 };
