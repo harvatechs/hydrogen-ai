@@ -50,17 +50,7 @@ const AppContent = () => {
           </ShadcnSidebar>
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out">
-            <Header>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mr-2 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                {sidebarOpen ? <PanelRightClose size={18} /> : <PanelLeft size={18} />}
-                <span className="sr-only">Toggle Sidebar</span>
-              </Button>
-            </Header>
+            <Header />
             
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-gemini-yellow/5 to-transparent opacity-30"></div>
