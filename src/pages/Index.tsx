@@ -35,23 +35,28 @@ const AppContent = () => {
   return (
     <ThemeHandler>
       <SidebarProvider>
-        <div className={`flex w-full h-screen bg-transparent font-size-${fontSize}`}>
+        <div className={`flex w-full h-screen overflow-hidden bg-gradient-to-br from-black via-black to-black/95 font-size-${fontSize}`}>
           <ShadcnSidebar className="hidden md:flex">
             <SidebarContent>
               <Sidebar />
             </SidebarContent>
           </ShadcnSidebar>
           
-          <SidebarInset className="flex flex-col h-screen">
+          <SidebarInset className="flex flex-col h-screen relative">
             <Header />
             
-            <ScrollArea className="flex-1 overflow-hidden relative">
-              <ChatHistory />
-            </ScrollArea>
-            
-            <div className="p-4 md:px-8 md:pb-8">
-              <ChatInput />
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-gemini-yellow/5 to-transparent opacity-30"></div>
+              <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gemini-yellow/5 rounded-full blur-3xl"></div>
             </div>
+            
+            <div className="flex-1 relative overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-130px)]">
+                <ChatHistory />
+              </ScrollArea>
+            </div>
+            
+            <ChatInput />
           </SidebarInset>
         </div>
       </SidebarProvider>

@@ -13,7 +13,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const isError = message.role === "error";
 
   return (
-    <div className={cn("py-6 first:pt-0", message.isLoading && "opacity-70")}>
+    <div className={cn(
+      "py-4 first:pt-0", 
+      message.isLoading && "opacity-70",
+      isUser ? "border-b border-white/10" : ""
+    )}>
       <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
         <div className="mt-1 flex-shrink-0">
           {isUser ? (
@@ -21,7 +25,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               <User size={16} />
             </div>
           ) : (
-            <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500">
+            <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow">
               <Bot size={16} />
             </div>
           )}
@@ -33,11 +37,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
           </div>
           
           {isUser ? (
-            <div className="text-primary">{message.content}</div>
+            <div className="text-primary pb-2">{message.content}</div>
           ) : (
             <div
               className={cn(
-                "prose prose-invert max-w-none text-muted-foreground",
+                "prose prose-invert prose-headings:text-gemini-yellow prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-muted-foreground prose-a:text-blue-400 prose-strong:text-white prose-strong:font-semibold prose-em:text-yellow-200 prose-code:bg-black/50 prose-code:text-yellow-200 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-blockquote:border-l-2 prose-blockquote:border-gemini-yellow/50 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground/80 max-w-none",
                 isError && "text-red-500",
                 message.isLoading && "animate-pulse",
                 "chat-message-content"

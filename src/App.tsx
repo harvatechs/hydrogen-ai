@@ -9,9 +9,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 
-// Ensure the uuid package is installed
-// <lov-add-dependency>uuid@11.1.0</lov-add-dependency>
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -22,18 +19,20 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  // Fix body height issue that prevents scrolling
+  // Fix scrolling issues
   useEffect(() => {
-    // This ensures the body takes full height and allows scrolling where needed
+    // This ensures the body takes full height and handles scrolling correctly
     document.body.style.height = '100%';
-    document.body.style.overflowX = 'hidden';
+    document.body.style.overflow = 'hidden';
     document.documentElement.style.height = '100%';
+    document.documentElement.style.overflow = 'hidden';
     
     // Cleanup function
     return () => {
       document.body.style.height = '';
-      document.body.style.overflowX = '';
+      document.body.style.overflow = '';
       document.documentElement.style.height = '';
+      document.documentElement.style.overflow = '';
     };
   }, []);
 
@@ -41,7 +40,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Sonner />
+        <Sonner position="top-right" className="toaster-container" />
         <BrowserRouter>
           <div className="min-h-screen w-full">
             <Routes>

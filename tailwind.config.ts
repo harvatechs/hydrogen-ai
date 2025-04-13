@@ -59,7 +59,8 @@ export default {
 					dark: '#1f2937',
 					'purple-light': '#a78bfa',
 					'yellow': '#FEF7CD',
-					'yellow-light': '#FFFCE8'
+					'yellow-light': '#FFFCE8',
+					'yellow-dark': '#E6D78F'
 				},
 			},
 			borderRadius: {
@@ -87,16 +88,100 @@ export default {
 				'pulse-slow': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(8px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'fade-out': {
+					'0%': { opacity: '1', transform: 'translateY(0)' },
+					'100%': { opacity: '0', transform: 'translateY(8px)' }
+				},
+				'slide-in': {
+					'0%': { opacity: '0', transform: 'translateX(-8px)' },
+					'100%': { opacity: '1', transform: 'translateX(0)' }
+				},
+				'typing': {
+					'0%': { width: '0%' },
+					'100%': { width: '100%' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'fade-out': 'fade-out 0.3s ease-out',
+				'slide-in': 'slide-in 0.3s ease-out',
+				'typing': 'typing 2s steps(20, end) infinite'
 			},
 			backgroundImage: {
 				'yellow-gradient': 'linear-gradient(to bottom right, #000000, #222222 70%, #FEF7CD)',
-				'yellow-light-gradient': 'linear-gradient(to bottom right, #222222, #FEF7CD)'
+				'yellow-light-gradient': 'linear-gradient(to bottom right, #222222, #FEF7CD)',
+				'glow-gradient': 'radial-gradient(circle at center, rgba(254, 247, 205, 0.15) 0%, transparent 70%)'
+			},
+			typography: {
+				DEFAULT: {
+					css: {
+						maxWidth: '100%',
+						color: 'var(--tw-prose-body)',
+						'[class~="lead"]': {
+							color: 'var(--tw-prose-lead)'
+						},
+						strong: {
+							color: 'var(--tw-prose-bold)'
+						},
+						'ol > li::marker': {
+							color: 'var(--tw-prose-counters)'
+						},
+						'ul > li::marker': {
+							color: 'var(--tw-prose-bullets)'
+						},
+						hr: {
+							borderColor: 'var(--tw-prose-hr)'
+						},
+						blockquote: {
+							color: 'var(--tw-prose-quotes)',
+							borderLeftColor: 'var(--tw-prose-quote-borders)'
+						},
+						h1: {
+							color: 'var(--tw-prose-headings)'
+						},
+						h2: {
+							color: 'var(--tw-prose-headings)'
+						},
+						h3: {
+							color: 'var(--tw-prose-headings)'
+						},
+						h4: {
+							color: 'var(--tw-prose-headings)'
+						},
+						'figure figcaption': {
+							color: 'var(--tw-prose-captions)'
+						},
+						code: {
+							color: 'var(--tw-prose-code)'
+						},
+						'a code': {
+							color: 'var(--tw-prose-links)'
+						},
+						pre: {
+							color: 'var(--tw-prose-pre-code)',
+							backgroundColor: 'var(--tw-prose-pre-bg)'
+						},
+						'pre code': {
+							backgroundColor: 'transparent',
+							color: 'inherit'
+						},
+						thead: {
+							color: 'var(--tw-prose-th-borders)',
+							borderBottomColor: 'var(--tw-prose-th-borders)'
+						},
+						'tbody tr': {
+							borderBottomColor: 'var(--tw-prose-td-borders)'
+						}
+					}
+				}
 			}
 		}
 	},
