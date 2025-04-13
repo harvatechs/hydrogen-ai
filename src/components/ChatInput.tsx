@@ -2,7 +2,7 @@
 import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, Search, X, Lightning } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, Search, X, Zap } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -246,7 +246,7 @@ export function ChatInput() {
                 title="Pro Search"
                 onClick={handleProSearch}
               >
-                <Lightning className="h-4 w-4" />
+                <Zap className="h-4 w-4" />
               </Button>
             </div>
             

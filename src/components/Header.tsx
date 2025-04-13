@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ApiKeyDialog } from "./ApiKeyDialog";
-import { Sparkles, Settings, Search, User, Lightning, Menu } from "lucide-react";
+import { Sparkles as SparklesIcon, Settings, Search, User, Zap, Menu } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -83,7 +83,7 @@ export function Header({ children }: HeaderProps) {
             className="border-white/10 bg-black/40 text-white/70 hover:bg-gemini-yellow/10 hover:text-gemini-yellow transition-all duration-300"
             onClick={handleProSearch}
           >
-            <Lightning className="h-3.5 w-3.5 mr-2" />
+            <Zap className="h-3.5 w-3.5 mr-2" />
             Pro Search
           </Button>
         </div>
@@ -96,7 +96,7 @@ export function Header({ children }: HeaderProps) {
                 size="sm" 
                 className="text-xs h-8 border-white/10 bg-black/40 text-muted-foreground hover:bg-gemini-yellow/10 hover:text-gemini-yellow transition-all duration-300"
               >
-                <Sparkles className="h-3.5 w-3.5 mr-1.5 text-gemini-yellow" />
+                <SparklesIcon className="h-3.5 w-3.5 mr-1.5 text-gemini-yellow" />
                 {getModelDisplayName()}
               </Button>
             </DropdownMenuTrigger>

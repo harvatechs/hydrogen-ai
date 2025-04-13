@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +15,7 @@ import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { Slider } from "@/components/ui/slider";
 import { Moon, Sun, Palette, Zap, Book, Globe, PenSquare, RefreshCw, Save, Eye, MessageSquareText, Info, FileText, Languages, 
-  Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key } from "lucide-react";
+  Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key, Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
