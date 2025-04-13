@@ -21,18 +21,22 @@ const queryClient = new QueryClient({
 const App = () => {
   // Fix scrolling issues
   useEffect(() => {
-    // This ensures the body takes full height and handles scrolling correctly
-    document.body.style.height = '100%';
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.height = '100%';
-    document.documentElement.style.overflow = 'hidden';
+    // We don't want to set overflow:hidden on the root elements
+    // because it breaks scrolling in scroll areas.
     
-    // Cleanup function
+    // Make sure we have proper body styling but allow scrolling within components
+    document.body.style.height = '100%';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.height = '100%';
+    
+    // Add smooth scrolling to the entire document
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
     return () => {
       document.body.style.height = '';
       document.body.style.overflow = '';
       document.documentElement.style.height = '';
-      document.documentElement.style.overflow = '';
+      document.documentElement.style.scrollBehavior = '';
     };
   }, []);
 
