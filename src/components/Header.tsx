@@ -47,14 +47,7 @@ export function Header() {
               {getModelDisplayName()}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Model Selection</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Gemini 2.0 Flash</DropdownMenuItem>
-            <DropdownMenuItem>Gemini 2.0 Pro</DropdownMenuItem>
-            <DropdownMenuItem>Gemini 1.5 Flash</DropdownMenuItem>
-            <DropdownMenuItem>Gemini 1.5 Pro</DropdownMenuItem>
-          </DropdownMenuContent>
+          
         </DropdownMenu>
         <ApiKeyDialog />
       </div>
