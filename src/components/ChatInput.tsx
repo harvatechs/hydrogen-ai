@@ -2,7 +2,7 @@
 import { useState, ChangeEvent, FormEvent, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Search, Sparkles, Mic, SendHorizontal, FileUp, Image, Link2 } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, Search } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -143,19 +143,6 @@ export function ChatInput() {
             />
             
             <div className="flex items-center space-x-1 mr-2">
-              <Button 
-                type="button"
-                size="icon" 
-                variant="ghost" 
-                className={cn("h-9 w-9 rounded-full transition-all duration-300 hover:bg-black/30 hover:text-white",
-                  isProcessing ? "text-gemini-yellow animate-pulse" : "text-muted-foreground"
-                )}
-                disabled={isProcessing}
-                title="Smart suggestions"
-              >
-                <Sparkles className="h-4 w-4" />
-              </Button>
-              
               <Dialog open={showVoiceInput} onOpenChange={setShowVoiceInput}>
                 <DialogTrigger asChild>
                   <Button 

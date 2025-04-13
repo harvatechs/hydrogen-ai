@@ -1,12 +1,17 @@
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ApiKeyDialog } from "./ApiKeyDialog";
-import { PanelLeft, ChevronDown, Sparkles, Settings, Search, MoreHorizontal, User } from "lucide-react";
+import { Sparkles, Settings, Search, User } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-export function Header() {
+interface HeaderProps {
+  children?: React.ReactNode;
+}
+
+export function Header({ children }: HeaderProps) {
   const { theme, model } = useChat();
   const { toggleSidebar } = useSidebar();
 
@@ -30,14 +35,7 @@ export function Header() {
     <header className="sticky top-0 z-10 border-b border-white/10 bg-black/50 backdrop-blur-md">
       <div className="flex items-center justify-between px-3 py-2 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8 md:hidden text-muted-foreground" 
-            onClick={toggleSidebar}
-          >
-            <PanelLeft className="h-5 w-5" />
-          </Button>
+          {children}
           
           <div className="flex items-center">
             <span className="font-semibold text-white mr-1">HydroGen</span>
