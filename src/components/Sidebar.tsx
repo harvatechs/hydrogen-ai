@@ -158,17 +158,17 @@ export function Sidebar() {
       
       <div className="p-2 border-t border-white/10">
         <div className="space-y-1">
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-white" onClick={() => clearConversation(currentConversationId || "")}>
+          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start bg-transparent text-gray-300">
             <Trash2 className="mr-2 h-4 w-4" />
             Clear conversation
           </Button>
           
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-white" onClick={() => setShowSettings(true)}>
+          <Button variant="ghost" onClick={() => setShowSettings(true)} className="w-full justify-start bg-transparent text-gray-300">
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
           
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-white">
+          <Button variant="ghost" className="w-full justify-start bg-transparent text-gray-300">
             <HelpCircle className="mr-2 h-4 w-4" />
             Help & FAQ
           </Button>
@@ -176,12 +176,12 @@ export function Sidebar() {
         
         <Separator className="my-2 bg-white/10" />
         
-        <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-white">
+        <Button variant="ghost" className="w-full justify-start bg-transparent text-gray-300">
           <User className="mr-2 h-4 w-4" />
           My account
         </Button>
         
-        <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-white">
+        <Button variant="ghost" className="w-full justify-start bg-transparent text-gray-300">
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </Button>
