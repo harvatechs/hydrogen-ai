@@ -49,13 +49,14 @@ const AppContent = () => {
             </SidebarContent>
           </ShadcnSidebar>
           
-          <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out">
+          <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
             <Header>
               <Button
                 variant="ghost"
                 size="icon"
-                className="mr-2 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
+                className="mr-2 text-white/70 hover:text-white hover:bg-gemini-yellow/20 transition-all duration-300"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
               >
                 {sidebarOpen ? <PanelRightClose size={18} /> : <PanelLeft size={18} />}
                 <span className="sr-only">Toggle Sidebar</span>

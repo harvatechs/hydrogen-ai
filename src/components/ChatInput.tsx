@@ -1,21 +1,50 @@
 
-import { useState, ChangeEvent, FormEvent, useRef, useCallback } from "react";
+import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, Search } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, Search, X, Lightning } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { AIVoiceInput } from "@/components/ui/ai-voice-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CommandItem, CommandList, CommandInput, CommandEmpty, CommandGroup, Command } from "@/components/ui/command";
+
+// Suggested queries for auto-completion
+const suggestedQueries = [
+  "Explain quantum computing in simple terms",
+  "What is the theory of relativity?",
+  "How do neural networks work?",
+  "What are the implications of climate change?",
+  "Explain the concept of blockchain",
+  "How does gene editing work?",
+  "What is the difference between AI and machine learning?",
+  "How do black holes form?",
+  "Explain the process of photosynthesis",
+  "What is the significance of the Higgs boson?"
+];
 
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showAutoComplete, setShowAutoComplete] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const { sendMessage, isProcessing } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (message.length > 0) {
+      const filtered = suggestedQueries.filter(query => 
+        query.toLowerCase().includes(message.toLowerCase())
+      );
+      setFilteredSuggestions(filtered.slice(0, 5));
+      setShowAutoComplete(filtered.length > 0);
+    } else {
+      setShowAutoComplete(false);
+    }
+  }, [message]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -23,6 +52,7 @@ export function ChatInput() {
     
     const currentMessage = message;
     setMessage("");
+    setShowAutoComplete(false);
     await sendMessage(currentMessage);
     
     // Focus the input field after sending
@@ -43,25 +73,34 @@ export function ChatInput() {
   }, []);
 
   const handleVoiceStop = useCallback((duration: number) => {
-    // In a real app, this would process the voice recording through a speech-to-text API
     if (duration > 0) {
+      // In production this would connect to a real speech-to-text API
       toast({
-        title: "Voice recorded",
-        description: `${duration} seconds of audio captured. Processing...`,
+        title: "Processing your voice input",
+        description: `${duration} seconds of audio captured`,
       });
       
-      // Simulate voice processing delay
+      // Simulate voice recognition delay
       setTimeout(() => {
-        const demoQuestions = [
-          "What are the main principles of quantum computing?",
-          "Explain the concept of neural networks in machine learning",
-          "What is the difference between artificial intelligence and machine learning?",
-          "How does climate change affect biodiversity?"
+        // Simulate real voice recognition with a random question from our list
+        const allQuestions = [
+          "What causes a recession?",
+          "Are we alone in the universe?",
+          "What is the blockchain used for?",
+          "Why did the dinosaurs go extinct?",
+          "How does machine learning impact finance?",
+          "What is quantum computing?",
+          "How do black holes work?"
         ];
         
-        const randomQuestion = demoQuestions[Math.floor(Math.random() * demoQuestions.length)];
+        const randomQuestion = allQuestions[Math.floor(Math.random() * allQuestions.length)];
         setMessage(randomQuestion);
         setShowVoiceInput(false);
+        
+        // Focus input after voice recognition
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
       }, 1500);
     } else {
       setShowVoiceInput(false);
@@ -78,18 +117,84 @@ export function ChatInput() {
     if (files && files.length > 0) {
       setIsUploading(true);
       
-      // Simulate file upload
+      // Simulated file processing with a realistic delay
       setTimeout(() => {
         setIsUploading(false);
         toast({
-          title: "File uploaded",
-          description: `${files[0].name} has been attached to your conversation.`,
+          title: "File uploaded successfully",
+          description: `Analyzing ${files[0].name} (${(files[0].size / 1024).toFixed(1)} KB)`,
         });
         
-        // Clear the input so the same file can be uploaded again
-        e.target.value = '';
+        // Simulate file analysis
+        setTimeout(() => {
+          setMessage(prev => prev + (prev ? " " : "") + `Analyze the content of this ${files[0].name} file.`);
+          
+          // Clear the input so the same file can be uploaded again
+          e.target.value = '';
+          
+          // Focus input after file upload
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 100);
+        }, 800);
       }, 1500);
     }
+  };
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    setMessage(suggestion);
+    setShowAutoComplete(false);
+    // Focus input after selection
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+  };
+
+  const handleSearchWeb = () => {
+    if (!message.trim()) {
+      toast({
+        title: "Please enter a search query",
+        description: "Type what you want to search for first."
+      });
+      return;
+    }
+    
+    toast({
+      title: "Searching the web",
+      description: `Looking up: "${message}"`,
+    });
+    
+    // Simulate web search
+    setTimeout(() => {
+      sendMessage(`Search the web for: ${message}`);
+      setMessage("");
+    }, 800);
+  };
+
+  const handleProSearch = () => {
+    if (!message.trim()) {
+      toast({
+        title: "Please enter a search query",
+        description: "Type what you want to research first."
+      });
+      return;
+    }
+    
+    toast({
+      title: "Advanced research in progress",
+      description: `Deep analysis for: "${message}"`,
+    });
+    
+    // Simulate advanced search
+    setTimeout(() => {
+      sendMessage(`Conduct comprehensive research on: ${message}`);
+      setMessage("");
+    }, 800);
+  };
+
+  const handleClearInput = () => {
+    setMessage("");
+    inputRef.current?.focus();
   };
 
   return (
@@ -103,14 +208,14 @@ export function ChatInput() {
                 ref={fileInputRef} 
                 onChange={handleFileChange} 
                 className="hidden" 
-                accept="image/*,.pdf,.doc,.docx,.txt"
+                accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.json,.md"
               />
               
               <Button 
                 type="button" 
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-black/30 hover:text-white"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
                 title="Attach file"
                 onClick={handleFileUpload}
                 disabled={isUploading}
@@ -126,21 +231,72 @@ export function ChatInput() {
                 type="button"
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-black/30 hover:text-white"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
                 title="Search the web"
+                onClick={handleSearchWeb}
               >
                 <Search className="h-4 w-4" />
               </Button>
+              
+              <Button 
+                type="button"
+                size="icon" 
+                variant="ghost" 
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
+                title="Pro Search"
+                onClick={handleProSearch}
+              >
+                <Lightning className="h-4 w-4" />
+              </Button>
             </div>
             
-            <Input
-              ref={inputRef}
-              placeholder="Ask anything..."
-              value={message}
-              onChange={handleInputChange}
-              className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 text-white placeholder:text-muted-foreground/70 transition-all duration-300"
-              disabled={isProcessing}
-            />
+            <div className="relative flex-grow">
+              <Input
+                ref={inputRef}
+                placeholder="Ask anything..."
+                value={message}
+                onChange={handleInputChange}
+                className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 text-white placeholder:text-muted-foreground/70 transition-all duration-300"
+                disabled={isProcessing}
+              />
+              
+              {message && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleClearInput}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 hover:text-white"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+              
+              {showAutoComplete && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-black/90 border border-white/10 rounded-md overflow-hidden shadow-lg">
+                  <Command>
+                    <CommandList>
+                      <CommandGroup heading="Suggestions">
+                        {filteredSuggestions.length === 0 ? (
+                          <CommandEmpty>No suggestions found</CommandEmpty>
+                        ) : (
+                          filteredSuggestions.map((suggestion, index) => (
+                            <CommandItem 
+                              key={index} 
+                              onSelect={() => handleSelectSuggestion(suggestion)}
+                              className="cursor-pointer hover:bg-gemini-yellow/10 px-3 py-2"
+                            >
+                              <Search className="h-3 w-3 mr-2 text-gemini-yellow" />
+                              <span className="text-sm">{suggestion}</span>
+                            </CommandItem>
+                          ))
+                        )}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </div>
+              )}
+            </div>
             
             <div className="flex items-center space-x-1 mr-2">
               <Dialog open={showVoiceInput} onOpenChange={setShowVoiceInput}>
@@ -149,7 +305,7 @@ export function ChatInput() {
                     type="button"
                     size="icon" 
                     variant="ghost" 
-                    className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-black/30 hover:text-white"
+                    className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
                     title="Voice input"
                   >
                     <Mic className="h-4 w-4" />

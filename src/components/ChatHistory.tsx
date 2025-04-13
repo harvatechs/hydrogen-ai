@@ -78,10 +78,12 @@ export function ChatHistory() {
     return shuffled.slice(0, 4);
   };
 
-  // Generate recommended questions on initial render
+  // Generate recommended questions on initial render and refresh them when empty state is shown
   useEffect(() => {
-    setRecommendedQuestions(generateRecommendedQuestions());
-  }, []);
+    if (messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant")) {
+      setRecommendedQuestions(generateRecommendedQuestions());
+    }
+  }, [messages]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -95,20 +97,28 @@ export function ChatHistory() {
       <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
         <div className="mt-1 flex-shrink-0">
           <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow">
-            <Skeleton className="h-4 w-4 rounded-full bg-white/20" />
+            <Skeleton className="h-5 w-5 rounded-full bg-white/20" />
           </div>
         </div>
         
         <div className="min-w-0 flex-1">
-          <Skeleton className="h-4 w-24 mb-3 bg-white/20" />
+          <Skeleton className="h-5 w-32 mb-3 bg-white/20" />
           
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Skeleton className="h-4 w-full bg-white/10" />
             <Skeleton className="h-4 w-11/12 bg-white/10" />
             <Skeleton className="h-4 w-3/4 bg-white/10" />
-            <div className="pt-1"></div>
+            <div className="pt-2"></div>
             <Skeleton className="h-4 w-5/6 bg-white/10" />
+            <Skeleton className="h-4 w-4/5 bg-white/10" />
+            <div className="pt-2"></div>
+            <Skeleton className="h-4 w-11/12 bg-white/10" />
             <Skeleton className="h-4 w-3/5 bg-white/10" />
+            <div className="pt-3"></div>
+            <div className="flex space-x-2">
+              <Skeleton className="h-7 w-20 rounded-md bg-white/10" />
+              <Skeleton className="h-7 w-24 rounded-md bg-white/10" />
+            </div>
           </div>
         </div>
       </div>
@@ -116,16 +126,21 @@ export function ChatHistory() {
   );
 
   const emptyStateContent = () => (
-    <div className="h-full flex flex-col items-center justify-center text-center max-w-4xl mx-auto px-4 py-8 animate-fade-in">
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gemini-yellow mb-4">
-        What would you like to explore today?
+    <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
+      <div className="w-16 h-16 mb-6 bg-gemini-yellow/20 rounded-full flex items-center justify-center">
+        <Sparkles className="h-8 w-8 text-gemini-yellow" />
+      </div>
+      
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
+        Welcome to HydroGen AI
       </h1>
+      
       <p className="text-md text-muted-foreground mb-8 max-w-2xl">
-        Ask me anything about science, history, technology, or any topic you're curious about. I'm here to help you learn and discover.
+        Ask me anything about science, technology, philosophy, or any topic that sparks your curiosity.
       </p>
       
-      <div className="grid grid-cols-1 gap-4 w-full max-w-3xl mb-8">
-        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
+      <div className="w-full max-w-2xl mb-8">
+        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism mb-6">
           <h3 className="text-lg font-medium text-gemini-yellow mb-4 flex items-center">
             <Lightbulb className="h-4 w-4 mr-2 flex-shrink-0" />
             Popular topics
@@ -145,34 +160,24 @@ export function ChatHistory() {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
-            <h3 className="text-base font-medium text-white mb-2 flex items-center">
-              <Globe className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
-              Research
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Get insights on academic topics and scientific research
-            </p>
-          </div>
-          
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
             <h3 className="text-base font-medium text-white mb-2 flex items-center">
               <BookOpen className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
-              Learn
+              For Students
             </h3>
             <p className="text-sm text-muted-foreground">
-              Understand complex concepts, theories, and processes
+              Get assistance with complex academic concepts and research topics
             </p>
           </div>
           
           <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
             <h3 className="text-base font-medium text-white mb-2 flex items-center">
-              <Sparkles className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
-              Explore
+              <Globe className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              For Professionals
             </h3>
             <p className="text-sm text-muted-foreground">
-              Discover fascinating facts about our universe and beyond
+              Explore industry insights and cutting-edge developments
             </p>
           </div>
         </div>
