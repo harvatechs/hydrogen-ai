@@ -35,7 +35,7 @@ export function Header() {
         <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden text-muted-foreground" onClick={toggleSidebar}>
           <PanelLeft className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" className="font-semibold text-white flex items-center gap-1 bg-transparent">
+        <Button variant="ghost" className="font-semibold flex items-center gap-1 bg-transparent text-white">
           HydroGen <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
