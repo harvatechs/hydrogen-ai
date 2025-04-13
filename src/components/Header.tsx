@@ -1,23 +1,20 @@
-
 import { Button } from "@/components/ui/button";
 import { ApiKeyDialog } from "./ApiKeyDialog";
 import { PanelLeft, History, ChevronDown, Sparkles } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { useSidebar } from "@/components/ui/sidebar";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 export function Header() {
-  const { clearMessages, theme, model } = useChat();
-  const { toggleSidebar } = useSidebar();
-  
+  const {
+    clearMessages,
+    theme,
+    model
+  } = useChat();
+  const {
+    toggleSidebar
+  } = useSidebar();
+
   // Get model display name
   const getModelDisplayName = () => {
     switch (model) {
@@ -33,33 +30,19 @@ export function Header() {
         return "Gemini";
     }
   };
-  
-  return (
-    <header className="border-b border-white/10 p-3 flex items-center justify-between">
+  return <header className="border-b border-white/10 p-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 md:hidden text-muted-foreground"
-          onClick={toggleSidebar}
-        >
+        <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden text-muted-foreground" onClick={toggleSidebar}>
           <PanelLeft className="h-5 w-5" />
         </Button>
-        <Button 
-          variant="ghost" 
-          className="font-semibold text-white flex items-center gap-1 hover:bg-secondary"
-        >
+        <Button variant="ghost" className="font-semibold text-white flex items-center gap-1 bg-transparent">
           HydroGen <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
       <div className="flex items-center gap-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-xs h-8 border-white/10 bg-transparent text-muted-foreground hover:bg-secondary hover:text-white"
-            >
+            <Button variant="outline" size="sm" className="text-xs h-8 border-white/10 bg-transparent text-muted-foreground hover:bg-secondary hover:text-white">
               <Sparkles className="h-4 w-4 mr-2" />
               {getModelDisplayName()}
             </Button>
@@ -75,6 +58,5 @@ export function Header() {
         </DropdownMenu>
         <ApiKeyDialog />
       </div>
-    </header>
-  );
+    </header>;
 }
