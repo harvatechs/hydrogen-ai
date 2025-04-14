@@ -263,8 +263,17 @@
   @apply bg-white/10 text-white hover:bg-white/20 border border-white/10;
 }
 
-.search-highlight {
-  @apply bg-gray-200/20 px-1 py-0.5 rounded 
-         dark:bg-gray-500/20 
-         light:bg-gray-100;
+/* Search highlight styles for both light and dark modes */
+@layer components {
+  .search-highlight {
+    @apply bg-gray-200/20 px-1 py-0.5 rounded;
+  }
+  
+  .dark .search-highlight {
+    @apply bg-gray-500/20;
+  }
+  
+  .light .search-highlight {
+    background-color: #f3f4f6;
+  }
 }
