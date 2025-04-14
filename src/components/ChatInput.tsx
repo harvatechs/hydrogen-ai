@@ -1,8 +1,8 @@
 
-import { useState, ChangeEvent, FormEvent, useRef, useCallback } from "react";
+import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, X, Zap } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -17,9 +17,69 @@ export function ChatInput() {
   const [isUploading, setIsUploading] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const { sendMessage, isProcessing, theme } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Speech recognition setup
+  const [recognition, setRecognition] = useState<any>(null);
+  
+  useEffect(() => {
+    // Initialize speech recognition if browser supports it
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = true;
+      recognitionInstance.lang = 'en-US';
+      
+      recognitionInstance.onstart = () => {
+        setIsListening(true);
+        toast({
+          title: "Listening...",
+          description: "Speak clearly into your microphone"
+        });
+      };
+      
+      recognitionInstance.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0])
+          .map(result => result.transcript)
+          .join('');
+        
+        setMessage(transcript);
+      };
+      
+      recognitionInstance.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+        
+        toast({
+          title: "Error with voice input",
+          description: `${event.error}. Please try again.`,
+          variant: "destructive"
+        });
+      };
+      
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+      
+      setRecognition(recognitionInstance);
+    }
+    
+    return () => {
+      if (recognition) {
+        try {
+          recognition.stop();
+        } catch (e) {
+          // Ignore errors when stopping
+        }
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -59,21 +119,62 @@ export function ChatInput() {
     setIsSearching(true);
     setMessage("");
     
-    const results = await searchGoogle(searchTerm);
-    setIsSearching(false);
-    
-    if (results && results.items) {
-      setSearchResults(results);
-    } else {
+    try {
+      const results = await searchGoogle(searchTerm);
+      setIsSearching(false);
+      
+      if (results && results.items && results.items.length > 0) {
+        setSearchResults(results);
+        toast({
+          title: "Search results found",
+          description: `Found ${results.items.length} results for "${searchTerm}"`
+        });
+      } else {
+        toast({
+          title: "No results found",
+          description: "Try a different search term",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      setIsSearching(false);
       toast({
-        title: "No results found",
-        description: "Try a different search term"
+        title: "Search failed",
+        description: "There was an error searching the web. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
+  };
+
+  const toggleVoiceRecognition = () => {
+    if (!recognition) {
+      toast({
+        title: "Voice recognition not supported",
+        description: "Your browser doesn't support voice recognition. Try a different browser.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error("Error starting recognition:", e);
+        toast({
+          title: "Error starting voice recognition",
+          description: "Please try again",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleVoiceStart = useCallback(() => {
@@ -85,34 +186,12 @@ export function ChatInput() {
 
   const handleVoiceStop = useCallback((duration: number) => {
     if (duration > 0) {
-      // In production this would connect to a real speech-to-text API
+      // This is now connected to the real speech-to-text functionality
       toast({
         title: "Processing your voice input",
         description: `${duration} seconds of audio captured`,
       });
-      
-      // Simulate voice recognition delay
-      setTimeout(() => {
-        // Simulate real voice recognition with a random question from our list
-        const allQuestions = [
-          "What causes a recession?",
-          "Are we alone in the universe?",
-          "What is the blockchain used for?",
-          "Why did the dinosaurs go extinct?",
-          "How does machine learning impact finance?",
-          "What is quantum computing?",
-          "How do black holes work?"
-        ];
-        
-        const randomQuestion = allQuestions[Math.floor(Math.random() * allQuestions.length)];
-        setMessage(randomQuestion);
-        setShowVoiceInput(false);
-        
-        // Focus input after voice recognition
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 100);
-      }, 1500);
+      setShowVoiceInput(false);
     } else {
       setShowVoiceInput(false);
     }
@@ -183,9 +262,9 @@ export function ChatInput() {
   };
 
   return (
-    <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background to-transparent pb-4 pt-2">
+    <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
       <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
-        <div className="rounded-xl border dark:bg-black/40 dark:border-white/10 light:bg-white/95 light:border-black/10 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-white/20 light:hover:border-black/20">
+        <div className="rounded-xl border glass-card shadow-lg transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center">
             <div className="flex items-center space-x-1 ml-2">
               <input 
@@ -206,7 +285,7 @@ export function ChatInput() {
                 disabled={isUploading}
               >
                 {isUploading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white dark:border-white/30 dark:border-t-white light:border-black/30 light:border-t-black"></div>
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <FileUp className="h-4 w-4" />
                 )}
@@ -222,17 +301,44 @@ export function ChatInput() {
               >
                 <Zap className="h-4 w-4" />
               </Button>
+              
+              <Button 
+                type="button"
+                size="icon" 
+                variant="ghost" 
+                className={cn(
+                  "h-9 w-9 rounded-full transition-all duration-300",
+                  isListening 
+                    ? "bg-gemini-purple/20 text-gemini-purple animate-pulse" 
+                    : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
+                )}
+                title={isListening ? "Stop listening" : "Voice search"}
+                onClick={toggleVoiceRecognition}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </Button>
+              
+              {message.trim().startsWith('/web') && (
+                <span className="text-xs text-gemini-purple bg-gemini-purple/10 px-2 py-1 rounded-full">
+                  Web Search Mode
+                </span>
+              )}
             </div>
             
             <div className="relative flex-grow">
-              <Input
-                ref={inputRef}
-                placeholder="Ask anything or type /web to search the web..."
-                value={message}
-                onChange={handleInputChange}
-                className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300"
-                disabled={isProcessing}
-              />
+              <div className="flex items-center">
+                <div className="absolute left-3 text-muted-foreground">
+                  <Search className="h-4 w-4" />
+                </div>
+                <Input
+                  ref={inputRef}
+                  placeholder="Ask anything or type /web to search the web..."
+                  value={message}
+                  onChange={handleInputChange}
+                  className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-10 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300"
+                  disabled={isProcessing}
+                />
+              </div>
               
               {message && (
                 <Button
@@ -259,7 +365,7 @@ export function ChatInput() {
                 >
                   <Mic className="h-4 w-4" />
                 </Button>
-                <DialogContent className="sm:max-w-md dark:bg-black/90 dark:border-white/10 light:bg-white/95 light:border-black/10 backdrop-blur-lg">
+                <DialogContent className="sm:max-w-md glass-card">
                   <DialogHeader>
                     <DialogTitle className="text-center dark:text-white light:text-black">Voice Search</DialogTitle>
                   </DialogHeader>
@@ -277,8 +383,8 @@ export function ChatInput() {
                 className={cn(
                   "h-9 w-9 rounded-full transition-all duration-200",
                   message.trim() && !isProcessing
-                    ? "dark:bg-white/10 dark:text-white dark:hover:bg-white/20 light:bg-black/10 light:text-black light:hover:bg-black/20"
-                    : "bg-white/20 text-white/50 cursor-not-allowed light:bg-black/10 light:text-black/50"
+                    ? "dark:bg-gemini-purple dark:text-white dark:hover:opacity-90 light:bg-gemini-purple light:text-white light:hover:opacity-90"
+                    : "bg-gemini-purple/20 text-gemini-purple/50 cursor-not-allowed"
                 )}
                 disabled={!message.trim() || isProcessing}
                 title="Send message"
@@ -308,6 +414,16 @@ export function ChatInput() {
           searchTerm={message || ""}
           onClose={handleCloseSearch}
         />
+      )}
+      
+      {isSearching && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-card p-6 rounded-xl shadow-xl flex flex-col items-center gap-4 max-w-md w-full">
+            <Loader2 className="h-10 w-10 text-gemini-purple animate-spin" />
+            <h3 className="text-xl font-medium">Searching the web...</h3>
+            <p className="text-muted-foreground text-center">Fetching the most relevant results for your query</p>
+          </div>
+        </div>
       )}
     </div>
   );

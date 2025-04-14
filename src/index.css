@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -52,8 +53,8 @@
     --popover: 0 0% 98%;
     --popover-foreground: 0 0% 3%;
     
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 275 100% 50%; /* Vibrant purple for primary in light mode */
+    --primary-foreground: 0 0% 100%;
     
     --secondary: 0 0% 95%;
     --secondary-foreground: 0 0% 9%;
@@ -61,22 +62,22 @@
     --muted: 0 0% 95%;
     --muted-foreground: 0 0% 45%;
     
-    --accent: 0 0% 20%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 270 76% 95%; /* Light purple for accent */
+    --accent-foreground: 270 70% 40%;
     
     --destructive: 0 100% 45%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 0 0% 90%;
+    --border: 270 20% 90%;
     --input: 0 0% 90%;
-    --ring: 0 0% 20%;
+    --ring: 270 70% 50%;
     
-    --sidebar: 0 0% 98%;
-    --sidebar-border: 0 0% 90%;
+    --sidebar: 270 50% 99%;
+    --sidebar-border: 270 30% 90%;
     --sidebar-foreground: 0 0% 9%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-ring: 0 0% 40%;
+    --sidebar-accent: 270 70% 95%;
+    --sidebar-accent-foreground: 270 70% 40%;
+    --sidebar-ring: 270 70% 40%;
   }
 }
 
@@ -90,8 +91,139 @@
   * {
     @apply border-border;
   }
+  
+  html, body {
+    @apply overflow-x-hidden scroll-smooth;
+  }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen;
+  }
+  
+  h1 {
+    @apply text-3xl font-bold md:text-4xl lg:text-5xl tracking-tight;
+  }
+  
+  h2 {
+    @apply text-2xl font-bold md:text-3xl lg:text-4xl;
+  }
+  
+  h3 {
+    @apply text-xl font-bold md:text-2xl;
+  }
+  
+  a {
+    @apply transition-all duration-200;
+  }
+}
+
+@layer components {
+  /* Button styling with hover effects that maintain text color */
+  .btn-custom {
+    @apply rounded-lg px-4 py-2 transition-all duration-200 font-medium;
+  }
+  
+  .btn-custom.btn-primary {
+    @apply bg-primary text-primary-foreground hover:opacity-90 hover:shadow-md hover:translate-y-[-1px];
+  }
+  
+  .btn-custom.btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:opacity-90 hover:shadow-md;
+  }
+  
+  .btn-custom.btn-accent {
+    @apply bg-accent text-accent-foreground hover:opacity-90 hover:shadow-md;
+  }
+  
+  /* Glass card effect */
+  .glass-card {
+    @apply backdrop-blur-lg border rounded-xl;
+  }
+  
+  .dark .glass-card {
+    @apply bg-white/5 border-white/10;
+  }
+  
+  .light .glass-card {
+    @apply bg-white/70 border-black/5 shadow-sm;
+  }
+  
+  /* Enhanced search input */
+  .search-input-container {
+    @apply relative w-full transition-all duration-300;
+  }
+  
+  .search-input {
+    @apply w-full px-4 py-3 pl-10 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2;
+  }
+  
+  .dark .search-input {
+    @apply bg-black/40 border-white/10 text-white focus:ring-white/30;
+  }
+  
+  .light .search-input {
+    @apply bg-white border-black/10 text-black focus:ring-primary/50 shadow-sm;
+  }
+  
+  /* Search highlight styles for both light and dark modes */
+  .search-highlight {
+    @apply bg-gray-200/20 px-1.5 py-0.5 rounded-md font-medium;
+  }
+  
+  .dark .search-highlight {
+    @apply bg-gray-500/20 text-white;
+  }
+  
+  .light .search-highlight {
+    @apply bg-primary/10 text-primary;
+  }
+  
+  /* Voice button animation */
+  .voice-btn {
+    @apply rounded-full p-2 transition-all duration-300;
+  }
+  
+  .voice-btn.active {
+    @apply animate-pulse;
+  }
+  
+  .dark .voice-btn {
+    @apply bg-white/10 hover:bg-white/20 text-white;
+  }
+  
+  .light .voice-btn {
+    @apply bg-primary/10 hover:bg-primary/20 text-primary;
+  }
+  
+  /* Mobile responsive container */
+  .responsive-container {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Feature card */
+  .feature-card {
+    @apply p-6 rounded-xl transition-all duration-300 h-full;
+  }
+  
+  .dark .feature-card {
+    @apply bg-secondary/50 border-white/5 hover:bg-secondary/70;
+  }
+  
+  .light .feature-card {
+    @apply bg-white border border-black/5 hover:shadow-lg hover:translate-y-[-2px] shadow-sm;
+  }
+  
+  /* CTA button */
+  .cta-button {
+    @apply rounded-full text-white font-medium py-3 px-8 transition-all duration-300;
+  }
+  
+  .dark .cta-button {
+    @apply bg-gradient-to-r from-gemini-purple to-indigo-600 hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
+  }
+  
+  .light .cta-button {
+    @apply bg-gradient-to-r from-gemini-purple to-indigo-600 hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
   }
 }
 
@@ -182,6 +314,12 @@
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   font-weight: 600;
+}
+
+.dark .chat-message-content h1, 
+.dark .chat-message-content h2, 
+.dark .chat-message-content h3, 
+.dark .chat-message-content h4 {
   color: white;
 }
 
@@ -217,10 +355,13 @@
 
 .chat-message-content code {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  background: rgba(255, 255, 255, 0.1);
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-size: 0.9em;
+}
+
+.dark .chat-message-content code {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .light .chat-message-content code {
@@ -228,11 +369,14 @@
 }
 
 .chat-message-content pre {
-  background-color: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
   padding: 1rem;
   overflow-x: auto;
   margin-bottom: 1rem;
+}
+
+.dark .chat-message-content pre {
+  background-color: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -242,38 +386,53 @@
 }
 
 .chat-message-content blockquote {
-  border-left: 3px solid rgba(255, 255, 255, 0.5);
   padding-left: 1rem;
   margin-left: 0;
-  color: rgba(255, 255, 255, 0.7);
   font-style: italic;
 }
 
+.dark .chat-message-content blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .light .chat-message-content blockquote {
-  border-left-color: rgba(0, 0, 0, 0.3);
+  border-left: 3px solid rgba(0, 0, 0, 0.3);
   color: rgba(0, 0, 0, 0.7);
 }
 
-/* Professional styles for light and dark mode */
-.light .btn-primary {
-  @apply bg-black/10 text-black hover:bg-black/20 border border-black/10;
-}
-
-.dark .btn-primary {
-  @apply bg-white/10 text-white hover:bg-white/20 border border-white/10;
-}
-
-/* Search highlight styles for both light and dark modes */
-@layer components {
-  .search-highlight {
-    @apply bg-gray-200/20 px-1 py-0.5 rounded;
+/* Responsive media queries */
+@media (max-width: 640px) {
+  .hide-on-mobile {
+    display: none;
   }
   
-  .dark .search-highlight {
-    @apply bg-gray-500/20;
+  .mobile-full-width {
+    width: 100%;
   }
   
-  .light .search-highlight {
-    background-color: #f3f4f6;
+  h1 {
+    font-size: 1.75rem;
   }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .md-hide-on-desktop {
+    display: none;
+  }
+}
+
+/* Animation for shimmer effect */
+.shimmer {
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0) 100%);
+  animation: shimmer 2s infinite linear;
+}
+
+.light .shimmer {
+  background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0) 100%);
 }

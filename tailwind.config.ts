@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -58,7 +57,13 @@ export default {
         gray: {
           100: '#f3f4f6',
           200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
           500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         }
       },
       borderRadius: {
@@ -102,6 +107,20 @@ export default {
         'typing': {
           '0%': { width: '0%' },
           '100%': { width: '100%' }
+        },
+        'wave': {
+          '0%': { transform: 'rotate(0.0deg)' },
+          '10%': { transform: 'rotate(14.0deg)' },
+          '20%': { transform: 'rotate(-8.0deg)' },
+          '30%': { transform: 'rotate(14.0deg)' },
+          '40%': { transform: 'rotate(-4.0deg)' },
+          '50%': { transform: 'rotate(10.0deg)' },
+          '60%': { transform: 'rotate(0.0deg)' },
+          '100%': { transform: 'rotate(0.0deg)' },
+        },
+        'shimmer': {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
         }
       },
       animation: {
@@ -111,13 +130,17 @@ export default {
         'fade-in': 'fade-in 0.3s ease-out',
         'fade-out': 'fade-out 0.3s ease-out',
         'slide-in': 'slide-in 0.3s ease-out',
-        'typing': 'typing 2s steps(20, end) infinite'
+        'typing': 'typing 2s steps(20, end) infinite',
+        'wave': 'wave 1.5s ease-in-out infinite',
+        'shimmer': 'shimmer 2s infinite linear'
       },
       backgroundImage: {
         'glassy-gradient': 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
         'yellow-gradient': 'linear-gradient(to bottom right, #000000, #222222 70%, #FEF7CD)',
         'yellow-light-gradient': 'linear-gradient(to bottom right, #222222, #FEF7CD)',
-        'glow-gradient': 'radial-gradient(circle at center, rgba(254, 247, 205, 0.15) 0%, transparent 70%)'
+        'glow-gradient': 'radial-gradient(circle at center, rgba(254, 247, 205, 0.15) 0%, transparent 70%)',
+        'light-glow': 'radial-gradient(circle at center, rgba(243, 244, 246, 0.7) 0%, rgba(243, 244, 246, 0.1) 70%, transparent 100%)',
+        'shimmer-gradient': 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0) 100%)',
       },
       typography: {
         DEFAULT: {
