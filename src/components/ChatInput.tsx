@@ -1,4 +1,3 @@
-
 import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,52 +21,52 @@ export function ChatInput() {
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Speech recognition setup
   const [recognition, setRecognition] = useState<any>(null);
   
   useEffect(() => {
-    // Initialize speech recognition if browser supports it
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
-      
-      recognitionInstance.continuous = false;
-      recognitionInstance.interimResults = true;
-      recognitionInstance.lang = 'en-US';
-      
-      recognitionInstance.onstart = () => {
-        setIsListening(true);
-        toast({
-          title: "Listening...",
-          description: "Speak clearly into your microphone"
-        });
-      };
-      
-      recognitionInstance.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0])
-          .map(result => result.transcript)
-          .join('');
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognitionInstance = new SpeechRecognition();
         
-        setMessage(transcript);
-      };
-      
-      recognitionInstance.onerror = (event: any) => {
-        console.error("Speech recognition error", event.error);
-        setIsListening(false);
+        recognitionInstance.continuous = false;
+        recognitionInstance.interimResults = true;
+        recognitionInstance.lang = 'en-US';
         
-        toast({
-          title: "Error with voice input",
-          description: `${event.error}. Please try again.`,
-          variant: "destructive"
-        });
-      };
-      
-      recognitionInstance.onend = () => {
-        setIsListening(false);
-      };
-      
-      setRecognition(recognitionInstance);
+        recognitionInstance.onstart = () => {
+          setIsListening(true);
+          toast({
+            title: "Listening...",
+            description: "Speak clearly into your microphone"
+          });
+        };
+        
+        recognitionInstance.onresult = (event: any) => {
+          const transcript = Array.from(event.results)
+            .map((result: any) => result[0])
+            .map(result => result.transcript)
+            .join('');
+          
+          setMessage(transcript);
+        };
+        
+        recognitionInstance.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          setIsListening(false);
+          
+          toast({
+            title: "Error with voice input",
+            description: `${event.error}. Please try again.`,
+            variant: "destructive"
+          });
+        };
+        
+        recognitionInstance.onend = () => {
+          setIsListening(false);
+        };
+        
+        setRecognition(recognitionInstance);
+      }
     }
     
     return () => {
@@ -85,7 +84,6 @@ export function ChatInput() {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
     
-    // Check for "/web" command
     if (message.trim().startsWith('/web ')) {
       const searchTerm = message.trim().replace('/web ', '');
       await handleWebSearch(searchTerm);
@@ -96,7 +94,6 @@ export function ChatInput() {
     setMessage("");
     await sendMessage(currentMessage);
     
-    // Focus the input field after sending
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
@@ -186,7 +183,6 @@ export function ChatInput() {
 
   const handleVoiceStop = useCallback((duration: number) => {
     if (duration > 0) {
-      // This is now connected to the real speech-to-text functionality
       toast({
         title: "Processing your voice input",
         description: `${duration} seconds of audio captured`,
@@ -207,7 +203,6 @@ export function ChatInput() {
     if (files && files.length > 0) {
       setIsUploading(true);
       
-      // Simulated file processing with a realistic delay
       setTimeout(() => {
         setIsUploading(false);
         toast({
@@ -215,14 +210,11 @@ export function ChatInput() {
           description: `Analyzing ${files[0].name} (${(files[0].size / 1024).toFixed(1)} KB)`,
         });
         
-        // Simulate file analysis
         setTimeout(() => {
           setMessage(prev => prev + (prev ? " " : "") + `Analyze the content of this ${files[0].name} file.`);
           
-          // Clear the input so the same file can be uploaded again
           e.target.value = '';
           
-          // Focus input after file upload
           setTimeout(() => {
             inputRef.current?.focus();
           }, 100);
@@ -245,7 +237,6 @@ export function ChatInput() {
       description: `Deep analysis for: "${message}"`,
     });
     
-    // Simulate advanced search
     setTimeout(() => {
       sendMessage(`Conduct comprehensive research on: ${message}`);
       setMessage("");

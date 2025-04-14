@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Mic, MicOff, AlertCircle } from "lucide-react";
@@ -40,9 +39,10 @@ export function AIVoiceInput({
     
     // Initialize speech recognition if browser supports it
     if (typeof window !== 'undefined') {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
         try {
-          const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
           const recognitionInstance = new SpeechRecognition();
           
           recognitionInstance.continuous = true;

@@ -57,7 +57,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster position="top-right" />
+        <Toaster />
         <Sonner position="top-right" className="toaster-container" />
         <BrowserRouter>
           <div className="min-h-screen w-full">
