@@ -53,6 +53,11 @@ export default {
         backgroundColor: {
           'light-highlight': '#f3f4f6',
           'dark-highlight': 'rgba(75, 85, 99, 0.2)',
+        },
+        gray: {
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          500: '#6b7280',
         }
       },
       borderRadius: {
