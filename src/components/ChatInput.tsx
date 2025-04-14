@@ -227,9 +227,7 @@ export function ChatInput() {
                 <Zap className="h-4 w-4" />
               </Button>
               
-              <Button type="button" size="icon" variant="ghost" className={cn("h-9 w-9 rounded-full transition-all duration-300", isListening ? "bg-gemini-purple/20 text-gemini-purple animate-pulse" : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black")} title={isListening ? "Stop listening" : "Voice search"} onClick={toggleVoiceRecognition}>
-                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
+              
               
               {message.trim().startsWith('/web') && <span className="text-xs text-gemini-purple bg-gemini-purple/10 px-2 py-1 rounded-full">
                   Web Search Mode
