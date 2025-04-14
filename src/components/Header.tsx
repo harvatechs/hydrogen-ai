@@ -75,10 +75,7 @@ export function Header({
         <div className="flex items-center gap-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="text-xs h-8 border-white/10 bg-black/40 text-muted-foreground hover:bg-gemini-yellow/10 hover:text-gemini-yellow transition-all duration-300">
-                <SparklesIcon className="h-3.5 w-3.5 mr-1.5 text-gemini-yellow" />
-                {getModelDisplayName()}
-              </Button>
+              
             </DropdownMenuTrigger>
             
           </DropdownMenu>
