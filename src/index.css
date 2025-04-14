@@ -23,7 +23,7 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
     
-    --accent: 60 100% 50%;
+    --accent: 0 0% 80%;
     --accent-foreground: 0 0% 0%;
     
     --destructive: 0 100% 50%;
@@ -41,6 +41,43 @@
     --sidebar-ring: 0 0% 60%;
     
     --radius: 0.5rem;
+  }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 3%;
+    
+    --card: 0 0% 95%;
+    --card-foreground: 0 0% 3%;
+    
+    --popover: 0 0% 95%;
+    --popover-foreground: 0 0% 3%;
+    
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 0 0% 85%;
+    --secondary-foreground: 0 0% 9%;
+    
+    --muted: 0 0% 85%;
+    --muted-foreground: 0 0% 35%;
+    
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 100% 45%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 0 0% 80%;
+    --input: 0 0% 80%;
+    --ring: 0 0% 20%;
+    
+    --sidebar: 0 0% 95%;
+    --sidebar-border: 0 0% 80%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-accent: 0 0% 85%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-ring: 0 0% 40%;
   }
 }
 
@@ -75,6 +112,10 @@
 /* Glass morphism */
 .glass-morphism {
   @apply backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300;
+}
+
+.glass-button {
+  @apply bg-glassy hover:bg-glassy-hover backdrop-blur-md border border-white/10 hover:border-white/30 transition-all duration-300;
 }
 
 /* Hover Effects */
@@ -147,7 +188,14 @@
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   font-weight: 600;
-  color: var(--gemini-yellow);
+  color: white;
+}
+
+.light .chat-message-content h1, 
+.light .chat-message-content h2, 
+.light .chat-message-content h3, 
+.light .chat-message-content h4 {
+  color: #333;
 }
 
 .chat-message-content ul, 
@@ -191,10 +239,14 @@
 }
 
 .chat-message-content blockquote {
-  border-left: 3px solid var(--gemini-yellow);
+  border-left: 3px solid rgba(255, 255, 255, 0.5);
   padding-left: 1rem;
   margin-left: 0;
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
 }
 
+.light .chat-message-content blockquote {
+  border-left-color: rgba(0, 0, 0, 0.3);
+  color: rgba(0, 0, 0, 0.7);
+}

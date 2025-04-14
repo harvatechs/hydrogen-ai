@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -53,14 +52,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				gemini: {
-					purple: '#7c3aed',
-					light: '#f3f4f6',
-					dark: '#1f2937',
-					'purple-light': '#a78bfa',
-					'yellow': '#FEF7CD',
-					'yellow-light': '#FFFCE8',
-					'yellow-dark': '#E6D78F'
+				glassy: {
+					DEFAULT: 'rgba(255, 255, 255, 0.1)',
+					hover: 'rgba(255, 255, 255, 0.2)',
+					light: 'rgba(255, 255, 255, 0.05)',
+					dark: 'rgba(0, 0, 0, 0.3)',
 				},
 			},
 			borderRadius: {
@@ -116,6 +112,7 @@ export default {
 				'typing': 'typing 2s steps(20, end) infinite'
 			},
 			backgroundImage: {
+				'glassy-gradient': 'linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
 				'yellow-gradient': 'linear-gradient(to bottom right, #000000, #222222 70%, #FEF7CD)',
 				'yellow-light-gradient': 'linear-gradient(to bottom right, #222222, #FEF7CD)',
 				'glow-gradient': 'radial-gradient(circle at center, rgba(254, 247, 205, 0.15) 0%, transparent 70%)'

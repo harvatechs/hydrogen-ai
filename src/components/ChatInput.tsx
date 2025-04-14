@@ -9,6 +9,8 @@ import { toast } from "@/components/ui/use-toast";
 import { AIVoiceInput } from "@/components/ui/ai-voice-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CommandItem, CommandList, CommandInput, CommandEmpty, CommandGroup, Command } from "@/components/ui/command";
+import { searchGoogle } from "@/utils/searchUtils";
+import { SearchResults } from "./SearchResults";
 
 // Suggested queries for auto-completion
 const suggestedQueries = [
@@ -30,7 +32,9 @@ export function ChatInput() {
   const [isUploading, setIsUploading] = useState(false);
   const [showAutoComplete, setShowAutoComplete] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
-  const { sendMessage, isProcessing } = useChat();
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const { sendMessage, isProcessing, theme } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -150,7 +154,7 @@ export function ChatInput() {
     }, 100);
   };
 
-  const handleSearchWeb = () => {
+  const handleSearchWeb = async () => {
     if (!message.trim()) {
       toast({
         title: "Please enter a search query",
@@ -164,11 +168,18 @@ export function ChatInput() {
       description: `Looking up: "${message}"`,
     });
     
-    // Simulate web search
-    setTimeout(() => {
-      sendMessage(`Search the web for: ${message}`);
-      setMessage("");
-    }, 800);
+    setIsSearching(true);
+    const results = await searchGoogle(message);
+    setIsSearching(false);
+    
+    if (results && results.items) {
+      setSearchResults(results);
+    } else {
+      toast({
+        title: "No results found",
+        description: "Try a different search term"
+      });
+    }
   };
 
   const handleProSearch = () => {
@@ -196,6 +207,10 @@ export function ChatInput() {
     setMessage("");
     inputRef.current?.focus();
   };
+  
+  const handleCloseSearch = () => {
+    setSearchResults(null);
+  };
 
   return (
     <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background to-transparent pb-4 pt-2">
@@ -215,7 +230,7 @@ export function ChatInput() {
                 type="button" 
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
                 title="Attach file"
                 onClick={handleFileUpload}
                 disabled={isUploading}
@@ -231,18 +246,23 @@ export function ChatInput() {
                 type="button"
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
                 title="Search the web"
                 onClick={handleSearchWeb}
+                disabled={isSearching}
               >
-                <Search className="h-4 w-4" />
+                {isSearching ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
               </Button>
               
               <Button 
                 type="button"
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
                 title="Pro Search"
                 onClick={handleProSearch}
               >
@@ -284,9 +304,9 @@ export function ChatInput() {
                             <CommandItem 
                               key={index} 
                               onSelect={() => handleSelectSuggestion(suggestion)}
-                              className="cursor-pointer hover:bg-gemini-yellow/10 px-3 py-2"
+                              className="cursor-pointer hover:bg-glassy px-3 py-2"
                             >
-                              <Search className="h-3 w-3 mr-2 text-gemini-yellow" />
+                              <Search className="h-3 w-3 mr-2 text-white" />
                               <span className="text-sm">{suggestion}</span>
                             </CommandItem>
                           ))
@@ -305,7 +325,7 @@ export function ChatInput() {
                     type="button"
                     size="icon" 
                     variant="ghost" 
-                    className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-gemini-yellow/10 hover:text-gemini-yellow"
+                    className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
                     title="Voice input"
                   >
                     <Mic className="h-4 w-4" />
@@ -313,7 +333,7 @@ export function ChatInput() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md bg-black/80 border-white/10 backdrop-blur-lg">
                   <DialogHeader>
-                    <DialogTitle className="text-center text-gemini-yellow">Voice Search</DialogTitle>
+                    <DialogTitle className="text-center text-white">Voice Search</DialogTitle>
                   </DialogHeader>
                   <AIVoiceInput 
                     onStart={handleVoiceStart}
@@ -329,7 +349,7 @@ export function ChatInput() {
                 className={cn(
                   "h-9 w-9 rounded-full transition-all duration-200",
                   message.trim() && !isProcessing
-                    ? "bg-gemini-yellow text-black hover:bg-gemini-yellow/90"
+                    ? "bg-glassy text-white hover:bg-glassy-hover"
                     : "bg-white/20 text-white/50 cursor-not-allowed"
                 )}
                 disabled={!message.trim() || isProcessing}
@@ -352,6 +372,15 @@ export function ChatInput() {
           HydroGen AI may display inaccurate info, including about people, places, or facts
         </div>
       </form>
+      
+      {searchResults && (
+        <SearchResults 
+          results={searchResults.items} 
+          searchInfo={searchResults.searchInformation}
+          searchTerm={message}
+          onClose={handleCloseSearch}
+        />
+      )}
     </div>
   );
 }

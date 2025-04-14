@@ -15,12 +15,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { Slider } from "@/components/ui/slider";
-import { Moon, Sun, Palette, Zap, Book, Globe, PenSquare, RefreshCw, Save, Eye, MessageSquareText, Info, FileText, Languages, 
-  Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key, Sparkles } from "lucide-react";
+import { Moon, Sun, Palette, Zap, Book, Globe, PenSquare, RefreshCw, Save, Eye, MessageSquareText, Info, FileText, 
+  Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
-export function SettingsPanel() {
+interface SettingsPanelProps {
+  onClose: () => void;
+}
+
+export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const { 
     apiKey, 
     setApiKey, 
@@ -139,6 +143,8 @@ export function SettingsPanel() {
       title: "All Settings Saved",
       description: "Your preferences have been updated successfully."
     });
+    
+    onClose();
   };
 
   return (
@@ -146,19 +152,19 @@ export function SettingsPanel() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
         <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-sm border-b border-white/10 p-4">
           <TabsList className="grid grid-cols-4 w-full bg-black/40">
-            <TabsTrigger value="appearance" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-gemini-yellow">
+            <TabsTrigger value="appearance" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
               <Palette size={14} className="mb-1" />
               <span>Display</span>
             </TabsTrigger>
-            <TabsTrigger value="models" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-gemini-yellow">
+            <TabsTrigger value="models" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
               <Zap size={14} className="mb-1" />
               <span>Models</span>
             </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-gemini-yellow">
+            <TabsTrigger value="advanced" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
               <MessageSquareText size={14} className="mb-1" />
               <span>Behavior</span>
             </TabsTrigger>
-            <TabsTrigger value="about" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-gemini-yellow">
+            <TabsTrigger value="about" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
               <Info size={14} className="mb-1" />
               <span>About</span>
             </TabsTrigger>
@@ -169,13 +175,13 @@ export function SettingsPanel() {
           {/* Appearance Tab */}
           <TabsContent value="appearance" className="space-y-6">
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Eye className="h-4 w-4 mr-2" />
                 Theme
               </h3>
               <RadioGroup value={theme} onValueChange={setTheme} className="grid grid-cols-3 gap-2">
                 <Label className="flex flex-col items-center space-y-2 cursor-pointer">
-                  <div className={`h-20 w-full rounded-md border ${theme === 'dark' ? 'border-gemini-yellow' : 'border-white/10'} bg-black p-2 flex items-center justify-center`}>
+                  <div className={`h-20 w-full rounded-md border ${theme === 'dark' ? 'border-white' : 'border-white/10'} bg-black p-2 flex items-center justify-center`}>
                     <Moon size={24} className="text-white/70" />
                   </div>
                   <div className="flex items-center space-x-2">
@@ -185,7 +191,7 @@ export function SettingsPanel() {
                 </Label>
                 
                 <Label className="flex flex-col items-center space-y-2 cursor-pointer">
-                  <div className={`h-20 w-full rounded-md border ${theme === 'light' ? 'border-gemini-yellow' : 'border-white/10'} bg-white p-2 flex items-center justify-center`}>
+                  <div className={`h-20 w-full rounded-md border ${theme === 'light' ? 'border-white' : 'border-white/10'} bg-white p-2 flex items-center justify-center`}>
                     <Sun size={24} className="text-black/70" />
                   </div>
                   <div className="flex items-center space-x-2">
@@ -195,7 +201,7 @@ export function SettingsPanel() {
                 </Label>
                 
                 <Label className="flex flex-col items-center space-y-2 cursor-pointer">
-                  <div className={`h-20 w-full rounded-md border ${theme === 'system' ? 'border-gemini-yellow' : 'border-white/10'} bg-gradient-to-r from-black to-white p-2 flex items-center justify-center`}>
+                  <div className={`h-20 w-full rounded-md border ${theme === 'system' ? 'border-white' : 'border-white/10'} bg-gradient-to-r from-black to-white p-2 flex items-center justify-center`}>
                     <Laptop size={24} className="text-white/70" />
                   </div>
                   <div className="flex items-center space-x-2">
@@ -207,7 +213,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <PenSquare className="h-4 w-4 mr-2" />
                 Text Size
               </h3>
@@ -239,7 +245,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Globe className="h-4 w-4 mr-2" />
                 Language
               </h3>
@@ -259,7 +265,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Volume2 className="h-4 w-4 mr-2" />
                 Voice Settings
               </h3>
@@ -311,16 +317,16 @@ export function SettingsPanel() {
           {/* Models Tab */}
           <TabsContent value="models" className="space-y-6">
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Zap className="h-4 w-4 mr-2" />
                 Model Selection
               </h3>
               <div className="grid gap-3">
                 {Object.entries(modelInfo).map(([id, info]) => (
-                  <Label 
+                  <div 
                     key={id}
-                    htmlFor={`model-${id}`}
-                    className={`flex flex-col p-3 rounded-lg border ${selectedModel === id ? 'border-gemini-yellow bg-gemini-yellow/5' : 'border-white/10 hover:bg-black/20'} cursor-pointer transition-colors`}
+                    className={`flex flex-col p-3 rounded-lg border ${selectedModel === id ? 'border-white bg-glassy' : 'border-white/10 hover:bg-black/20'} cursor-pointer transition-colors`}
+                    onClick={() => setSelectedModel(id)}
                   >
                     <div className="flex items-start">
                       <RadioGroup value={selectedModel} onValueChange={setSelectedModel} className="flex">
@@ -333,7 +339,7 @@ export function SettingsPanel() {
                       <div className="ml-3 space-y-1">
                         <div className="flex items-center">
                           <span className="font-medium">{info.name}</span>
-                          {id.includes("2.0") && <Badge className="ml-2 text-[10px] bg-gemini-yellow/20 text-gemini-yellow">Latest</Badge>}
+                          {id.includes("2.0") && <Badge className="ml-2 text-[10px] bg-glassy text-white">Latest</Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground">{info.description}</p>
                         <div className="flex flex-wrap gap-1 mt-2">
@@ -348,13 +354,13 @@ export function SettingsPanel() {
                         </div>
                       </div>
                     </div>
-                  </Label>
+                  </div>
                 ))}
               </div>
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Key className="h-4 w-4 mr-2" />
                 API Configuration
               </h3>
@@ -375,7 +381,7 @@ export function SettingsPanel() {
                       href="https://ai.google.dev/tutorials/setup"
                       target="_blank"
                       rel="noreferrer"
-                      className="text-gemini-yellow hover:underline"
+                      className="text-white hover:underline"
                     >
                       Google AI Studio
                     </a>
@@ -397,7 +403,7 @@ export function SettingsPanel() {
                 <div className="flex space-x-2 pt-2">
                   <Button 
                     onClick={handleSaveApiSettings} 
-                    className="flex-1 bg-gemini-yellow text-black hover:bg-gemini-yellow/90"
+                    className="flex-1 glass-button text-white hover:bg-glassy-hover"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Save API Settings
@@ -405,7 +411,7 @@ export function SettingsPanel() {
                   <Button 
                     onClick={handleResetApiSettings}
                     variant="outline"
-                    className="flex-1 border-gemini-yellow/20 hover:bg-gemini-yellow/10"
+                    className="flex-1 border-white/20 hover:bg-glassy"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Reset to Default
@@ -415,7 +421,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Zap className="h-4 w-4 mr-2" />
                 Model Parameters
               </h3>
@@ -474,7 +480,7 @@ export function SettingsPanel() {
                 
                 <Button 
                   onClick={handleSaveModelParams} 
-                  className="w-full bg-gemini-yellow/20 text-gemini-yellow hover:bg-gemini-yellow/30 border border-gemini-yellow/30"
+                  className="w-full glass-button text-white hover:bg-glassy-hover border border-white/20"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Save Parameters
@@ -486,7 +492,7 @@ export function SettingsPanel() {
           {/* Advanced Tab */}
           <TabsContent value="advanced" className="space-y-6">
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <MessageSquareText className="h-4 w-4 mr-2" />
                 Response Behavior
               </h3>
@@ -542,7 +548,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <HardDrive className="h-4 w-4 mr-2" />
                 Data Management
               </h3>
@@ -587,7 +593,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <BellRing className="h-4 w-4 mr-2" />
                 Notifications
               </h3>
@@ -611,10 +617,10 @@ export function SettingsPanel() {
           <TabsContent value="about" className="space-y-6">
             <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
               <div className="text-center py-4">
-                <div className="w-16 h-16 bg-gemini-yellow/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="h-8 w-8 text-gemini-yellow" />
+                <div className="w-16 h-16 bg-glassy rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Zap className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gemini-yellow">HydroGen AI</h3>
+                <h3 className="text-xl font-bold text-white">HydroGen AI</h3>
                 <p className="text-sm text-muted-foreground">Version 1.0.0</p>
                 <p className="text-sm mt-4">
                   A modern AI assistant powered by Google Gemini models,
@@ -623,7 +629,7 @@ export function SettingsPanel() {
               </div>
               
               <div className="pt-4 space-y-2">
-                <Button variant="outline" className="w-full border-gemini-yellow/20 hover:bg-gemini-yellow/10">
+                <Button variant="outline" className="w-full border-white/20 hover:bg-glassy">
                   Check for Updates
                 </Button>
                 <Button variant="outline" className="w-full border-white/10 hover:bg-white/5">
@@ -636,7 +642,7 @@ export function SettingsPanel() {
             </div>
             
             <div className="bg-black/40 rounded-lg p-4 space-y-2 border border-white/10">
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center">
+              <h3 className="text-md font-medium text-white flex items-center">
                 <Zap className="h-4 w-4 mr-2" />
                 Powered By
               </h3>
@@ -644,7 +650,7 @@ export function SettingsPanel() {
                 Google Gemini 2.0 AI models
               </p>
               
-              <h3 className="text-md font-medium text-gemini-yellow flex items-center pt-2">
+              <h3 className="text-md font-medium text-white flex items-center pt-2">
                 <Book className="h-4 w-4 mr-2" />
                 Created For
               </h3>
@@ -657,10 +663,16 @@ export function SettingsPanel() {
       </Tabs>
       
       <div className="sticky bottom-0 w-full bg-black/80 backdrop-blur-sm border-t border-white/10 p-4">
-        <Button onClick={handleSaveAllSettings} className="w-full bg-gemini-yellow text-black hover:bg-gemini-yellow/90">
-          <Save className="h-4 w-4 mr-2" />
-          Save All Settings
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={onClose} variant="outline" className="flex-1">
+            <X className="h-4 w-4 mr-2" />
+            Close
+          </Button>
+          <Button onClick={handleSaveAllSettings} className="flex-1 glass-button text-white hover:bg-glassy-hover">
+            <Save className="h-4 w-4 mr-2" />
+            Save All Settings
+          </Button>
+        </div>
       </div>
     </div>
   );
