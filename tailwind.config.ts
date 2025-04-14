@@ -64,7 +64,8 @@ export default {
           700: '#374151',
           800: '#1f2937',
           900: '#111827',
-        }
+        },
+        'gemini-purple': '#a142f4',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -141,6 +142,7 @@ export default {
         'glow-gradient': 'radial-gradient(circle at center, rgba(254, 247, 205, 0.15) 0%, transparent 70%)',
         'light-glow': 'radial-gradient(circle at center, rgba(243, 244, 246, 0.7) 0%, rgba(243, 244, 246, 0.1) 70%, transparent 100%)',
         'shimmer-gradient': 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0) 100%)',
+        'gemini-gradient': 'linear-gradient(to right, #a142f4, #6a5acd)',
       },
       typography: {
         DEFAULT: {

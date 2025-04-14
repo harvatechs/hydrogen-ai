@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -219,11 +218,11 @@
   }
   
   .dark .cta-button {
-    @apply bg-gradient-to-r from-gemini-purple to-indigo-600 hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
+    @apply bg-gemini-gradient hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
   }
   
   .light .cta-button {
-    @apply bg-gradient-to-r from-gemini-purple to-indigo-600 hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
+    @apply bg-gemini-gradient hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
   }
 }
 
