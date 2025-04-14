@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -322,13 +323,13 @@ export function SettingsPanel() {
                     className={`flex flex-col p-3 rounded-lg border ${selectedModel === id ? 'border-gemini-yellow bg-gemini-yellow/5' : 'border-white/10 hover:bg-black/20'} cursor-pointer transition-colors`}
                   >
                     <div className="flex items-start">
-                      <RadioGroupItem 
-                        value={id} 
-                        id={`model-${id}`}
-                        checked={selectedModel === id}
-                        onClick={() => setSelectedModel(id)}
-                        className="mt-1"
-                      />
+                      <RadioGroup value={selectedModel} onValueChange={setSelectedModel} className="flex">
+                        <RadioGroupItem 
+                          value={id} 
+                          id={`model-${id}`}
+                          className="mt-1"
+                        />
+                      </RadioGroup>
                       <div className="ml-3 space-y-1">
                         <div className="flex items-center">
                           <span className="font-medium">{info.name}</span>

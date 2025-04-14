@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ApiKeyDialog } from "./ApiKeyDialog";
@@ -6,9 +7,11 @@ import { useChat } from "@/context/ChatContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
+
 interface HeaderProps {
   children?: React.ReactNode;
 }
+
 export function Header({
   children
 }: HeaderProps) {
@@ -36,18 +39,21 @@ export function Header({
         return "Gemini";
     }
   };
+  
   const handleSearch = () => {
     toast({
       title: "Search activated",
       description: "Type your query in the input box below"
     });
   };
+  
   const handleProSearch = () => {
     toast({
       title: "Pro Search activated",
       description: "This will search and analyze multiple sources"
     });
   };
+  
   const handleModelChange = (model: string) => {
     // In a real app this would call setModel from context
     toast({
@@ -55,6 +61,7 @@ export function Header({
       description: `Now using ${model}`
     });
   };
+  
   return <header className="sticky top-0 z-10 border-b border-white/10 bg-black/50 backdrop-blur-md">
       <div className="flex items-center justify-between px-3 py-2 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
