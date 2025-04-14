@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ApiKeyDialog } from "./ApiKeyDialog";
@@ -8,12 +7,10 @@ import { toast } from "@/components/ui/use-toast";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { searchGoogle } from "@/utils/searchUtils";
 import { SearchResults } from "./SearchResults";
-
 interface HeaderProps {
   children?: React.ReactNode;
   onOpenSettings: () => void;
 }
-
 export function Header({
   children,
   onOpenSettings
@@ -24,12 +21,11 @@ export function Header({
     model,
     sendMessage
   } = useChat();
-  
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
-  
+
   // Get model display name
   const getModelDisplayName = () => {
     switch (model) {
@@ -45,7 +41,6 @@ export function Header({
         return "Gemini";
     }
   };
-  
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       toast({
@@ -54,11 +49,9 @@ export function Header({
       });
       return;
     }
-    
     setIsSearching(true);
     const results = await searchGoogle(searchTerm);
     setIsSearching(false);
-    
     if (results && results.items) {
       setSearchResults(results);
     } else {
@@ -68,7 +61,6 @@ export function Header({
       });
     }
   };
-  
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -76,12 +68,10 @@ export function Header({
       setShowSearchInput(false);
     }
   };
-  
   const handleCloseSearch = () => {
     setSearchResults(null);
     setSearchTerm("");
   };
-  
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
     toast({
@@ -89,9 +79,7 @@ export function Header({
       description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
     });
   };
-
-  return (
-    <header className="sticky top-0 z-10 border-b border-white/10 bg-black/50 backdrop-blur-md dark:bg-black/50 light:bg-white/80">
+  return <header className="sticky top-0 z-10 border-b border-white/10 bg-black/50 backdrop-blur-md dark:bg-black/50 light:bg-white/80">
       <div className="flex items-center justify-between px-3 py-2 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
           {children}
@@ -103,59 +91,17 @@ export function Header({
         </div>
         
         <div className="hidden md:flex items-center space-x-2">
-          {showSearchInput && (
-            <div className="relative">
-              <input
-                type="text"
-                className="bg-glassy-dark border border-white/10 pl-9 pr-4 py-1.5 rounded-md text-sm focus:ring-1 focus:ring-white/30 focus:outline-none text-white w-64"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleSearchKeyDown}
-                placeholder="Search the web..."
-                autoFocus
-              />
+          {showSearchInput && <div className="relative">
+              <input type="text" className="bg-glassy-dark border border-white/10 pl-9 pr-4 py-1.5 rounded-md text-sm focus:ring-1 focus:ring-white/30 focus:outline-none text-white w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onKeyDown={handleSearchKeyDown} placeholder="Search the web..." autoFocus />
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
-              {isSearching && (
-                <div className="absolute right-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-              )}
-            </div>
-          )}
+              {isSearching && <div className="absolute right-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>}
+            </div>}
           
-          {!showSearchInput && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="glass-button w-8 h-8"
-              onClick={() => setShowSearchInput(true)} 
-              aria-label="Search"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          )}
+          {!showSearchInput}
           
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="glass-button w-8 h-8" 
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
           
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="glass-button w-8 h-8"
-            onClick={onOpenSettings}
-            aria-label="Settings"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          
+          
         </div>
         
         <div className="flex items-center gap-1">
@@ -207,14 +153,6 @@ export function Header({
         </div>
       </div>
       
-      {searchResults && (
-        <SearchResults 
-          results={searchResults.items} 
-          searchInfo={searchResults.searchInformation}
-          searchTerm={searchTerm}
-          onClose={handleCloseSearch}
-        />
-      )}
-    </header>
-  );
+      {searchResults && <SearchResults results={searchResults.items} searchInfo={searchResults.searchInformation} searchTerm={searchTerm} onClose={handleCloseSearch} />}
+    </header>;
 }
