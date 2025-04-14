@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -13,14 +12,18 @@ import { cn } from "@/lib/utils";
 import { SettingsPanel } from "@/components/SettingsPanel";
 
 // Theme application component
-const ThemeHandler = ({ children }: { children: React.ReactNode }) => {
-  const { theme } = useChat();
-  
+const ThemeHandler = ({
+  children
+}: {
+  children: React.ReactNode;
+}) => {
+  const {
+    theme
+  } = useChat();
   useEffect(() => {
     // Apply theme to html element
     const htmlElement = document.documentElement;
     htmlElement.classList.remove("light", "dark");
-    
     if (theme === "system") {
       // Check system preference
       const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -29,30 +32,25 @@ const ThemeHandler = ({ children }: { children: React.ReactNode }) => {
       htmlElement.classList.add(theme);
     }
   }, [theme]);
-  
   return <>{children}</>;
 };
-
 const AppContent = () => {
-  const { fontSize, theme } = useChat();
+  const {
+    fontSize,
+    theme
+  } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
-  
   const toggleSidebar = () => {
     setSidebarOpen(prevState => !prevState);
   };
-  
-  return (
-    <ThemeHandler>
+  return <ThemeHandler>
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
           dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
           light:bg-gradient-to-br light:from-white light:via-white/95 light:to-white/90 
           font-size-${fontSize}`}>
-          <ShadcnSidebar className={cn(
-            "transition-all duration-300 ease-in-out",
-            sidebarOpen ? "md:flex" : "hidden"
-          )}>
+          <ShadcnSidebar className={cn("transition-all duration-300 ease-in-out", sidebarOpen ? "md:flex" : "hidden")}>
             <SidebarContent>
               <Sidebar />
             </SidebarContent>
@@ -60,16 +58,7 @@ const AppContent = () => {
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
             <Header onOpenSettings={() => setShowSettings(true)}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mr-2 dark:text-white/70 dark:hover:text-white light:text-black/70 light:hover:text-black hover:bg-transparent transition-all duration-300"
-                onClick={toggleSidebar}
-                aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-              >
-                {sidebarOpen ? <PanelRightClose size={18} /> : <PanelLeft size={18} />}
-                <span className="sr-only">Toggle Sidebar</span>
-              </Button>
+              
             </Header>
             
             <div className="absolute inset-0 pointer-events-none">
@@ -87,36 +76,24 @@ const AppContent = () => {
           </SidebarInset>
           
           {/* Settings Panel */}
-          {showSettings && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
+          {showSettings && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
               <div className="fixed left-0 top-0 h-full w-full max-w-md dark:bg-black/95 light:bg-white/95 shadow-lg dark:border-r dark:border-white/10 light:border-r light:border-black/10 overflow-hidden md:left-[16rem]">
                 <div className="flex items-center justify-between p-4 border-b dark:border-white/10 light:border-black/10">
                   <h2 className="text-lg font-semibold dark:text-white light:text-black">Settings</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setShowSettings(false)}
-                    className="dark:hover:bg-white/5 light:hover:bg-black/5"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)} className="dark:hover:bg-white/5 light:hover:bg-black/5">
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
                 <SettingsPanel onClose={() => setShowSettings(false)} />
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </SidebarProvider>
-    </ThemeHandler>
-  );
+    </ThemeHandler>;
 };
-
 const Index = () => {
-  return (
-    <ChatProvider>
+  return <ChatProvider>
       <AppContent />
-    </ChatProvider>
-  );
+    </ChatProvider>;
 };
-
 export default Index;
