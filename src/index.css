@@ -265,5 +265,5 @@
 }
 
 .search-highlight {
-  @apply bg-yellow-200/20 px-1 py-0.5 rounded dark:bg-yellow-500/20 light:bg-yellow-300;
+  @apply bg-gray-200/20 px-1 py-0.5 rounded dark:bg-gray-500/20 light:bg-gray-300;
 }
