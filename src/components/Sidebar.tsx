@@ -1,11 +1,14 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Search, Settings, Trash2, User, LogOut, Edit2, X, Check, Moon, Sun, HelpCircle, Plus, MessageSquare } from "lucide-react";
+import { Search, Settings, Trash2, User, LogOut, Edit2, X, Check, Moon, Sun, HelpCircle, Plus, MessageSquare, PanelLeftClose, PanelLeft } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+
 export function Sidebar() {
   const {
     clearMessages,
@@ -25,6 +28,7 @@ export function Sidebar() {
   const [editTitle, setEditTitle] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
+  const [sidebarVisible, setSidebarVisible] = useState(true);
   const editInputRef = useRef<HTMLInputElement>(null);
 
   // Filter conversations based on search term
@@ -113,6 +117,28 @@ export function Sidebar() {
       description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
     });
   };
+
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
+
+  // Sidebar toggle button - visible when sidebar is hidden
+  if (!sidebarVisible) {
+    return (
+      <div className="absolute top-4 left-4 z-50">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={toggleSidebar} 
+          className="rounded-full bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 light:bg-primary light:hover:bg-primary/90"
+          aria-label="Show Sidebar"
+        >
+          <PanelLeft className="h-5 w-5 text-primary-foreground" />
+        </Button>
+      </div>
+    );
+  }
+
   const renderConversationGroup = (title: string, conversations: typeof filteredConversations) => {
     if (conversations.length === 0) return null;
     return <div key={title}>
@@ -150,7 +176,22 @@ export function Sidebar() {
         </div>
       </div>;
   };
-  return <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10">
+
+  return (
+    <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10 relative">
+      {/* Sidebar toggle button */}
+      <div className="absolute top-3 right-3 z-10">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleSidebar} 
+          className="h-7 w-7 rounded-full hover:bg-secondary"
+          aria-label="Hide Sidebar"
+        >
+          <PanelLeftClose className="h-4 w-4" />
+        </Button>
+      </div>
+
       <div className="p-2">
         <Button variant="outline" onClick={createNewConversation} className="w-full justify-start text-left border-white/10 dark:border-white/10 dark:hover:bg-white/5 light:border-black/10 light:hover:bg-black/5 mb-1 bg-transparent text-inherit">
           <Plus className="mr-2 h-4 w-4" />
@@ -222,5 +263,6 @@ export function Sidebar() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>;
+    </div>
+  );
 }

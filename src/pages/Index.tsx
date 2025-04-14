@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -34,6 +35,7 @@ const ThemeHandler = ({
   }, [theme]);
   return <>{children}</>;
 };
+
 const AppContent = () => {
   const {
     fontSize,
@@ -41,20 +43,20 @@ const AppContent = () => {
   } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
-  const toggleSidebar = () => {
-    setSidebarOpen(prevState => !prevState);
-  };
+  
   return <ThemeHandler>
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
           dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
           light:bg-gradient-to-br light:from-white light:via-white/95 light:to-white/90 
           font-size-${fontSize}`}>
-          <ShadcnSidebar className={cn("transition-all duration-300 ease-in-out", sidebarOpen ? "md:flex" : "hidden")}>
-            <SidebarContent>
-              <Sidebar />
-            </SidebarContent>
-          </ShadcnSidebar>
+          {sidebarOpen && (
+            <ShadcnSidebar className="md:flex">
+              <SidebarContent>
+                <Sidebar />
+              </SidebarContent>
+            </ShadcnSidebar>
+          )}
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
             <Header onOpenSettings={() => setShowSettings(true)}>
@@ -91,9 +93,11 @@ const AppContent = () => {
       </SidebarProvider>
     </ThemeHandler>;
 };
+
 const Index = () => {
   return <ChatProvider>
       <AppContent />
     </ChatProvider>;
 };
+
 export default Index;
