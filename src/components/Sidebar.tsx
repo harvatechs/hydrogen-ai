@@ -158,17 +158,17 @@ export function Sidebar() {
       
       <div className="p-2 border-t border-white/10">
         <div className="space-y-1">
-          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start bg-transparent text-gray-300">
+          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start text-gray-300 bg-transparent">
             <Trash2 className="mr-2 h-4 w-4" />
             Clear conversation
           </Button>
           
-          <Button variant="ghost" onClick={() => setShowSettings(true)} className="w-full justify-start bg-transparent text-gray-300">
+          <Button variant="ghost" onClick={() => setShowSettings(true)} className="w-full justify-start text-gray-300 bg-transparent">
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
           
-          <Button variant="ghost" className="w-full justify-start bg-transparent text-gray-300">
+          <Button variant="ghost" className="w-full justify-start text-gray-300 bg-transparent">
             <HelpCircle className="mr-2 h-4 w-4" />
             Help & FAQ
           </Button>
@@ -176,12 +176,12 @@ export function Sidebar() {
         
         <Separator className="my-2 bg-white/10" />
         
-        <Button variant="ghost" className="w-full justify-start bg-transparent text-gray-300">
+        <Button variant="ghost" className="w-full justify-start text-gray-300 bg-transparent">
           <User className="mr-2 h-4 w-4" />
           My account
         </Button>
         
-        <Button variant="ghost" className="w-full justify-start bg-transparent text-gray-300">
+        <Button variant="ghost" className="w-full justify-start text-gray-300 bg-transparent">
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </Button>
