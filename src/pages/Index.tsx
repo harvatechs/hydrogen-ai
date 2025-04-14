@@ -36,6 +36,10 @@ const AppContent = () => {
   const { fontSize } = useChat();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   
+  const toggleSidebar = () => {
+    setSidebarOpen(prevState => !prevState);
+  };
+  
   return (
     <ThemeHandler>
       <SidebarProvider>
@@ -55,7 +59,7 @@ const AppContent = () => {
                 variant="ghost"
                 size="icon"
                 className="mr-2 text-white/70 hover:text-white hover:bg-gemini-yellow/20 transition-all duration-300"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
+                onClick={toggleSidebar}
                 aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
               >
                 {sidebarOpen ? <PanelRightClose size={18} /> : <PanelLeft size={18} />}

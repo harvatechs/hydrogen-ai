@@ -20,10 +20,7 @@ export function Header({
     model,
     sendMessage
   } = useChat();
-  const {
-    toggleSidebar
-  } = useSidebar();
-
+  
   // Get model display name
   const getModelDisplayName = () => {
     switch (model) {
@@ -74,17 +71,14 @@ export function Header({
         </div>
         
         <div className="hidden md:flex items-center space-x-2">
-          
-          
-          
+          {/* Reserved for future elements */}
         </div>
         
         <div className="flex items-center gap-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              
+              {/* Model selection trigger will go here */}
             </DropdownMenuTrigger>
-            
           </DropdownMenu>
           
           <ApiKeyDialog />
