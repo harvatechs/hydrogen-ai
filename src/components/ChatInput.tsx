@@ -1,68 +1,75 @@
 
-import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
+import { useState, ChangeEvent, FormEvent, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, Search, X, Zap } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, X, Zap } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { AIVoiceInput } from "@/components/ui/ai-voice-input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CommandItem, CommandList, CommandInput, CommandEmpty, CommandGroup, Command } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { searchGoogle } from "@/utils/searchUtils";
 import { SearchResults } from "./SearchResults";
-
-// Suggested queries for auto-completion
-const suggestedQueries = [
-  "Explain quantum computing in simple terms",
-  "What is the theory of relativity?",
-  "How do neural networks work?",
-  "What are the implications of climate change?",
-  "Explain the concept of blockchain",
-  "How does gene editing work?",
-  "What is the difference between AI and machine learning?",
-  "How do black holes form?",
-  "Explain the process of photosynthesis",
-  "What is the significance of the Higgs boson?"
-];
 
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [showAutoComplete, setShowAutoComplete] = useState(false);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
   const { sendMessage, isProcessing, theme } = useChat();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (message.length > 0) {
-      const filtered = suggestedQueries.filter(query => 
-        query.toLowerCase().includes(message.toLowerCase())
-      );
-      setFilteredSuggestions(filtered.slice(0, 5));
-      setShowAutoComplete(filtered.length > 0);
-    } else {
-      setShowAutoComplete(false);
-    }
-  }, [message]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
     
+    // Check for "/web" command
+    if (message.trim().startsWith('/web ')) {
+      const searchTerm = message.trim().replace('/web ', '');
+      await handleWebSearch(searchTerm);
+      return;
+    }
+    
     const currentMessage = message;
     setMessage("");
-    setShowAutoComplete(false);
     await sendMessage(currentMessage);
     
     // Focus the input field after sending
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
+  };
+
+  const handleWebSearch = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      toast({
+        title: "Please enter a search query",
+        description: "Type what you want to search for after /web"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Searching the web",
+      description: `Looking up: "${searchTerm}"`
+    });
+    
+    setIsSearching(true);
+    setMessage("");
+    
+    const results = await searchGoogle(searchTerm);
+    setIsSearching(false);
+    
+    if (results && results.items) {
+      setSearchResults(results);
+    } else {
+      toast({
+        title: "No results found",
+        description: "Try a different search term"
+      });
+    }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -145,43 +152,6 @@ export function ChatInput() {
     }
   };
 
-  const handleSelectSuggestion = (suggestion: string) => {
-    setMessage(suggestion);
-    setShowAutoComplete(false);
-    // Focus input after selection
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
-  };
-
-  const handleSearchWeb = async () => {
-    if (!message.trim()) {
-      toast({
-        title: "Please enter a search query",
-        description: "Type what you want to search for first."
-      });
-      return;
-    }
-    
-    toast({
-      title: "Searching the web",
-      description: `Looking up: "${message}"`,
-    });
-    
-    setIsSearching(true);
-    const results = await searchGoogle(message);
-    setIsSearching(false);
-    
-    if (results && results.items) {
-      setSearchResults(results);
-    } else {
-      toast({
-        title: "No results found",
-        description: "Try a different search term"
-      });
-    }
-  };
-
   const handleProSearch = () => {
     if (!message.trim()) {
       toast({
@@ -215,7 +185,7 @@ export function ChatInput() {
   return (
     <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background to-transparent pb-4 pt-2">
       <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
-        <div className="rounded-xl border bg-black/40 backdrop-blur-sm glass-morphism shadow-lg transition-all duration-300 hover:shadow-xl hover:border-white/20">
+        <div className="rounded-xl border dark:bg-black/40 dark:border-white/10 light:bg-white/95 light:border-black/10 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-white/20 light:hover:border-black/20">
           <div className="flex items-center">
             <div className="flex items-center space-x-1 ml-2">
               <input 
@@ -230,13 +200,13 @@ export function ChatInput() {
                 type="button" 
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
                 title="Attach file"
                 onClick={handleFileUpload}
                 disabled={isUploading}
               >
                 {isUploading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white dark:border-white/30 dark:border-t-white light:border-black/30 light:border-t-black"></div>
                 ) : (
                   <FileUp className="h-4 w-4" />
                 )}
@@ -246,23 +216,7 @@ export function ChatInput() {
                 type="button"
                 size="icon" 
                 variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
-                title="Search the web"
-                onClick={handleSearchWeb}
-                disabled={isSearching}
-              >
-                {isSearching ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-                ) : (
-                  <Search className="h-4 w-4" />
-                )}
-              </Button>
-              
-              <Button 
-                type="button"
-                size="icon" 
-                variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
                 title="Pro Search"
                 onClick={handleProSearch}
               >
@@ -273,10 +227,10 @@ export function ChatInput() {
             <div className="relative flex-grow">
               <Input
                 ref={inputRef}
-                placeholder="Ask anything..."
+                placeholder="Ask anything or type /web to search the web..."
                 value={message}
                 onChange={handleInputChange}
-                className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 text-white placeholder:text-muted-foreground/70 transition-all duration-300"
+                className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300"
                 disabled={isProcessing}
               />
               
@@ -286,54 +240,28 @@ export function ChatInput() {
                   size="icon"
                   variant="ghost"
                   onClick={handleClearInput}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 hover:text-white"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 dark:hover:text-white light:hover:text-black"
                 >
                   <X className="h-3 w-3" />
                 </Button>
-              )}
-              
-              {showAutoComplete && (
-                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-black/90 border border-white/10 rounded-md overflow-hidden shadow-lg">
-                  <Command>
-                    <CommandList>
-                      <CommandGroup heading="Suggestions">
-                        {filteredSuggestions.length === 0 ? (
-                          <CommandEmpty>No suggestions found</CommandEmpty>
-                        ) : (
-                          filteredSuggestions.map((suggestion, index) => (
-                            <CommandItem 
-                              key={index} 
-                              onSelect={() => handleSelectSuggestion(suggestion)}
-                              className="cursor-pointer hover:bg-glassy px-3 py-2"
-                            >
-                              <Search className="h-3 w-3 mr-2 text-white" />
-                              <span className="text-sm">{suggestion}</span>
-                            </CommandItem>
-                          ))
-                        )}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </div>
               )}
             </div>
             
             <div className="flex items-center space-x-1 mr-2">
               <Dialog open={showVoiceInput} onOpenChange={setShowVoiceInput}>
-                <DialogTrigger asChild>
-                  <Button 
-                    type="button"
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 hover:bg-glassy hover:text-white"
-                    title="Voice input"
-                  >
-                    <Mic className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-black/80 border-white/10 backdrop-blur-lg">
+                <Button 
+                  type="button"
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
+                  title="Voice input"
+                  onClick={() => setShowVoiceInput(true)}
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+                <DialogContent className="sm:max-w-md dark:bg-black/90 dark:border-white/10 light:bg-white/95 light:border-black/10 backdrop-blur-lg">
                   <DialogHeader>
-                    <DialogTitle className="text-center text-white">Voice Search</DialogTitle>
+                    <DialogTitle className="text-center dark:text-white light:text-black">Voice Search</DialogTitle>
                   </DialogHeader>
                   <AIVoiceInput 
                     onStart={handleVoiceStart}
@@ -349,8 +277,8 @@ export function ChatInput() {
                 className={cn(
                   "h-9 w-9 rounded-full transition-all duration-200",
                   message.trim() && !isProcessing
-                    ? "bg-glassy text-white hover:bg-glassy-hover"
-                    : "bg-white/20 text-white/50 cursor-not-allowed"
+                    ? "dark:bg-white/10 dark:text-white dark:hover:bg-white/20 light:bg-black/10 light:text-black light:hover:bg-black/20"
+                    : "bg-white/20 text-white/50 cursor-not-allowed light:bg-black/10 light:text-black/50"
                 )}
                 disabled={!message.trim() || isProcessing}
                 title="Send message"
@@ -360,9 +288,9 @@ export function ChatInput() {
             </div>
           </div>
           {isProcessing && (
-            <div className="px-4 py-1 text-xs text-muted-foreground/70 border-t border-white/5 bg-black/20">
+            <div className="px-4 py-1 text-xs text-muted-foreground/70 border-t dark:border-white/5 light:border-black/5 dark:bg-black/20 light:bg-black/5">
               <div className="flex items-center">
-                <div className="mr-2 typing-animation w-24 h-3 bg-white/20 rounded-full"></div>
+                <div className="mr-2 typing-animation w-24 h-3 dark:bg-white/20 light:bg-black/10 rounded-full"></div>
                 <span>Generating response...</span>
               </div>
             </div>
@@ -377,7 +305,7 @@ export function ChatInput() {
         <SearchResults 
           results={searchResults.items} 
           searchInfo={searchResults.searchInformation}
-          searchTerm={message}
+          searchTerm={message || ""}
           onClose={handleCloseSearch}
         />
       )}
