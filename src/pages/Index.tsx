@@ -8,8 +8,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider, Sidebar as ShadcnSidebar, SidebarContent, SidebarInset } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { PanelLeft, PanelRightClose, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { PanelLeft, X } from "lucide-react";
 import { SettingsPanel } from "@/components/SettingsPanel";
 
 // Theme application component
@@ -59,9 +58,11 @@ const AppContent = () => {
           )}
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
-            <Header onOpenSettings={() => setShowSettings(true)}>
-              
-            </Header>
+            <Header 
+              onOpenSettings={() => setShowSettings(true)}
+              toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
+              sidebarOpen={sidebarOpen}
+            />
             
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute bottom-0 left-0 w-full h-1/2 dark:bg-gradient-to-t dark:from-black/30 dark:to-transparent light:bg-gradient-to-t light:from-white/30 light:to-transparent opacity-30"></div>
@@ -89,6 +90,20 @@ const AppContent = () => {
                 <SettingsPanel onClose={() => setShowSettings(false)} />
               </div>
             </div>}
+          
+          {/* Sidebar toggle when sidebar is closed */}
+          {!sidebarOpen && (
+            <div className="absolute top-4 left-4 z-10">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => setSidebarOpen(true)} 
+                className="h-8 w-8 rounded-full bg-background/50 backdrop-blur-sm border-white/10"
+              >
+                <PanelLeft className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </SidebarProvider>
     </ThemeHandler>;
