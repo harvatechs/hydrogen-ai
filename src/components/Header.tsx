@@ -27,7 +27,7 @@ export function Header({
         
         <div className="flex items-center gap-1.5">
           
-          <h1 className="text-lg font-semibold">HydroGen</h1>
+          <h1 className="text-lg font-semibold">HydroGen AI</h1>
         </div>
       </div>
       

@@ -185,7 +185,7 @@ export function Sidebar() {
         <div className="grid grid-cols-2 gap-1.5 mb-2">
           <Button variant="outline" size="sm" onClick={() => setShowAtomThemes(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Sparkles className="h-3.5 w-3.5 text-yellow-500" />
-            <span className="text-xs">Atom Themes</span>
+            <span className="text-xs text-slate-50">Atom Themes</span>
           </Button>
           
           <Button variant="outline" size="sm" onClick={() => setShowAIModels(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
@@ -224,10 +224,7 @@ export function Sidebar() {
             Clear conversation
           </Button>
           
-          <Button variant="ghost" onClick={toggleTheme} className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
-            {theme === 'dark' ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          </Button>
+          
           
           <Button variant="ghost" className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
             <HelpCircle className="mr-2 h-4 w-4" />
