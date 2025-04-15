@@ -11,13 +11,13 @@ import {
   BookOpen, 
   BrainCircuit, 
   FileQuestion, 
-  Flashcard, 
+  BadgeCheck, 
   GraduationCap, 
   Lightbulb, 
-  Microphone, 
+  Mic, 
   School, 
   Search
-} from "lucide-react";
+} from 'lucide-react';
 
 export function StudentTools({ onClose }: { onClose: () => void }) {
   const [topic, setTopic] = useState("");
@@ -165,7 +165,7 @@ export function StudentTools({ onClose }: { onClose: () => void }) {
               <span className="text-xs">Explain</span>
             </TabsTrigger>
             <TabsTrigger value="flashcards" className="flex flex-col items-center gap-1 py-3">
-              <Flashcard className="h-4 w-4" />
+              <BadgeCheck className="h-4 w-4" />
               <span className="text-xs">Flashcards</span>
             </TabsTrigger>
             <TabsTrigger value="quiz" className="flex flex-col items-center gap-1 py-3">
@@ -173,7 +173,7 @@ export function StudentTools({ onClose }: { onClose: () => void }) {
               <span className="text-xs">Quiz</span>
             </TabsTrigger>
             <TabsTrigger value="podcast" className="flex flex-col items-center gap-1 py-3">
-              <Microphone className="h-4 w-4" />
+              <Mic className="h-4 w-4" />
               <span className="text-xs">Podcast</span>
             </TabsTrigger>
           </TabsList>
@@ -230,7 +230,7 @@ export function StudentTools({ onClose }: { onClose: () => void }) {
                 onClick={handleCreateFlashcards} 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
-                <Flashcard className="mr-2 h-4 w-4" />
+                <BadgeCheck className="mr-2 h-4 w-4" />
                 Generate Flashcards
               </Button>
             </div>
@@ -282,7 +282,7 @@ export function StudentTools({ onClose }: { onClose: () => void }) {
                 onClick={handleCreatePodcast} 
                 className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
-                <Microphone className="mr-2 h-4 w-4" />
+                <Mic className="mr-2 h-4 w-4" />
                 Generate Podcast Script
               </Button>
             </div>

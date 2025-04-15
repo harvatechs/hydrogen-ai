@@ -10,7 +10,20 @@ export type ThemeCategory =
   | 'Computer Science' 
   | 'AI' 
   | 'Geography' 
-  | 'History';
+  | 'History'
+  | 'Popular'
+  | 'Medicine'
+  | 'Creative'
+  | 'Music'
+  | 'Film'
+  | 'Art'
+  | 'Games'
+  | 'Food'
+  | 'Business'
+  | 'Law'
+  | 'Education'
+  | 'Engineering'
+  | 'Social Sciences';
 
 export interface AtomTheme {
   id: string;
