@@ -190,17 +190,17 @@ export function Sidebar() {
           
           <Button variant="outline" size="sm" onClick={() => setShowAIModels(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Cpu className="h-3.5 w-3.5 text-violet-500" />
-            <span className="text-xs">AI Models</span>
+            <span className="text-xs text-slate-50">AI Models</span>
           </Button>
           
           <Button variant="outline" size="sm" onClick={() => setShowYouTubeTools(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Youtube className="h-3.5 w-3.5 text-red-500" />
-            <span className="text-xs">YouTube</span>
+            <span className="text-xs text-slate-50">YouTube</span>
           </Button>
           
           <Button variant="outline" size="sm" onClick={() => setShowImageGenerator(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Image className="h-3.5 w-3.5 text-blue-500" />
-            <span className="text-xs">Image Gen</span>
+            <span className="text-xs text-slate-50">Image Gen</span>
           </Button>
         </div>
       </div>
@@ -219,7 +219,7 @@ export function Sidebar() {
       
       <div className="p-2 border-t dark:border-white/10 light:border-black/10">
         <div className="space-y-1">
-          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
+          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5 text-slate-50">
             <Trash2 className="mr-2 h-4 w-4" />
             Clear conversation
           </Button>
