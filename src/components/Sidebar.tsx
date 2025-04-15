@@ -167,7 +167,7 @@ export function Sidebar() {
       </div>
 
       <div className="p-2">
-        <Button variant="outline" onClick={createNewConversation} className="w-full justify-start text-left border-white/10 dark:border-white/10 dark:hover:bg-white/5 light:border-black/10 light:hover:bg-black/5 mb-1 bg-transparent text-inherit">
+        <Button variant="outline" onClick={createNewConversation} className="w-full justify-start text-left border-white/10 dark:border-white/10 light:border-black/10 mb-1 text-slate-50 bg-transparent">
           <Plus className="mr-2 h-4 w-4" />
           New chat
         </Button>

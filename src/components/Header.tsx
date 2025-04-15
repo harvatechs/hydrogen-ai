@@ -21,7 +21,7 @@ export function Header({
   };
   return <header className="border-b dark:border-white/10 light:border-black/10 p-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5">
+        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-9 w-9 rounded-full text-slate-50 bg-transparent">
           {sidebarOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
         </Button>
         
@@ -32,7 +32,7 @@ export function Header({
       </div>
       
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5">
+        <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 rounded-full text-slate-50 bg-transparent">
           {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
         
