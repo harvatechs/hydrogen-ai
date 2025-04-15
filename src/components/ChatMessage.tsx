@@ -15,7 +15,7 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
-  const isError = message.role === "error";
+  const isError = message.role === "error" || message.isError === true;
   const [copied, setCopied] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null);

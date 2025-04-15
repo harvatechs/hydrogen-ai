@@ -1,4 +1,5 @@
-export type MessageRole = "user" | "assistant" | "system" | "error";
+
+export type MessageRole = "user" | "assistant" | "system" | "function" | "error";
 
 export interface Message {
   id: string;
@@ -23,9 +24,11 @@ export interface UserSettings {
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system' | 'function';
+  role: MessageRole;
   content: string;
   timestamp: number;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 export interface Conversation {
