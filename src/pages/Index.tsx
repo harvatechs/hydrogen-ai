@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
-import { Header as AppHeader } from "@/components/Header"; // Rename import to match export
+import { Header } from "@/components/Header"; // Using our custom Header component
 import { ChatHistory } from "@/components/ChatHistory";
 import { ChatInput } from "@/components/ChatInput";
 import { Sidebar } from "@/components/Sidebar";
@@ -58,7 +58,7 @@ const AppContent = () => {
           )}
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
-            <AppHeader 
+            <Header 
               onOpenSettings={() => setShowSettings(true)}
               toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
               sidebarOpen={sidebarOpen}

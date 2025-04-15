@@ -1,13 +1,74 @@
 
-// Since we can't modify the Header component directly (it's read-only),
-// I'm creating a new file that will re-export it with proper props.
-// This will serve as a bridge between our application and the read-only component.
+import React from 'react';
+import { Button } from "@/components/ui/button";
+import { 
+  Settings, 
+  PanelLeft, 
+  PanelLeftClose,
+  Moon,
+  Sun,
+  MessageSquare
+} from "lucide-react";
+import { useChat } from "@/context/ChatContext";
 
-// The implementation details of this file would depend on the actual Header component
-// that's being imported. Since we can't see the original file, we're making an educated
-// guess based on the error and usage patterns.
+interface HeaderProps {
+  onOpenSettings: () => void;
+  toggleSidebar: () => void;
+  sidebarOpen: boolean;
+}
 
-export { Header } from "@/components/ui/header";
-
-// If the above doesn't exist, you might need to create a custom Header component
-// that can be used instead of the one in the read-only files.
+export function Header({ onOpenSettings, toggleSidebar, sidebarOpen }: HeaderProps) {
+  const { theme, setTheme } = useChat();
+  
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+  
+  return (
+    <header className="border-b dark:border-white/10 light:border-black/10 p-3 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleSidebar} 
+          className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5"
+        >
+          {sidebarOpen ? (
+            <PanelLeftClose className="h-5 w-5" />
+          ) : (
+            <PanelLeft className="h-5 w-5" />
+          )}
+        </Button>
+        
+        <div className="flex items-center gap-1.5">
+          <MessageSquare className="h-5 w-5 text-primary" />
+          <h1 className="text-lg font-semibold">Atom Chat</h1>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleTheme} 
+          className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5"
+        >
+          {theme === 'dark' ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onOpenSettings}
+          className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5"
+        >
+          <Settings className="h-5 w-5" />
+        </Button>
+      </div>
+    </header>
+  );
+}

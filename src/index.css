@@ -223,6 +223,11 @@
     @apply rounded-full text-white font-medium py-3 px-8 transition-all duration-300;
   }
   
+  /* Define the missing bg-gemini-gradient class */
+  .bg-gemini-gradient {
+    background: linear-gradient(90deg, var(--gemini-purple), var(--gemini-yellow));
+  }
+  
   .dark .cta-button {
     @apply bg-gemini-gradient hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
   }
