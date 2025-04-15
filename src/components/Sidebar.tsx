@@ -1,11 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Search, Settings, Trash2, User, LogOut, Edit2, X, Check, 
-  Moon, Sun, HelpCircle, Plus, MessageSquare, PanelLeftClose, 
-  PanelLeft, Image, Youtube, Sparkles, Palette, Cpu
-} from "lucide-react";
+import { Search, Settings, Trash2, User, LogOut, Edit2, X, Check, Moon, Sun, HelpCircle, Plus, MessageSquare, PanelLeftClose, PanelLeft, Image, Youtube, Sparkles, Palette, Cpu } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
@@ -14,7 +10,6 @@ import { AtomThemes } from "./AtomThemes";
 import { YouTubeSummarizer } from "./YouTubeSummarizer";
 import { AIModels } from "./AIModels";
 import { ImageGenerator } from "./ImageGenerator";
-
 export function Sidebar() {
   const {
     clearMessages,
@@ -40,9 +35,7 @@ export function Sidebar() {
   const [showYouTubeTools, setShowYouTubeTools] = useState(false);
   const [showAIModels, setShowAIModels] = useState(false);
   const [showImageGenerator, setShowImageGenerator] = useState(false);
-
   const filteredConversations = conversations.filter(chat => chat.title.toLowerCase().includes(searchTerm.toLowerCase()));
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
@@ -58,13 +51,11 @@ export function Sidebar() {
     pastMonth: filteredConversations.filter(chat => chat.lastUpdatedAt >= pastMonth && chat.lastUpdatedAt < pastWeek),
     older: filteredConversations.filter(chat => chat.lastUpdatedAt < pastMonth)
   };
-
   useEffect(() => {
     if (editingId && editInputRef.current) {
       editInputRef.current.focus();
     }
   }, [editingId]);
-
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchTerm.startsWith('/web ')) {
       const query = searchTerm.replace('/web ', '').trim();
@@ -123,27 +114,16 @@ export function Sidebar() {
       description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
     });
   };
-
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
-
   if (!sidebarVisible) {
-    return (
-      <div className="absolute top-4 left-4 z-50">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={toggleSidebar} 
-          className="rounded-full bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 light:bg-primary light:hover:bg-primary/90"
-          aria-label="Show Sidebar"
-        >
+    return <div className="absolute top-4 left-4 z-50">
+        <Button variant="outline" size="icon" onClick={toggleSidebar} className="rounded-full bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 light:bg-primary light:hover:bg-primary/90" aria-label="Show Sidebar">
           <PanelLeft className="h-5 w-5 text-primary-foreground" />
         </Button>
-      </div>
-    );
+      </div>;
   }
-
   const renderConversationGroup = (title: string, conversations: typeof filteredConversations) => {
     if (conversations.length === 0) return null;
     return <div key={title}>
@@ -181,19 +161,9 @@ export function Sidebar() {
         </div>
       </div>;
   };
-
-  return (
-    <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10 relative">
+  return <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10 relative">
       <div className="absolute top-3 right-3 z-10">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleSidebar} 
-          className="h-7 w-7 rounded-full hover:bg-secondary"
-          aria-label="Hide Sidebar"
-        >
-          <PanelLeftClose className="h-4 w-4" />
-        </Button>
+        
       </div>
 
       <div className="p-2">
@@ -213,42 +183,22 @@ export function Sidebar() {
           AI Tools
         </div>
         <div className="grid grid-cols-2 gap-1.5 mb-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowAtomThemes(true)} 
-            className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5"
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowAtomThemes(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Sparkles className="h-3.5 w-3.5 text-yellow-500" />
             <span className="text-xs">Atom Themes</span>
           </Button>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowAIModels(true)}
-            className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5"
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowAIModels(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Cpu className="h-3.5 w-3.5 text-violet-500" />
             <span className="text-xs">AI Models</span>
           </Button>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowYouTubeTools(true)}
-            className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5"
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowYouTubeTools(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Youtube className="h-3.5 w-3.5 text-red-500" />
             <span className="text-xs">YouTube</span>
           </Button>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowImageGenerator(true)}
-            className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5"
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowImageGenerator(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
             <Image className="h-3.5 w-3.5 text-blue-500" />
             <span className="text-xs">Image Gen</span>
           </Button>
@@ -340,6 +290,5 @@ export function Sidebar() {
           <ImageGenerator onClose={() => setShowImageGenerator(false)} />
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 }
