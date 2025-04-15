@@ -6,7 +6,8 @@ import {
   Search, Settings, Trash2, User, LogOut, Edit2, X, Check, 
   Moon, Sun, HelpCircle, Plus, MessageSquare, PanelLeftClose, 
   PanelLeft, Image, Youtube, Sparkles, Palette, Cpu, GraduationCap,
-  BookOpen, Beaker, HeartPulse, Microscope, Brain
+  BookOpen, Beaker, HeartPulse, Microscope, Brain, Zap,
+  Bookmark, Command, Compass, HardDrive, Lightbulb, BarChart
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/context/ChatContext";
@@ -18,6 +19,8 @@ import { AIModels } from "./AIModels";
 import { ImageGenerator } from "./ImageGenerator";
 import { StudentTools } from "./StudentTools";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
+import { searchPopularTopic } from "@/utils/searchUtils";
 
 export function Sidebar() {
   const {
@@ -73,10 +76,16 @@ export function Sidebar() {
   }, [editingId]);
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchTerm.startsWith('/web ')) {
-      const query = searchTerm.replace('/web ', '').trim();
-      if (query) {
-        sendMessage(`Search the web for: ${query}`);
+    if (e.key === 'Enter') {
+      if (searchTerm.startsWith('/web ')) {
+        const query = searchTerm.replace('/web ', '').trim();
+        if (query) {
+          sendMessage(`Search the web for: ${query}`);
+          setSearchTerm('');
+        }
+      } else if (searchTerm.trim()) {
+        // If it's not a web search but there's something to search
+        sendMessage(`I'd like to learn about: ${searchTerm.trim()}`);
         setSearchTerm('');
       }
     }
@@ -143,81 +152,106 @@ export function Sidebar() {
     setSidebarVisible(!sidebarVisible);
   };
 
-  // Tools grouped by category for the FloatingToolbar
-  const toolsCategories = [
+  // Enhanced tools grouped by category
+  const allTools = [
+    // AI Creation Tools
     {
-      name: "AI Assistants",
+      category: "Creative AI",
       icon: <Sparkles className="h-4 w-4 text-yellow-500" />,
       tools: [
-        { name: "Atom Themes", icon: <Sparkles className="h-4 w-4" />, color: "yellow", onClick: () => setShowAtomThemes(true) },
+        { name: "Chat Styles", icon: <Palette className="h-4 w-4" />, color: "yellow", onClick: () => setShowAtomThemes(true) },
+        { name: "Image Creator", icon: <Image className="h-4 w-4" />, color: "blue", onClick: () => setShowImageGenerator(true) },
+        { name: "YouTube Analyzer", icon: <Youtube className="h-4 w-4" />, color: "red", onClick: () => setShowYouTubeTools(true) },
         { name: "AI Models", icon: <Cpu className="h-4 w-4" />, color: "violet", onClick: () => setShowAIModels(true) },
       ]
     },
+    // Education Tools
     {
-      name: "Media Tools",
-      icon: <Image className="h-4 w-4 text-blue-500" />,
-      tools: [
-        { name: "Image Generator", icon: <Image className="h-4 w-4" />, color: "blue", onClick: () => setShowImageGenerator(true) },
-        { name: "YouTube", icon: <Youtube className="h-4 w-4" />, color: "red", onClick: () => setShowYouTubeTools(true) },
-      ]
-    },
-    {
-      name: "Education",
+      category: "Education",
       icon: <GraduationCap className="h-4 w-4 text-green-500" />,
       tools: [
-        { name: "Student Tools", icon: <GraduationCap className="h-4 w-4" />, color: "green", onClick: () => setShowStudentTools(true) },
-        { name: "Research Assistant", icon: <BookOpen className="h-4 w-4" />, color: "blue", onClick: () => { 
+        { name: "Student Suite", icon: <GraduationCap className="h-4 w-4" />, color: "green", onClick: () => setShowStudentTools(true) },
+        { name: "Research Helper", icon: <BookOpen className="h-4 w-4" />, color: "blue", onClick: () => { 
           sendMessage("Act as a research assistant. Help me find academic sources and information about " + (searchTerm || "various topics"));
-          setShowToolsMenu(false);
+        }},
+        { name: "Quiz Creator", icon: <HelpCircle className="h-4 w-4" />, color: "indigo", onClick: () => { 
+          sendMessage("Create a quiz about " + (searchTerm || "a general knowledge topic") + " with 5 questions and provide the answers");
+        }},
+        { name: "Concept Mapper", icon: <Compass className="h-4 w-4" />, color: "purple", onClick: () => { 
+          sendMessage("Create a concept map for " + (searchTerm || "a topic of your choice"));
         }},
       ]
     },
+    // Professional Tools
     {
-      name: "Science & Tech",
-      icon: <Beaker className="h-4 w-4 text-purple-500" />,
+      category: "Professional",
+      icon: <BarChart className="h-4 w-4 text-blue-500" />,
       tools: [
-        { name: "Science Explainer", icon: <Microscope className="h-4 w-4" />, color: "purple", onClick: () => { 
-          sendMessage("Explain this scientific concept in simple terms: " + (searchTerm || "quantum computing"));
-          setShowToolsMenu(false);
-        }},
-        { name: "Tech Analyst", icon: <Cpu className="h-4 w-4" />, color: "indigo", onClick: () => { 
-          sendMessage("Analyze this technology and its implications: " + (searchTerm || "artificial intelligence"));
-          setShowToolsMenu(false);
-        }},
-      ]
-    },
-    {
-      name: "Professional",
-      icon: <Brain className="h-4 w-4 text-indigo-500" />,
-      tools: [
-        { name: "Code Assistant", icon: <Cpu className="h-4 w-4" />, color: "blue", onClick: () => { 
+        { name: "Code Assistant", icon: <Command className="h-4 w-4" />, color: "blue", onClick: () => { 
           sendMessage("Help me with this code: " + (searchTerm || "write a function to sort an array"));
-          setShowToolsMenu(false);
         }},
         { name: "Business Coach", icon: <HeartPulse className="h-4 w-4" />, color: "pink", onClick: () => { 
           sendMessage("Act as a business consultant. Help me with: " + (searchTerm || "creating a marketing strategy"));
-          setShowToolsMenu(false);
+        }},
+        { name: "Data Analyzer", icon: <BarChart className="h-4 w-4" />, color: "cyan", onClick: () => { 
+          sendMessage("Analyze this data and provide insights: " + (searchTerm || "monthly sales figures for a company"));
+        }},
+        { name: "Meeting Notes", icon: <BookOpen className="h-4 w-4" />, color: "emerald", onClick: () => { 
+          sendMessage("Help me prepare notes for a meeting about: " + (searchTerm || "project status update"));
+        }},
+      ]
+    },
+    // Knowledge Tools
+    {
+      category: "Knowledge",
+      icon: <Lightbulb className="h-4 w-4 text-amber-500" />,
+      tools: [
+        { name: "Explain Concept", icon: <Lightbulb className="h-4 w-4" />, color: "amber", onClick: () => { 
+          sendMessage("Explain this concept in simple terms: " + (searchTerm || "quantum computing"));
+        }},
+        { name: "Tech Analysis", icon: <HardDrive className="h-4 w-4" />, color: "slate", onClick: () => { 
+          sendMessage("Analyze this technology and its implications: " + (searchTerm || "artificial intelligence"));
+        }},
+        { name: "Book Summary", icon: <BookOpen className="h-4 w-4" />, color: "orange", onClick: () => { 
+          sendMessage("Give me a summary of the book: " + (searchTerm || "Thinking, Fast and Slow"));
+        }},
+        { name: "Learn Topic", icon: <Bookmark className="h-4 w-4" />, color: "rose", onClick: () => { 
+          sendMessage("I want to learn about: " + (searchTerm || "machine learning"));
+        }},
+      ]
+    },
+    // Special Tools 
+    {
+      category: "Special Tools",
+      icon: <Zap className="h-4 w-4 text-purple-500" />,
+      tools: [
+        { name: "Story Writer", icon: <BookOpen className="h-4 w-4" />, color: "pink", onClick: () => { 
+          sendMessage("Write a short story about: " + (searchTerm || "a space adventure"));
+        }},
+        { name: "Email Composer", icon: <MessageSquare className="h-4 w-4" />, color: "sky", onClick: () => { 
+          sendMessage("Help me write a professional email about: " + (searchTerm || "scheduling a meeting"));
+        }},
+        { name: "Debate Helper", icon: <MessageSquare className="h-4 w-4" />, color: "red", onClick: () => { 
+          sendMessage("Provide arguments for and against: " + (searchTerm || "social media regulation"));
+        }},
+        { name: "Idea Generator", icon: <Lightbulb className="h-4 w-4" />, color: "yellow", onClick: () => { 
+          sendMessage("Generate 5 creative ideas for: " + (searchTerm || "a new mobile app"));
         }},
       ]
     }
   ];
 
-  if (!sidebarVisible) {
-    return (
-      <div className="absolute top-4 left-4 z-50">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={toggleSidebar} 
-          className="rounded-full bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 light:bg-primary light:hover:bg-primary/90"
-          aria-label="Show Sidebar"
-        >
-          <PanelLeft className="h-5 w-5 text-primary-foreground" />
-        </Button>
-      </div>
-    );
-  }
-
+  const popularTopics = [
+    { name: "ChatGPT", color: "bg-green-500" },
+    { name: "Machine Learning", color: "bg-blue-500" },
+    { name: "JavaScript", color: "bg-yellow-500" },
+    { name: "Climate Change", color: "bg-emerald-500" },
+    { name: "Quantum Computing", color: "bg-purple-500" },
+    { name: "Artificial Intelligence", color: "bg-indigo-500" },
+    { name: "Blockchain", color: "bg-orange-500" },
+    { name: "Solar Energy", color: "bg-amber-500" },
+  ];
+  
   const renderConversationGroup = (title: string, conversations: typeof filteredConversations) => {
     if (conversations.length === 0) return null;
     return <div key={title}>
@@ -274,11 +308,11 @@ export function Sidebar() {
           </div>
           
           <div className="space-y-4">
-            {toolsCategories.map((category, i) => (
+            {allTools.map((category, i) => (
               <div key={i}>
                 <div className="flex items-center gap-1.5 mb-2">
                   {category.icon}
-                  <h4 className="text-sm font-medium">{category.name}</h4>
+                  <h4 className="text-sm font-medium">{category.category}</h4>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {category.tools.map((tool, j) => (
@@ -337,14 +371,39 @@ export function Sidebar() {
         
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search or type /web to search..." className="pl-9 bg-transparent dark:border-white/10 light:border-black/10 focus-visible:ring-muted" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onKeyDown={handleSearchKeyDown} />
+          <Input 
+            placeholder="Search or type /web to search..." 
+            className="pl-9 bg-transparent dark:border-white/10 light:border-black/10 focus-visible:ring-muted" 
+            value={searchTerm} 
+            onChange={e => setSearchTerm(e.target.value)} 
+            onKeyDown={handleSearchKeyDown} 
+          />
         </div>
       </div>
       
+      {/* Popular Topics */}
+      <div className="px-2 pt-2 pb-1">
+        <div className="text-xs font-medium text-muted-foreground mb-1 px-2">
+          Popular Topics
+        </div>
+        <div className="flex flex-wrap gap-1.5 px-1">
+          {popularTopics.map((topic, index) => (
+            <button
+              key={index}
+              className={`text-xs px-2 py-1 rounded-full ${topic.color}/20 border border-${topic.color}/30 text-${topic.color} hover:bg-${topic.color}/30 transition-colors`}
+              onClick={() => searchPopularTopic(topic.name, sendMessage)}
+            >
+              {topic.name}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* AI Tools Section - Moved above conversation list */}
       {!isMobile && (
-        <div className="px-2 py-1">
+        <div className="px-2 py-2">
           <div className="text-xs font-medium text-muted-foreground mb-1 px-2">
-            Tools
+            AI Tools
           </div>
           <div className="grid grid-cols-4 gap-1.5 mb-2">
             <Button 
@@ -414,16 +473,22 @@ export function Sidebar() {
         </div>
       )}
       
+      <Separator className="mx-2 my-1 dark:bg-white/10 light:bg-black/10" />
+      
       <div className="flex-1 overflow-auto p-2">
-        {filteredConversations.length === 0 && searchTerm ? <div className="text-sm text-center text-muted-foreground p-4">
+        {filteredConversations.length === 0 && searchTerm ? (
+          <div className="text-sm text-center text-muted-foreground p-4">
             No conversations matching "{searchTerm}"
-          </div> : <>
+          </div>
+        ) : (
+          <>
             {renderConversationGroup("Today", groupedConversations.today)}
             {renderConversationGroup("Yesterday", groupedConversations.yesterday)}
             {renderConversationGroup("Previous 7 Days", groupedConversations.pastWeek)}
             {renderConversationGroup("Previous 30 Days", groupedConversations.pastMonth)}
             {renderConversationGroup("Older", groupedConversations.older)}
-          </>}
+          </>
+        )}
       </div>
       
       <div className="p-2 border-t dark:border-white/10 light:border-black/10">
@@ -478,30 +543,45 @@ export function Sidebar() {
       
       <Dialog open={showAtomThemes} onOpenChange={setShowAtomThemes}>
         <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-3xl h-[80vh] overflow-hidden max-h-[90vh] md:h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Chat Themes & Styles</DialogTitle>
+          </DialogHeader>
           <AtomThemes onClose={() => setShowAtomThemes(false)} />
         </DialogContent>
       </Dialog>
       
       <Dialog open={showYouTubeTools} onOpenChange={setShowYouTubeTools}>
         <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh] overflow-hidden max-h-[90vh] md:h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>YouTube Video Analysis</DialogTitle>
+          </DialogHeader>
           <YouTubeSummarizer onClose={() => setShowYouTubeTools(false)} />
         </DialogContent>
       </Dialog>
       
       <Dialog open={showAIModels} onOpenChange={setShowAIModels}>
         <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh] overflow-hidden max-h-[90vh] md:h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>AI Language Models</DialogTitle>
+          </DialogHeader>
           <AIModels onClose={() => setShowAIModels(false)} />
         </DialogContent>
       </Dialog>
       
       <Dialog open={showImageGenerator} onOpenChange={setShowImageGenerator}>
         <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh] overflow-hidden max-h-[90vh] md:h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>AI Image Generation</DialogTitle>
+          </DialogHeader>
           <ImageGenerator onClose={() => setShowImageGenerator(false)} />
         </DialogContent>
       </Dialog>
       
       <Dialog open={showStudentTools} onOpenChange={setShowStudentTools}>
         <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh] overflow-hidden max-h-[90vh] md:h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Student Learning Tools</DialogTitle>
+          </DialogHeader>
           <StudentTools onClose={() => setShowStudentTools(false)} />
         </DialogContent>
       </Dialog>
