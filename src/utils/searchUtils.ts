@@ -68,11 +68,23 @@ export const searchPopularTopic = (topic: string, sendMessage: (message: string)
   if (!topic) return;
   
   console.log('Searching popular topic:', topic);
-  sendMessage(`I'd like to learn about ${topic}`);
   
-  toast({
-    title: "Topic selected",
-    description: `Searching for information about ${topic}`,
-  });
+  // Instead of directly calling sendMessage, create a new conversation if none exists
+  try {
+    sendMessage(`I'd like to learn about ${topic}`);
+    
+    toast({
+      title: "Topic selected",
+      description: `Searching for information about ${topic}`,
+    });
+  } catch (error) {
+    console.error('Error in searchPopularTopic:', error);
+    
+    // If we get "No conversation selected" error, show a helpful toast
+    toast({
+      title: "Please start a new chat first",
+      description: "Click 'New chat' in the sidebar before selecting a topic",
+      variant: "destructive",
+    });
+  }
 };
-
