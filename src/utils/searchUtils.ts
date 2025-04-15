@@ -36,19 +36,14 @@ export const searchGoogle = async (searchTerm: string): Promise<SearchResponse |
   try {
     const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(searchTerm)}&key=${apiKey}&cx=${cx}`;
     
-    console.log('Searching for:', searchTerm);
-    console.log('API URL:', apiUrl);
-    
     const response = await fetch(apiUrl);
     
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Search API error:', errorData);
       throw new Error(errorData.error?.message || 'Search request failed');
     }
     
     const data = await response.json();
-    console.log('Search results:', data);
     return data;
   } catch (error) {
     console.error('Search error:', error);
@@ -60,31 +55,5 @@ export const searchGoogle = async (searchTerm: string): Promise<SearchResponse |
     });
     
     return null;
-  }
-};
-
-// Function to handle popular topics search
-export const searchPopularTopic = (topic: string, sendMessage: (message: string) => void) => {
-  if (!topic) return;
-  
-  console.log('Searching popular topic:', topic);
-  
-  // Instead of directly calling sendMessage, create a new conversation if none exists
-  try {
-    sendMessage(`I'd like to learn about ${topic}`);
-    
-    toast({
-      title: "Topic selected",
-      description: `Searching for information about ${topic}`,
-    });
-  } catch (error) {
-    console.error('Error in searchPopularTopic:', error);
-    
-    // If we get "No conversation selected" error, show a helpful toast
-    toast({
-      title: "Please start a new chat first",
-      description: "Click 'New chat' in the sidebar before selecting a topic",
-      variant: "destructive",
-    });
   }
 };

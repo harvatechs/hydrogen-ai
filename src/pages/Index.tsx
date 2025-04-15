@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider, Sidebar as ShadcnSidebar, SidebarContent, SidebarInset } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { PanelLeft, X, Sparkles, GraduationCap, Youtube, Image as ImageIcon, Cpu } from "lucide-react";
+import { PanelLeft, X, Sparkles, GraduationCap, YouTube, Image as ImageIcon, Cpu } from "lucide-react";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AtomThemes } from "@/components/AtomThemes";
@@ -150,7 +150,7 @@ const AppContent = () => {
                       setShowQuickTools(false);
                     }}
                   >
-                    <Youtube className="h-4 w-4 mr-2 text-red-500" />
+                    <YouTube className="h-4 w-4 mr-2 text-red-500" />
                     YouTube Tools
                   </Button>
                   <Button
