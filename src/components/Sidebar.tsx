@@ -219,7 +219,7 @@ export function Sidebar() {
       
       <div className="p-2 border-t dark:border-white/10 light:border-black/10">
         <div className="space-y-1">
-          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5 text-slate-50">
+          <Button variant="ghost" onClick={() => clearConversation(currentConversationId || "")} className="w-full justify-start text-slate-50 bg-transparent">
             <Trash2 className="mr-2 h-4 w-4" />
             Clear conversation
           </Button>
@@ -229,7 +229,7 @@ export function Sidebar() {
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </Button>
           
-          <Button variant="ghost" className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
+          <Button variant="ghost" className="w-full justify-start bg-transparent text-slate-50">
             <HelpCircle className="mr-2 h-4 w-4" />
             Help & FAQ
           </Button>
@@ -237,12 +237,12 @@ export function Sidebar() {
         
         <Separator className="my-2 dark:bg-white/10 light:bg-black/10" />
         
-        <Button variant="ghost" className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
+        <Button variant="ghost" className="w-full justify-start bg-transparent text-slate-50">
           <User className="mr-2 h-4 w-4" />
           My account
         </Button>
         
-        <Button variant="ghost" className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
+        <Button variant="ghost" className="w-full justify-start bg-transparent text-red-300">
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </Button>
