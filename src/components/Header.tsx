@@ -26,7 +26,7 @@ export function Header({ onOpenSettings, toggleSidebar, sidebarOpen }: HeaderPro
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar} 
-          className="mr-2"
+          className="mr-2 button-hover-visible"
           aria-label="Toggle sidebar"
         >
           <PanelLeft className="h-5 w-5" />
@@ -55,7 +55,7 @@ export function Header({ onOpenSettings, toggleSidebar, sidebarOpen }: HeaderPro
           variant="ghost" 
           size="icon"
           onClick={toggleTheme}
-          className="hidden md:flex"
+          className="hidden md:flex button-hover-visible"
         >
           {theme === 'dark' ? <Sun className="h-5 w-5" /> : <MoonStar className="h-5 w-5" />}
         </Button>
@@ -65,6 +65,7 @@ export function Header({ onOpenSettings, toggleSidebar, sidebarOpen }: HeaderPro
           size="icon" 
           onClick={onOpenSettings}
           aria-label="Settings"
+          className="button-hover-visible"
         >
           <Settings className="h-5 w-5" />
         </Button>
