@@ -55,26 +55,3 @@ export interface OpenRouterResponse {
     index: number;
   }[];
 }
-
-// Student feature types
-export type ExplanationLevel = "five" | "ten" | "fifteen" | "expert";
-
-export interface FlashCard {
-  question: string;
-  answer: string;
-}
-
-export interface QuizQuestion {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-}
-
-export interface StudentFeature {
-  type: "flashcards" | "quiz" | "podcast" | "explain";
-  topic?: string;
-  level?: ExplanationLevel;
-  questions?: QuizQuestion[];
-  flashcards?: FlashCard[];
-  podcastScript?: string;
-}
