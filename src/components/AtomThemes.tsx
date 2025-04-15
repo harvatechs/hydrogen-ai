@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { AtomTheme, ThemeCategory } from '@/types/atom-themes';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { toast } from '@/components/ui/use-toast';
 import { 
   Code, 
   Calculator, 
-  Flask, 
+  Beaker,
   DollarSign, 
   TrendingUp, 
   Landmark, 
@@ -24,7 +23,7 @@ import { Input } from './ui/input';
 const themeCategories: { category: ThemeCategory; icon: React.ReactNode; color: string }[] = [
   { category: 'Coding', icon: <Code />, color: '#007ACC' },
   { category: 'Math', icon: <Calculator />, color: '#FF5722' },
-  { category: 'Science', icon: <Flask />, color: '#4CAF50' },
+  { category: 'Science', icon: <Beaker />, color: '#4CAF50' },
   { category: 'Finance', icon: <DollarSign />, color: '#4CAF50' },
   { category: 'Economics', icon: <TrendingUp />, color: '#9C27B0' },
   { category: 'Politics', icon: <Landmark />, color: '#2196F3' },
@@ -60,7 +59,7 @@ const atomThemes: AtomTheme[] = [
     description: 'Clear explanations of scientific concepts',
     category: 'Science',
     prompt: 'Explain the following scientific concept in simple terms:',
-    icon: 'Flask',
+    icon: 'Beaker',
     color: '#4CAF50'
   },
   {

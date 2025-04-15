@@ -1,260 +1,263 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from '@/components/ui/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Image, Download, Copy, ExternalLink, Palette, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-type ImageStyle = 
-  | 'photorealistic' 
-  | 'digital-art' 
-  | 'anime' 
-  | 'illustration' 
-  | 'painting' 
-  | 'sketch' 
-  | '3d-render';
-
-interface ImageGenerationOptions {
-  style: ImageStyle;
-  ratio: '1:1' | '16:9' | '9:16' | '4:3' | '3:4';
-  enhancePrompt: boolean;
-}
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Check, Image as ImageIcon, Download, Copy, RefreshCw, Sparkles } from 'lucide-react';
+import { useChat } from '@/context/ChatContext';
+import { toast } from '@/components/ui/use-toast';
 
 export function ImageGenerator({ onClose }: { onClose: () => void }) {
   const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [options, setOptions] = useState<ImageGenerationOptions>({
-    style: 'photorealistic',
-    ratio: '1:1',
-    enhancePrompt: true
-  });
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<'square' | 'portrait' | 'landscape'>('square');
+  const [selectedStyle, setSelectedStyle] = useState<'photorealistic' | 'artistic' | 'cartoon' | '3d'>('photorealistic');
+  const { sendMessage } = useChat();
 
-  // OpenRouter API Key (this should be stored securely in a production environment)
-  const apiKey = "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";
+  const imageSizes = {
+    square: '1024x1024',
+    portrait: '1024x1792',
+    landscape: '1792x1024'
+  };
 
-  const generateImages = async () => {
+  const styleDescriptions = {
+    photorealistic: 'Detailed and realistic images',
+    artistic: 'Creative and painterly style',
+    cartoon: 'Stylized cartoon illustrations',
+    '3d': '3D rendered objects and scenes'
+  };
+
+  // Example image URLs for demonstration
+  const exampleImages = [
+    'https://images.unsplash.com/photo-1682687982501-1e58ab814714',
+    'https://images.unsplash.com/photo-1682687982501-1e58ab814714',
+    'https://images.unsplash.com/photo-1682687982501-1e58ab814714',
+    'https://images.unsplash.com/photo-1682687982501-1e58ab814714'
+  ];
+
+  const generateImages = () => {
     if (!prompt.trim()) {
       toast({
-        title: 'Empty prompt',
-        description: 'Please enter a description for your image',
-        variant: 'destructive'
+        title: "Empty prompt",
+        description: "Please enter a description for the image you want to generate.",
+        variant: "destructive"
       });
       return;
     }
 
     setIsGenerating(true);
     
-    try {
-      // In a real implementation, you would call the actual API
-      // For demo purposes, we'll simulate the API call with a timeout
-      toast({
-        title: 'Generating images',
-        description: 'This may take a few moments...'
-      });
-
-      setTimeout(() => {
-        // Mock generated images - in a real app, these would come from the API
-        const mockImages = [
-          'https://picsum.photos/seed/img1/512/512',
-          'https://picsum.photos/seed/img2/512/512',
-          'https://picsum.photos/seed/img3/512/512',
-          'https://picsum.photos/seed/img4/512/512'
-        ];
-        
-        setGeneratedImages(mockImages);
-        setIsGenerating(false);
-        
-        toast({
-          title: 'Images generated',
-          description: `Created ${mockImages.length} images based on your prompt`
-        });
-      }, 3000);
-    } catch (error) {
+    // In a real implementation, this would call an API
+    // For now, we'll simulate image generation with a delay
+    setTimeout(() => {
+      setGeneratedImages(exampleImages);
       setIsGenerating(false);
+      
       toast({
-        title: 'Error generating images',
-        description: 'There was a problem with the image generation service',
-        variant: 'destructive'
+        title: "Images generated",
+        description: "Your images have been created successfully."
       });
+      
+      // Send the prompt to the chat for context
+      sendMessage(`I generated images with the prompt: "${prompt}" (${imageSizes[selectedSize]}, ${selectedStyle} style)`);
+    }, 2000);
+  };
+
+  const copyPrompt = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(text);
+    
+    setTimeout(() => {
+      setCopied(null);
+    }, 2000);
+    
+    toast({
+      title: "Copied to clipboard",
+      description: "The prompt has been copied to your clipboard."
+    });
+  };
+
+  const downloadImage = (url: string) => {
+    // In a real implementation, this would download the actual image
+    // For now, we'll just show a toast
+    toast({
+      title: "Download started",
+      description: "Your image is being downloaded."
+    });
+  };
+
+  const enhancePrompt = () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "Empty prompt",
+        description: "Please enter a basic prompt to enhance.",
+        variant: "destructive"
+      });
+      return;
     }
-  };
-
-  const handleDownload = (imageUrl: string, index: number) => {
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `generated-image-${index}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
     
-    toast({
-      title: 'Image downloaded',
-      description: 'The image has been saved to your device'
-    });
-  };
-
-  const handleCopyURL = (imageUrl: string) => {
-    navigator.clipboard.writeText(imageUrl);
+    setIsGenerating(true);
     
-    toast({
-      title: 'URL copied',
-      description: 'Image URL has been copied to clipboard'
-    });
+    // Simulate enhancing the prompt
+    setTimeout(() => {
+      const enhancedPrompt = `${prompt}, highly detailed, professional photography, dramatic lighting, 8k resolution, trending on artstation, masterpiece`;
+      setPrompt(enhancedPrompt);
+      setIsGenerating(false);
+      
+      toast({
+        title: "Prompt enhanced",
+        description: "Your prompt has been enhanced with additional details."
+      });
+    }, 1000);
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b dark:border-white/10 light:border-black/10">
-        <h2 className="text-xl font-semibold mb-1">Image Generator</h2>
-        <p className="text-sm text-muted-foreground">Create AI-generated images from text descriptions</p>
-      </div>
+      <DialogHeader className="px-4 pt-4 pb-2">
+        <DialogTitle className="text-xl flex items-center gap-2">
+          <ImageIcon className="h-5 w-5 text-blue-500" />
+          Image Generator
+        </DialogTitle>
+        <DialogDescription>
+          Create images from text descriptions using AI
+        </DialogDescription>
+      </DialogHeader>
       
-      <div className="p-4 flex-1 overflow-auto space-y-4">
-        <div>
-          <label className="text-sm font-medium mb-1 block">Image Description</label>
-          <Textarea
-            placeholder="Describe the image you want to generate..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[100px] resize-none"
-          />
-          <div className="text-xs text-muted-foreground mt-1">
-            Be detailed and specific about what you want to see in the image
-          </div>
-        </div>
+      <div className="p-4 space-y-4">
+        <Textarea
+          placeholder="Describe the image you want to generate in detail..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          className="min-h-[100px] dark:bg-black/20 light:bg-white"
+        />
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium mb-1 block">Style</label>
-            <Select
-              value={options.style}
-              onValueChange={(value) => setOptions({...options, style: value as ImageStyle})}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select style" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="photorealistic">Photorealistic</SelectItem>
-                <SelectItem value="digital-art">Digital Art</SelectItem>
-                <SelectItem value="anime">Anime</SelectItem>
-                <SelectItem value="illustration">Illustration</SelectItem>
-                <SelectItem value="painting">Painting</SelectItem>
-                <SelectItem value="sketch">Sketch</SelectItem>
-                <SelectItem value="3d-render">3D Render</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-1 block">Aspect Ratio</label>
-            <Select
-              value={options.ratio}
-              onValueChange={(value) => setOptions({...options, ratio: value as any})}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select ratio" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1:1">Square (1:1)</SelectItem>
-                <SelectItem value="16:9">Landscape (16:9)</SelectItem>
-                <SelectItem value="9:16">Portrait (9:16)</SelectItem>
-                <SelectItem value="4:3">Standard (4:3)</SelectItem>
-                <SelectItem value="3:4">Portrait (3:4)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Button 
             variant="outline" 
             size="sm" 
-            className={cn(
-              "flex items-center gap-1 border-dashed",
-              options.enhancePrompt 
-                ? "dark:bg-white/5 dark:text-white light:bg-black/5 light:text-black" 
-                : ""
-            )}
-            onClick={() => setOptions({...options, enhancePrompt: !options.enhancePrompt})}
+            onClick={enhancePrompt}
+            disabled={isGenerating}
+            className="flex items-center gap-1.5"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Enhance Prompt</span>
-            {options.enhancePrompt && <Check className="h-3 w-3 ml-1" />}
+            <Sparkles className="h-3.5 w-3.5 text-yellow-500" />
+            Enhance prompt
           </Button>
           
-          <div className="text-xs text-muted-foreground">
-            AI will automatically improve your prompt for better results
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => copyPrompt(prompt)}
+            disabled={!prompt.trim()}
+            className="flex items-center gap-1.5"
+          >
+            {copied === prompt ? (
+              <Check className="h-3.5 w-3.5 text-green-500" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            Copy
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Image size</h3>
+            <div className="flex flex-col gap-2">
+              {(Object.keys(imageSizes) as Array<keyof typeof imageSizes>).map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedSize === size ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedSize(size)}
+                  className="justify-start"
+                >
+                  {size.charAt(0).toUpperCase() + size.slice(1)} ({imageSizes[size]})
+                </Button>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-sm font-medium mb-2">Style</h3>
+            <div className="flex flex-col gap-2">
+              {(Object.keys(styleDescriptions) as Array<keyof typeof styleDescriptions>).map((style) => (
+                <Button
+                  key={style}
+                  variant={selectedStyle === style ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedStyle(style)}
+                  className="justify-start"
+                >
+                  {style.charAt(0).toUpperCase() + style.slice(1)}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
         
         <Button 
-          onClick={generateImages}
-          disabled={isGenerating || !prompt.trim()}
+          onClick={generateImages} 
+          disabled={isGenerating || !prompt.trim()} 
           className="w-full"
         >
           {isGenerating ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
               Generating...
             </>
           ) : (
             <>
-              <Palette className="h-4 w-4 mr-2" />
+              <ImageIcon className="mr-2 h-4 w-4" />
               Generate Images
             </>
           )}
         </Button>
-        
-        {generatedImages.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-medium">Generated Images</h3>
+      </div>
+      
+      {generatedImages.length > 0 && (
+        <div className="flex-1 p-4 pt-0">
+          <h3 className="text-sm font-medium mb-2">Generated Images</h3>
+          <ScrollArea className="h-[300px]">
             <div className="grid grid-cols-2 gap-4">
               {generatedImages.map((image, index) => (
-                <div key={index} className="rounded-lg overflow-hidden border dark:border-white/10 light:border-black/10">
-                  <div className="aspect-square relative">
-                    <img 
-                      src={image} 
-                      alt={`Generated image ${index+1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
-                      <div className="flex justify-end space-x-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 bg-white/10 backdrop-blur-sm hover:bg-white/20"
-                          onClick={() => handleCopyURL(image)}
-                        >
-                          <Copy className="h-4 w-4 text-white" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 bg-white/10 backdrop-blur-sm hover:bg-white/20"
-                          onClick={() => handleDownload(image, index)}
-                        >
-                          <Download className="h-4 w-4 text-white" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 bg-white/10 backdrop-blur-sm hover:bg-white/20"
-                          onClick={() => window.open(image, '_blank')}
-                        >
-                          <ExternalLink className="h-4 w-4 text-white" />
-                        </Button>
-                      </div>
-                    </div>
+                <div key={index} className="relative group">
+                  <img 
+                    src={image} 
+                    alt={`Generated image ${index + 1}`} 
+                    className="w-full h-auto rounded-lg object-cover aspect-square"
+                  />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => downloadImage(image)}
+                      className="h-8 w-8 bg-black/50 border-white/20 text-white hover:bg-black/70"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => copyPrompt(prompt)}
+                      className="h-8 w-8 bg-black/50 border-white/20 text-white hover:bg-black/70"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
+      
+      <div className="p-4 border-t dark:border-white/10 light:border-black/10">
+        <Button variant="outline" onClick={onClose} className="w-full">
+          Close
+        </Button>
       </div>
     </div>
   );

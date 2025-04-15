@@ -58,7 +58,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Sonner position="top-right" className="toaster-container" />
+        <Sonner className="toaster-container" />
         <BrowserRouter>
           <div className="min-h-screen w-full">
             <Routes>
