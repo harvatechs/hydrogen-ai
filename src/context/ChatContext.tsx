@@ -19,6 +19,7 @@ interface ChatContextType {
   conversations: Conversation[];
   currentConversationId: string | null;
   currentConversation: Conversation | null;
+  messages: ChatMessage[];
   addMessage: (message: ChatMessage) => void;
   sendMessage: (content: string) => Promise<void>;
   startNewConversation: () => void;
@@ -35,6 +36,10 @@ interface ChatContextType {
   setFontSize: (fontSize: FontSize) => void;
   model: string;
   setModel: (model: string) => void;
+  apiKey: string;
+  setApiKey: (key: string) => void;
+  apiUrl: string;
+  setApiUrl: (url: string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -51,26 +56,37 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>("system");
   const [fontSize, setFontSize] = useState<FontSize>("normal");
   const [model, setModel] = useState<string>("openai/gpt-3.5-turbo");
+  const [apiKey, setApiKey] = useState<string>(localStorage.getItem('openRouterApiKey') || "");
+  const [apiUrl, setApiUrl] = useState<string>(localStorage.getItem('openRouterApiUrl') || "");
 
-  // Load conversations from local storage on mount
   useEffect(() => {
     const storedConversations = localStorage.getItem("conversations");
     if (storedConversations) {
       setConversations(JSON.parse(storedConversations));
+    } else {
+      const defaultConversation: Conversation = {
+        id: uuidv4(),
+        title: "New conversation",
+        messages: [],
+        lastUpdatedAt: new Date(),
+      };
+      setConversations([defaultConversation]);
+      setCurrentConversationId(defaultConversation.id);
     }
   }, []);
 
-  // Save conversations to local storage whenever they change
   useEffect(() => {
     localStorage.setItem("conversations", JSON.stringify(conversations));
   }, [conversations]);
 
-  // Set current conversation to the first one if none is selected
   useEffect(() => {
-    if (conversations.length > 0 && !currentConversationId) {
-      setCurrentConversationId(conversations[0].id);
+    if (apiKey) {
+      localStorage.setItem('openRouterApiKey', apiKey);
     }
-  }, [conversations, currentConversationId]);
+    if (apiUrl) {
+      localStorage.setItem('openRouterApiUrl', apiUrl);
+    }
+  }, [apiKey, apiUrl]);
 
   const currentConversation = React.useMemo(() => {
     return (
@@ -78,6 +94,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       null
     );
   }, [conversations, currentConversationId]);
+
+  const messages = React.useMemo(() => {
+    return currentConversation?.messages || [];
+  }, [currentConversation]);
 
   const addMessage = (message: ChatMessage) => {
     setConversations((prevConversations) => {
@@ -114,7 +134,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       addMessage(userMessage);
 
       try {
-        // Prepare messages for the API request
         const apiMessages = [
           ...currentConversation.messages.map((message) => ({
             role: message.role,
@@ -123,7 +142,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           { role: userMessage.role, content: userMessage.content },
         ];
 
-        // Call the OpenRouter API
         const response: OpenRouterResponse = await generateCompletionWithOpenRouter(
           apiMessages,
           model
@@ -138,7 +156,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
         addMessage(aiMessage);
       } catch (error: any) {
-        // Error handling
         addMessage({
           id: uuidv4(),
           role: "assistant",
@@ -203,13 +220,19 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     setConversations((prevConversations) =>
       prevConversations.filter((conversation) => conversation.id !== id)
     );
-    // If the deleted conversation was the current one, set the current
-    // conversation to the first one in the list, if there are any left.
     if (currentConversationId === id) {
       if (conversations.length > 1) {
-        setCurrentConversationId(conversations[1].id);
+        const remainingConversations = conversations.filter(c => c.id !== id);
+        setCurrentConversationId(remainingConversations[0].id);
       } else {
-        setCurrentConversationId(null);
+        const newConversation: Conversation = {
+          id: uuidv4(),
+          title: "New conversation",
+          messages: [],
+          lastUpdatedAt: new Date(),
+        };
+        setConversations([newConversation]);
+        setCurrentConversationId(newConversation.id);
       }
     }
   };
@@ -218,6 +241,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     conversations,
     currentConversationId,
     currentConversation,
+    messages,
     addMessage,
     sendMessage,
     startNewConversation,
@@ -234,6 +258,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     setFontSize,
     model,
     setModel,
+    apiKey,
+    setApiKey,
+    apiUrl,
+    setApiUrl
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

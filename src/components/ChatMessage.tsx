@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from "react";
-import { Message } from "@/types/message";
+import { ChatMessage as MessageType } from "@/types/message";
 import { cn } from "@/lib/utils";
 import { Bot, User, Copy, Check, ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 interface ChatMessageProps {
-  message: Message;
+  message: MessageType;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
@@ -89,7 +89,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             "chat-message-content"
           )}
         >
-          <div dangerouslySetInnerHTML={{ __html: message.content }} />
+          {message.content}
         </div>
         
         {/* Reference links section */}

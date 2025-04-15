@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -135,6 +134,11 @@
     @apply bg-accent text-accent-foreground hover:opacity-90 hover:shadow-md;
   }
   
+  /* Define the missing gradient class */
+  .bg-gemini-gradient {
+    @apply bg-gradient-to-r from-gemini-purple to-purple-600;
+  }
+  
   /* Glass card effect */
   .glass-card {
     @apply backdrop-blur-lg border rounded-xl;
@@ -213,19 +217,9 @@
     @apply bg-white border border-black/5 hover:shadow-lg hover:translate-y-[-2px] shadow-sm;
   }
   
-  /* Gemini gradient background */
-  .bg-gemini-gradient {
-    @apply bg-gradient-to-r from-gemini-purple to-indigo-600;
-  }
-  
   /* CTA button */
   .cta-button {
     @apply rounded-full text-white font-medium py-3 px-8 transition-all duration-300;
-  }
-  
-  /* Define the missing bg-gemini-gradient class */
-  .bg-gemini-gradient {
-    background: linear-gradient(90deg, var(--gemini-purple), var(--gemini-yellow));
   }
   
   .dark .cta-button {
