@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from "react";
 import { useChat } from "@/context/ChatContext";
 import { ChatMessage } from "./ChatMessage";
@@ -5,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Globe, BookOpen, FileText, PanelRight, Lightbulb, Zap, Code2, PenLine } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+
 export function ChatHistory() {
   const {
     messages,
     sendMessage,
     isProcessing
   } = useChat();
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [recommendedQuestions, setRecommendedQuestions] = useState<string[]>([]);
 
@@ -31,7 +34,8 @@ export function ChatHistory() {
 
   // Generate recommended questions on initial render and refresh them when empty state is shown
   useEffect(() => {
-    if (messages.length === 0 || messages.length === 1 && messages[0].role === "assistant") {
+    // Add null check for messages before accessing length
+    if (!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant")) {
       setRecommendedQuestions(generateRecommendedQuestions());
     }
   }, [messages]);
@@ -42,7 +46,9 @@ export function ChatHistory() {
       behavior: "smooth"
     });
   }, [messages]);
-  const renderSkeletonLoader = () => <div className="py-4 animate-fade-in">
+
+  const renderSkeletonLoader = () => (
+    <div className="py-4 animate-fade-in">
       <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
         <div className="mt-1 flex-shrink-0">
           <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow">
@@ -71,8 +77,11 @@ export function ChatHistory() {
           </div>
         </div>
       </div>
-    </div>;
-  const emptyStateContent = () => <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
+    </div>
+  );
+
+  const emptyStateContent = () => (
+    <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
       <div className="w-16 h-16 mb-6 bg-gemini-yellow/20 rounded-full flex items-center justify-center">
         <Sparkles className="h-8 w-8 text-gemini-yellow" />
       </div>
@@ -92,10 +101,17 @@ export function ChatHistory() {
             Popular topics
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {recommendedQuestions.map((question, index) => <Button key={index} variant="outline" className="h-auto py-3 px-4 justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all btn-hover-effect" onClick={() => sendMessage(question)}>
+            {recommendedQuestions.map((question, index) => (
+              <Button 
+                key={index} 
+                variant="outline" 
+                className="h-auto py-3 px-4 justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all btn-hover-effect" 
+                onClick={() => sendMessage(question)}
+              >
                 <Search className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
                 <span className="truncate text-slate-50">{question}</span>
-              </Button>)}
+              </Button>
+            ))}
           </div>
         </div>
         
@@ -105,12 +121,23 @@ export function ChatHistory() {
           
         </div>
       </div>
-    </div>;
-  return <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4">
-      {messages.length === 0 || messages.length === 1 && messages[0].role === "assistant" ? emptyStateContent() : <div className="py-4 max-w-4xl mx-auto">
-          {messages.map(message => <ChatMessage key={message.id} message={message} />)}
+    </div>
+  );
+
+  // Add null check for messages before checking its length
+  return (
+    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4">
+      {!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant") ? (
+        emptyStateContent()
+      ) : (
+        <div className="py-4 max-w-4xl mx-auto">
+          {messages.map(message => (
+            <ChatMessage key={message.id} message={message} />
+          ))}
           {isProcessing && renderSkeletonLoader()}
           <div ref={messagesEndRef} />
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 }
