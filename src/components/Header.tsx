@@ -1,85 +1,119 @@
 
-import React from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Settings, PanelLeft, PanelLeftClose, Moon, Sun, MessageSquare, Menu } from "lucide-react";
+import { ApiKeyDialog } from "./ApiKeyDialog";
+import { Settings, User, Zap, Moon, Sun, LogOut } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
-import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
+  children?: React.ReactNode;
   onOpenSettings: () => void;
-  toggleSidebar: () => void;
-  sidebarOpen: boolean;
 }
 
 export function Header({
-  onOpenSettings,
-  toggleSidebar,
-  sidebarOpen
+  children,
+  onOpenSettings
 }: HeaderProps) {
   const {
     theme,
-    setTheme
+    setTheme,
+    model
   } = useChat();
-  
+
+  // Get model display name
+  const getModelDisplayName = () => {
+    switch (model) {
+      case "gemini-2.0-pro":
+        return "Gemini 2.0 Pro";
+      case "gemini-2.0-flash":
+        return "Gemini 2.0 Flash";
+      case "gemini-1.5-pro":
+        return "Gemini 1.5 Pro";
+      case "gemini-1.5-flash":
+        return "Gemini 1.5 Flash";
+      default:
+        return "Gemini";
+    }
+  };
+
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+    toast({
+      title: `${theme === 'dark' ? 'Light' : 'Dark'} mode activated`,
+      description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
+    });
   };
-  
+
   return (
-    <header className="border-b dark:border-white/10 light:border-black/10 p-3 flex items-center justify-between sticky top-0 z-30 bg-background backdrop-blur-sm">
-      <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleSidebar} 
-          className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5"
-          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-        >
-          {sidebarOpen ? 
-            <PanelLeftClose className="h-5 w-5" /> : 
-            <PanelLeft className="h-5 w-5" />
-          }
-        </Button>
-        
-        <div className="flex items-center gap-1.5">
+    <header className="sticky top-0 z-10 border-b border-white/10 bg-black/50 backdrop-blur-md dark:bg-black/50 light:bg-white/80">
+      <div className="flex items-center justify-between px-3 py-2 max-w-6xl mx-auto">
+        <div className="flex items-center gap-2">
+          {children}
+          
           <div className="flex items-center">
-            <h1 className="text-lg font-semibold">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gemini-purple to-blue-500">
-                HydroGen
-              </span>
-            </h1>
-            <div className="flex items-center justify-center ml-1.5">
-              <div className="bg-gemini-purple text-white text-[10px] px-1.5 py-0.5 rounded-sm font-medium uppercase">
-                Beta
-              </div>
-            </div>
+            <span className="font-semibold text-white mr-1 dark:text-white light:text-black">HydroGen</span>
+            <span className="bg-black/20 text-white text-xs px-1.5 py-0.5 rounded-full dark:text-white light:text-black light:bg-black/10">Beta</span>
           </div>
         </div>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleTheme} 
-          className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5"
-          aria-label={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {theme === 'dark' ? 
-            <Sun className="h-5 w-5" /> : 
-            <Moon className="h-5 w-5" />
-          }
-        </Button>
         
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onOpenSettings} 
-          className="h-9 w-9 rounded-full dark:hover:bg-white/5 light:hover:bg-black/5"
-          aria-label="Open settings"
-        >
-          <Settings className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="h-8 w-8 border-white/10 dark:border-white/10 light:border-black/10">
+                <Zap className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-black/90 border-white/10 dark:bg-black/90 light:bg-white/95 light:border-black/10 light:text-black">
+              <DropdownMenuLabel className="text-white light:text-black">AI Model</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10 light:bg-black/10" />
+              <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white group dark:text-white dark:focus:bg-white/10 light:text-black light:focus:bg-black/5">
+                <div className="flex flex-col">
+                  <span className="font-medium">Current: {getModelDisplayName()}</span>
+                  <span className="text-xs text-muted-foreground group-hover:text-white/70 light:group-hover:text-black/70">
+                    Change model in settings
+                  </span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <ApiKeyDialog />
+          
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="h-8 w-8 border-white/10 dark:border-white/10 light:border-black/10"
+            onClick={onOpenSettings}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="h-8 w-8 border-white/10 dark:border-white/10 light:border-black/10">
+                <User className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-black/90 border-white/10 dark:bg-black/90 light:bg-white/95 light:border-black/10 light:text-black">
+              <DropdownMenuLabel className="text-white light:text-black">My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10 light:bg-black/10" />
+              <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white dark:text-white dark:focus:bg-white/10 light:text-black light:focus:bg-black/5">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white dark:text-white dark:focus:bg-white/10 light:text-black light:focus:bg-black/5">
+                Help & Support
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/10 light:bg-black/10" />
+              <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );

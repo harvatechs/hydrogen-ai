@@ -1,17 +1,14 @@
-
 import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, FileSpreadsheet, FileText, FileImage, FilePlus } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { AIVoiceInput } from "@/components/ui/ai-voice-input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { searchGoogle } from "@/utils/searchUtils";
 import { SearchResults } from "./SearchResults";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
@@ -19,18 +16,14 @@ export function ChatInput() {
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [showFileOptions, setShowFileOptions] = useState(false);
-  
   const {
     sendMessage,
     isProcessing,
     theme
   } = useChat();
-  
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recognition, setRecognition] = useState<any>(null);
-  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -75,33 +68,21 @@ export function ChatInput() {
       }
     };
   }, []);
-  
-  // Focus input on component mount
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
-  
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
-    
     if (message.trim().startsWith('/web ')) {
       const searchTerm = message.trim().replace('/web ', '');
       await handleWebSearch(searchTerm);
       return;
     }
-    
     const currentMessage = message;
     setMessage("");
     await sendMessage(currentMessage);
-    
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
   };
-  
   const handleWebSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) {
       toast({
@@ -110,19 +91,15 @@ export function ChatInput() {
       });
       return;
     }
-    
     toast({
       title: "Searching the web",
       description: `Looking up: "${searchTerm}"`
     });
-    
     setIsSearching(true);
     setMessage("");
-    
     try {
       const results = await searchGoogle(searchTerm);
       setIsSearching(false);
-      
       if (results && results.items && results.items.length > 0) {
         setSearchResults(results);
         toast({
@@ -145,11 +122,9 @@ export function ChatInput() {
       });
     }
   };
-  
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
-  
   const toggleVoiceRecognition = () => {
     if (!recognition) {
       toast({
@@ -159,7 +134,6 @@ export function ChatInput() {
       });
       return;
     }
-    
     if (isListening) {
       recognition.stop();
       setIsListening(false);
@@ -176,14 +150,12 @@ export function ChatInput() {
       }
     }
   };
-  
   const handleVoiceStart = useCallback(() => {
     toast({
       title: "Voice recording started",
       description: "Speak clearly and we'll convert your speech to text."
     });
   }, []);
-  
   const handleVoiceStop = useCallback((duration: number) => {
     if (duration > 0) {
       toast({
@@ -195,52 +167,29 @@ export function ChatInput() {
       setShowVoiceInput(false);
     }
   }, []);
-  
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
-  
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       setIsUploading(true);
-      
-      // Get file extension to determine type
-      const fileName = files[0].name;
-      const fileSize = (files[0].size / 1024).toFixed(1);
-      const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      
-      let fileType = "file";
-      if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
-        fileType = "image";
-      } else if (fileExtension === 'pdf' || fileExtension === 'doc' || fileExtension === 'docx' || fileExtension === 'txt') {
-        fileType = "document";
-      } else if (fileExtension === 'xls' || fileExtension === 'xlsx' || fileExtension === 'csv') {
-        fileType = "spreadsheet";
-      }
-      
       setTimeout(() => {
         setIsUploading(false);
         toast({
           title: "File uploaded successfully",
-          description: `Analyzing ${fileName} (${fileSize} KB)`,
-          variant: "default"
+          description: `Analyzing ${files[0].name} (${(files[0].size / 1024).toFixed(1)} KB)`
         });
-        
         setTimeout(() => {
-          setMessage(prev => prev + (prev ? " " : "") + `Analyze this ${fileType}: ${fileName}`);
+          setMessage(prev => prev + (prev ? " " : "") + `Analyze the content of this ${files[0].name} file.`);
           e.target.value = '';
-          
           setTimeout(() => {
             inputRef.current?.focus();
           }, 100);
         }, 800);
       }, 1500);
     }
-    
-    setShowFileOptions(false);
   };
-  
   const handleProSearch = () => {
     if (!message.trim()) {
       toast({
@@ -249,99 +198,40 @@ export function ChatInput() {
       });
       return;
     }
-    
     toast({
       title: "Advanced research in progress",
-      description: `Deep analysis for: "${message}"`,
-      variant: "default"
+      description: `Deep analysis for: "${message}"`
     });
-    
     setTimeout(() => {
       sendMessage(`Conduct comprehensive research on: ${message}`);
       setMessage("");
     }, 800);
   };
-  
   const handleClearInput = () => {
     setMessage("");
     inputRef.current?.focus();
   };
-  
   const handleCloseSearch = () => {
     setSearchResults(null);
   };
-  
-  const fileTypes = [
-    { name: "Document", icon: FileText, accept: ".pdf,.doc,.docx,.txt" },
-    { name: "Image", icon: FileImage, accept: ".jpg,.jpeg,.png,.gif" },
-    { name: "Spreadsheet", icon: FileSpreadsheet, accept: ".xls,.xlsx,.csv" },
-    { name: "Other", icon: FilePlus, accept: ".json,.md" }
-  ];
-  
-  return (
-    <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
+  return <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
       <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
         <div className="rounded-xl border glass-card shadow-lg transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center">
             <div className="flex items-center space-x-1 ml-2">
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
-                accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.json,.md" 
-              />
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.json,.md" />
               
-              <Popover open={showFileOptions} onOpenChange={setShowFileOptions}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    type="button" 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                    title="Upload file"
-                  >
-                    <FileUp className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-0 dark:bg-gray-900 light:bg-white">
-                  <div className="grid gap-1 p-1">
-                    {fileTypes.map((type) => (
-                      <Button 
-                        key={type.name}
-                        variant="ghost" 
-                        className="flex justify-start cursor-pointer px-2 py-1.5 h-auto"
-                        onClick={() => {
-                          if (fileInputRef.current) {
-                            fileInputRef.current.accept = type.accept;
-                            fileInputRef.current.click();
-                          }
-                        }}
-                      >
-                        <type.icon className="h-4 w-4 mr-2" />
-                        <span className="text-sm">{type.name}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
               
-              <Button 
-                type="button" 
-                size="icon" 
-                variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                title="Pro Search" 
-                onClick={handleProSearch}
-              >
+              
+              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Pro Search" onClick={handleProSearch}>
                 <Zap className="h-4 w-4" />
               </Button>
               
-              {message.trim().startsWith('/web') && 
-                <span className="text-xs text-gemini-purple bg-gemini-purple/10 px-2 py-1 rounded-full">
+              
+              
+              {message.trim().startsWith('/web') && <span className="text-xs text-gemini-purple bg-gemini-purple/10 px-2 py-1 rounded-full">
                   Web Search Mode
-                </span>
-              }
+                </span>}
             </div>
             
             <div className="relative flex-grow">
@@ -349,110 +239,52 @@ export function ChatInput() {
                 <div className="absolute left-3 text-muted-foreground">
                   <Search className="h-4 w-4" />
                 </div>
-                <Input 
-                  ref={inputRef} 
-                  placeholder="Ask anything or type /web to search the web..." 
-                  value={message} 
-                  onChange={handleInputChange} 
-                  className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-10 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300" 
-                  disabled={isProcessing}
-                />
+                <Input ref={inputRef} placeholder="Ask anything or type /web to search the web..." value={message} onChange={handleInputChange} className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-10 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300" disabled={isProcessing} />
               </div>
               
-              {message && 
-                <Button 
-                  type="button" 
-                  size="icon" 
-                  variant="ghost" 
-                  onClick={handleClearInput} 
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 dark:hover:text-white light:hover:text-black"
-                >
+              {message && <Button type="button" size="icon" variant="ghost" onClick={handleClearInput} className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 dark:hover:text-white light:hover:text-black">
                   <X className="h-3 w-3" />
-                </Button>
-              }
+                </Button>}
             </div>
             
             <div className="flex items-center space-x-1 mr-2">
               <Dialog open={showVoiceInput} onOpenChange={setShowVoiceInput}>
-                <Button 
-                  type="button" 
-                  size="icon" 
-                  variant="ghost" 
-                  className={cn(
-                    "h-9 w-9 rounded-full transition-all duration-300",
-                    isListening 
-                      ? "bg-gemini-purple text-white animate-pulse" 
-                      : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
-                  )}
-                  title="Voice input" 
-                  onClick={toggleVoiceRecognition}
-                >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Voice input" onClick={() => setShowVoiceInput(true)}>
+                  <Mic className="h-4 w-4" />
                 </Button>
                 <DialogContent className="sm:max-w-md glass-card">
                   <DialogHeader>
                     <DialogTitle className="text-center dark:text-white light:text-black">Voice Search</DialogTitle>
-                    <DialogDescription className="text-center text-muted-foreground">
-                      Speak clearly into your microphone
-                    </DialogDescription>
                   </DialogHeader>
                   <AIVoiceInput onStart={handleVoiceStart} onStop={handleVoiceStop} className="py-8" />
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowVoiceInput(false)}>Cancel</Button>
-                  </DialogFooter>
                 </DialogContent>
               </Dialog>
               
-              <Button 
-                type="submit" 
-                size="icon" 
-                className={cn(
-                  "h-9 w-9 rounded-full transition-all duration-200",
-                  message.trim() && !isProcessing 
-                    ? "dark:bg-gemini-purple dark:text-white dark:hover:opacity-90 light:bg-gemini-purple light:text-white light:hover:opacity-90" 
-                    : "bg-gemini-purple/20 text-gemini-purple/50 cursor-not-allowed"
-                )} 
-                disabled={!message.trim() || isProcessing} 
-                title="Send message"
-              >
+              <Button type="submit" size="icon" className={cn("h-9 w-9 rounded-full transition-all duration-200", message.trim() && !isProcessing ? "dark:bg-gemini-purple dark:text-white dark:hover:opacity-90 light:bg-gemini-purple light:text-white light:hover:opacity-90" : "bg-gemini-purple/20 text-gemini-purple/50 cursor-not-allowed")} disabled={!message.trim() || isProcessing} title="Send message">
                 <SendHorizontal className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          
-          {isProcessing && 
-            <div className="px-4 py-1 text-xs text-muted-foreground/70 border-t dark:border-white/5 light:border-black/5 dark:bg-black/20 light:bg-black/5">
+          {isProcessing && <div className="px-4 py-1 text-xs text-muted-foreground/70 border-t dark:border-white/5 light:border-black/5 dark:bg-black/20 light:bg-black/5">
               <div className="flex items-center">
                 <div className="mr-2 typing-animation w-24 h-3 dark:bg-white/20 light:bg-black/10 rounded-full"></div>
                 <span>Generating response...</span>
               </div>
-            </div>
-          }
+            </div>}
         </div>
-        
         <div className="mt-1 text-xs text-center text-muted-foreground/50">
           HydroGen AI may display inaccurate info, including about people, places, or facts
         </div>
       </form>
       
-      {searchResults && 
-        <SearchResults 
-          results={searchResults.items} 
-          searchInfo={searchResults.searchInformation} 
-          searchTerm={message || ""} 
-          onClose={handleCloseSearch}
-        />
-      }
+      {searchResults && <SearchResults results={searchResults.items} searchInfo={searchResults.searchInformation} searchTerm={message || ""} onClose={handleCloseSearch} />}
       
-      {isSearching && 
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+      {isSearching && <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-card p-6 rounded-xl shadow-xl flex flex-col items-center gap-4 max-w-md w-full">
             <Loader2 className="h-10 w-10 text-gemini-purple animate-spin" />
             <h3 className="text-xl font-medium">Searching the web...</h3>
             <p className="text-muted-foreground text-center">Fetching the most relevant results for your query</p>
           </div>
-        </div>
-      }
-    </div>
-  );
+        </div>}
+    </div>;
 }

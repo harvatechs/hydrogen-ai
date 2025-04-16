@@ -1,5 +1,5 @@
 
-export type MessageRole = "user" | "assistant" | "system" | "function" | "error";
+export type MessageRole = "user" | "assistant" | "system" | "error";
 
 export interface Message {
   id: string;
@@ -22,36 +22,10 @@ export interface UserSettings {
   apiConfig: ApiConfig;
 }
 
-export interface ChatMessage {
-  id: string;
-  role: MessageRole;
-  content: string;
-  timestamp: number;
-  isLoading?: boolean;
-  isError?: boolean;
-}
-
 export interface Conversation {
   id: string;
   title: string;
-  messages: ChatMessage[];
+  messages: Message[];
+  createdAt: Date;
   lastUpdatedAt: Date;
-}
-
-export type Theme = 'dark' | 'light' | 'system';
-export type FontSize = 'small' | 'normal' | 'large';
-
-export interface OpenRouterResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  choices: {
-    message: {
-      role: string;
-      content: string;
-    };
-    finish_reason: string;
-    index: number;
-  }[];
 }

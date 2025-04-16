@@ -1,13 +1,13 @@
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +40,7 @@ const App = () => {
   
   // Fix scrolling issues
   useEffect(() => {
+    // Add smooth scrolling to the entire document
     document.documentElement.style.scrollBehavior = 'smooth';
     document.documentElement.style.height = '100%';
     document.body.style.minHeight = '100vh';
@@ -57,7 +58,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Sonner className="toaster-container" />
+        <Sonner position="top-right" className="toaster-container" />
         <BrowserRouter>
           <div className="min-h-screen w-full">
             <Routes>

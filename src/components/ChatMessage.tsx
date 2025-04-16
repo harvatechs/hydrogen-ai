@@ -1,25 +1,21 @@
 
 import React, { useState, useRef } from "react";
-import { ChatMessage as MessageType } from "@/types/message";
+import { Message } from "@/types/message";
 import { cn } from "@/lib/utils";
 import { Bot, User, Copy, Check, ExternalLink, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger
-} from "@/components/ui/hover-card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 interface ChatMessageProps {
-  message: MessageType;
+  message: Message;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === "user";
-  const isError = message.role === "error" || message.isError === true;
+  const isError = message.role === "error";
   const [copied, setCopied] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null);
@@ -93,7 +89,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             "chat-message-content"
           )}
         >
-          {message.content}
+          <div dangerouslySetInnerHTML={{ __html: message.content }} />
         </div>
         
         {/* Reference links section */}
@@ -190,21 +186,23 @@ export function ChatMessage({ message }: ChatMessageProps) {
             </div>
             
             {!isUser && !message.isLoading && (
-              <HoverCard>
-                <HoverCardTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-muted-foreground/70 hover:text-gemini-yellow hover:bg-gemini-yellow/10 rounded-full"
-                    onClick={handleCopy}
-                  >
-                    {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  </Button>
-                </HoverCardTrigger>
-                <HoverCardContent side="left" className="p-2 text-xs">
-                  {copied ? "Copied!" : "Copy message"}
-                </HoverCardContent>
-              </HoverCard>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground/70 hover:text-gemini-yellow hover:bg-gemini-yellow/10 rounded-full"
+                      onClick={handleCopy}
+                    >
+                      {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    {copied ? "Copied!" : "Copy message"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
           

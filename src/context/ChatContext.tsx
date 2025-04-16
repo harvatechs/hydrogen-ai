@@ -1,405 +1,721 @@
 
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-} from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { createContext, useContext, useEffect, useReducer, useState } from "react";
+import { Message, MessageRole } from "../types/message";
 import { toast } from "@/components/ui/use-toast";
+import { v4 as uuidv4 } from "uuid";
 
-export type Role = 'user' | 'assistant';
+// Default API configuration
+const DEFAULT_API_CONFIG = {
+  key: 'AIzaSyApy8Nw8M6PeUWtKapURmaZnuH4lWogN6I',
+  url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+};
 
-export interface Message {
-  id: string;
-  role: Role;
-  content: string;
-  timestamp: number;
-  isLoading?: boolean;
-  isError?: boolean;
+// Initial message shown to the user
+const WELCOME_MESSAGE = `
+<h2>Welcome to HydroGen</h2>
+<p>Ask me anything, and I'll provide detailed, structured answers using Google's Gemini AI.</p>
+<ul>
+  <li>Ask questions on any topic</li>
+  <li>Get detailed explanations with references</li>
+  <li>View response history in your current session</li>
+</ul>
+<p>How can I help you today?</p>
+`;
+
+// Types
+interface ChatState {
+  messages: Message[];
+  apiKey: string;
+  apiUrl: string;
+  isProcessing: boolean;
+  theme: string;
+  fontSize: string;
+  conversations: Conversation[];
+  currentConversationId: string | null;
+  model: string;
 }
 
-export interface Conversation {
+interface Conversation {
   id: string;
   title: string;
+  messages: Message[];
+  createdAt: Date;
   lastUpdatedAt: Date;
 }
 
-interface ChatContextType {
+type ChatAction =
+  | { type: "ADD_MESSAGE"; message: Message; conversationId?: string }
+  | { type: "UPDATE_MESSAGE"; id: string; content: string }
+  | { type: "SET_LOADING"; id: string; isLoading: boolean }
+  | { type: "SET_API_KEY"; apiKey: string }
+  | { type: "SET_API_URL"; apiUrl: string }
+  | { type: "SET_PROCESSING"; isProcessing: boolean }
+  | { type: "SET_THEME"; theme: string }
+  | { type: "SET_FONT_SIZE"; fontSize: string }
+  | { type: "CREATE_CONVERSATION"; conversation: Conversation }
+  | { type: "SET_CURRENT_CONVERSATION"; id: string }
+  | { type: "UPDATE_CONVERSATION_TITLE"; id: string; title: string }
+  | { type: "CLEAR_CONVERSATION"; id: string }
+  | { type: "DELETE_CONVERSATION"; id: string }
+  | { type: "SET_MODEL"; model: string }
+  | { type: "CLEAR_MESSAGES" };
+
+interface ChatContextProps {
   messages: Message[];
-  addMessage: (message: Message) => void;
-  sendMessage: (content: string) => Promise<void>;
-  isProcessing: boolean;
-  clearMessages: () => void;
-  clearConversation: (conversationId: string) => void;
-  deleteConversation: (conversationId: string) => void;
+  apiKey: string;
+  apiUrl: string;
+  theme: string;
+  fontSize: string;
   conversations: Conversation[];
   currentConversationId: string | null;
-  setCurrentConversation: (conversationId: string | null) => void;
-  updateConversationTitle: (conversationId: string, newTitle: string) => void;
+  model: string;
+  setApiKey: (key: string) => void;
+  setApiUrl: (url: string) => void;
+  sendMessage: (content: string) => Promise<void>;
+  clearMessages: () => void;
+  isProcessing: boolean;
+  setTheme: (theme: string) => void;
+  setFontSize: (size: string) => void;
   createNewConversation: () => void;
-  theme: 'dark' | 'light' | 'system';
-  setTheme: (theme: 'dark' | 'light' | 'system') => void;
-  fontSize: 'small' | 'normal' | 'large';
-  setFontSize: (size: 'small' | 'normal' | 'large') => void;
-  apiKey?: string;
-  setApiKey?: (key: string) => void;
-  apiUrl?: string;
-  setApiUrl?: (url: string) => void;
-  model?: string;
-  setModel?: (model: string) => void;
+  setCurrentConversation: (id: string) => void;
+  updateConversationTitle: (id: string, title: string) => void;
+  clearConversation: (id: string) => void;
+  deleteConversation: (id: string) => void;
+  setModel: (model: string) => void;
 }
 
-// Gemini API configuration with explicit type
-interface GeminiMessage {
-  role: "user" | "model";
-  parts: {
-    text: string;
-  }[];
-}
+// Get stored API key or use default
+const getStoredApiKey = () => {
+  return localStorage.getItem("gemini-api-key") || DEFAULT_API_CONFIG.key;
+};
 
-// Function to call the Gemini API
-const generateCompletionWithGemini = async (messages: GeminiMessage[]): Promise<string> => {
-  const API_KEY = 'AIzaSyApy8Nw8M6PeUWtKapURmaZnuH4lWogN6I';
-  const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+// Get stored API URL or use default
+const getStoredApiUrl = () => {
+  return localStorage.getItem("gemini-api-url") || DEFAULT_API_CONFIG.url;
+};
+
+// Get stored theme or use default
+const getStoredTheme = () => {
+  return localStorage.getItem("app-theme") || "dark";
+};
+
+// Get stored font size or use default
+const getStoredFontSize = () => {
+  return localStorage.getItem("app-font-size") || "medium";
+};
+
+// Get stored model or use default
+const getStoredModel = () => {
+  return localStorage.getItem("app-model") || "gemini-2.0-flash";
+};
+
+// Get stored conversations
+const getStoredConversations = (): Conversation[] => {
+  const stored = localStorage.getItem("conversations");
+  if (!stored) return [];
   
   try {
-    const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const parsed = JSON.parse(stored);
+    // Convert date strings back to Date objects
+    return parsed.map((conv: any) => ({
+      ...conv,
+      createdAt: new Date(conv.createdAt),
+      lastUpdatedAt: new Date(conv.lastUpdatedAt),
+    }));
+  } catch (e) {
+    console.error("Error parsing stored conversations:", e);
+    return [];
+  }
+};
+
+// Create a new conversation with welcome message
+const createInitialConversation = (): Conversation => {
+  const now = new Date();
+  return {
+    id: uuidv4(),
+    title: "New chat",
+    messages: [
+      {
+        id: "welcome",
+        role: "assistant",
+        content: WELCOME_MESSAGE,
+        timestamp: now,
       },
-      body: JSON.stringify({
-        contents: messages,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to generate response');
-    }
-
-    const data = await response.json();
-    if (data.candidates && data.candidates[0] && 
-        data.candidates[0].content && 
-        data.candidates[0].content.parts && 
-        data.candidates[0].content.parts[0]) {
-      return data.candidates[0].content.parts[0].text;
-    } else {
-      throw new Error('Unexpected response format from API');
-    }
-  } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    throw error;
-  }
+    ],
+    createdAt: now,
+    lastUpdatedAt: now,
+  };
 };
 
-export const ChatContext = createContext<ChatContextType>({
-  messages: [],
-  addMessage: () => {},
-  sendMessage: async () => {},
+// Initial state
+const initialState: ChatState = {
+  messages: [
+    {
+      id: "welcome",
+      role: "assistant",
+      content: WELCOME_MESSAGE,
+      timestamp: new Date(),
+    },
+  ],
+  apiKey: getStoredApiKey(),
+  apiUrl: getStoredApiUrl(),
   isProcessing: false,
-  clearMessages: () => {},
-  clearConversation: () => {},
-  deleteConversation: () => {},
-  conversations: [],
+  theme: getStoredTheme(),
+  fontSize: getStoredFontSize(),
+  conversations: getStoredConversations(),
   currentConversationId: null,
-  setCurrentConversation: () => {},
-  updateConversationTitle: () => {},
-  createNewConversation: () => {},
-  theme: 'dark',
-  setTheme: () => {},
-  fontSize: 'normal',
-  setFontSize: () => {},
-});
+  model: getStoredModel(),
+};
 
-export const useChat = () => useContext(ChatContext);
+// If no conversations exist, create an initial one
+if (initialState.conversations.length === 0) {
+  const initialConversation = createInitialConversation();
+  initialState.conversations = [initialConversation];
+  initialState.currentConversationId = initialConversation.id;
+} else {
+  // Use the first conversation as current if none is set
+  initialState.currentConversationId = initialState.conversations[0].id;
+  // Set initial messages to the current conversation's messages
+  const currentConv = initialState.conversations.find(c => c.id === initialState.currentConversationId);
+  if (currentConv) {
+    initialState.messages = currentConv.messages;
+  }
+}
 
-// Function to extract a title from the content
-const extractTitleFromContent = (content: string) => {
-  const maxLength = 50;
-  const trimmedContent = content.trim();
-  
-  if (trimmedContent.length <= maxLength) {
-    return trimmedContent;
-  } else {
-    return trimmedContent.substring(0, maxLength).trim() + "...";
+// Reducer
+const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
+  switch (action.type) {
+    case "ADD_MESSAGE": {
+      const newMessages = [...state.messages, action.message];
+      
+      // Update the conversation if we have one
+      if (state.currentConversationId) {
+        const updatedConversations = state.conversations.map(conv => 
+          conv.id === state.currentConversationId 
+            ? { 
+                ...conv, 
+                messages: newMessages,
+                lastUpdatedAt: new Date(),
+                // Update title if this is the second message (after welcome)
+                title: conv.title === "New chat" && newMessages.length === 3 
+                  ? newMessages[1].content.substring(0, 30) + "..." 
+                  : conv.title
+              } 
+            : conv
+        );
+
+        return {
+          ...state,
+          messages: newMessages,
+          conversations: updatedConversations,
+        };
+      }
+      
+      return {
+        ...state,
+        messages: newMessages,
+      };
+    }
+    case "UPDATE_MESSAGE": {
+      const updatedMessages = state.messages.map((msg) =>
+        msg.id === action.id
+          ? { ...msg, content: action.content }
+          : msg
+      );
+      
+      // Update the conversation if we have one
+      if (state.currentConversationId) {
+        const updatedConversations = state.conversations.map(conv => 
+          conv.id === state.currentConversationId 
+            ? { 
+                ...conv, 
+                messages: updatedMessages,
+                lastUpdatedAt: new Date() 
+              } 
+            : conv
+        );
+
+        return {
+          ...state,
+          messages: updatedMessages,
+          conversations: updatedConversations,
+        };
+      }
+      
+      return {
+        ...state,
+        messages: updatedMessages,
+      };
+    }
+    case "SET_LOADING": {
+      const updatedMessages = state.messages.map((msg) =>
+        msg.id === action.id
+          ? { ...msg, isLoading: action.isLoading }
+          : msg
+      );
+      
+      // Update the conversation if we have one
+      if (state.currentConversationId) {
+        const updatedConversations = state.conversations.map(conv => 
+          conv.id === state.currentConversationId 
+            ? { ...conv, messages: updatedMessages } 
+            : conv
+        );
+
+        return {
+          ...state,
+          messages: updatedMessages,
+          conversations: updatedConversations,
+        };
+      }
+      
+      return {
+        ...state,
+        messages: updatedMessages,
+      };
+    }
+    case "SET_API_KEY":
+      return {
+        ...state,
+        apiKey: action.apiKey,
+      };
+    case "SET_API_URL":
+      return {
+        ...state,
+        apiUrl: action.apiUrl,
+      };
+    case "SET_PROCESSING":
+      return {
+        ...state,
+        isProcessing: action.isProcessing,
+      };
+    case "SET_THEME":
+      return {
+        ...state,
+        theme: action.theme,
+      };
+    case "SET_FONT_SIZE":
+      return {
+        ...state,
+        fontSize: action.fontSize,
+      };
+    case "SET_MODEL":
+      return {
+        ...state,
+        model: action.model,
+      };
+    case "CREATE_CONVERSATION":
+      return {
+        ...state,
+        conversations: [...state.conversations, action.conversation],
+        currentConversationId: action.conversation.id,
+        messages: action.conversation.messages,
+      };
+    case "SET_CURRENT_CONVERSATION": {
+      const conversation = state.conversations.find(c => c.id === action.id);
+      return {
+        ...state,
+        currentConversationId: action.id,
+        messages: conversation ? conversation.messages : state.messages,
+      };
+    }
+    case "UPDATE_CONVERSATION_TITLE": {
+      const updatedConversations = state.conversations.map(conv => 
+        conv.id === action.id 
+          ? { ...conv, title: action.title, lastUpdatedAt: new Date() } 
+          : conv
+      );
+      return {
+        ...state,
+        conversations: updatedConversations,
+      };
+    }
+    case "CLEAR_CONVERSATION": {
+      const now = new Date();
+      const updatedConversations = state.conversations.map(conv => 
+        conv.id === action.id 
+          ? { 
+              ...conv, 
+              messages: [
+                {
+                  id: `welcome-${action.id}`,
+                  role: "assistant" as MessageRole,
+                  content: WELCOME_MESSAGE,
+                  timestamp: now,
+                },
+              ],
+              lastUpdatedAt: now
+            } 
+          : conv
+      );
+      
+      // If this is the current conversation, update messages too
+      if (state.currentConversationId === action.id) {
+        return {
+          ...state,
+          conversations: updatedConversations,
+          messages: [
+            {
+              id: `welcome-${action.id}`,
+              role: "assistant" as MessageRole,
+              content: WELCOME_MESSAGE,
+              timestamp: now,
+            },
+          ],
+        };
+      }
+      
+      return {
+        ...state,
+        conversations: updatedConversations,
+      };
+    }
+    case "DELETE_CONVERSATION": {
+      const updatedConversations = state.conversations.filter(conv => conv.id !== action.id);
+      
+      // If this was the current conversation, switch to another one
+      if (state.currentConversationId === action.id) {
+        if (updatedConversations.length > 0) {
+          const newCurrentConv = updatedConversations[0];
+          return {
+            ...state,
+            conversations: updatedConversations,
+            currentConversationId: newCurrentConv.id,
+            messages: newCurrentConv.messages,
+          };
+        } else {
+          // Create a new conversation if there are none left
+          const newConversation = createInitialConversation();
+          return {
+            ...state,
+            conversations: [newConversation],
+            currentConversationId: newConversation.id,
+            messages: newConversation.messages,
+          };
+        }
+      }
+      
+      return {
+        ...state,
+        conversations: updatedConversations,
+      };
+    }
+    case "CLEAR_MESSAGES": {
+      const now = new Date();
+      const newMessages = [
+        {
+          id: "welcome-new",
+          role: "assistant" as MessageRole,
+          content: WELCOME_MESSAGE,
+          timestamp: now,
+        },
+      ];
+      
+      // Also update the current conversation if we have one
+      if (state.currentConversationId) {
+        const updatedConversations = state.conversations.map(conv => 
+          conv.id === state.currentConversationId 
+            ? { 
+                ...conv, 
+                messages: newMessages,
+                title: "New chat",
+                lastUpdatedAt: now
+              } 
+            : conv
+        );
+
+        return {
+          ...state,
+          messages: newMessages,
+          conversations: updatedConversations,
+        };
+      }
+      
+      return {
+        ...state,
+        messages: newMessages,
+      };
+    }
+    default:
+      return state;
   }
 };
+
+// Context
+const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
-  const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
-  const [apiKey, setApiKey] = useState<string>('');
-  const [apiUrl, setApiUrl] = useState<string>('');
-  const [model, setModel] = useState<string>('gemini-2.0-flash');
-
-  // Load conversations from local storage on mount
-  useEffect(() => {
-    const storedConversations = localStorage.getItem('conversations');
-    if (storedConversations) {
-      setConversations(JSON.parse(storedConversations));
-    }
-    
-    const storedTheme = localStorage.getItem('theme') as 'dark' | 'light' | 'system' | null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-    
-    const storedFontSize = localStorage.getItem('fontSize') as 'small' | 'normal' | 'large' | null;
-    if (storedFontSize) {
-      setFontSize(storedFontSize);
-    }
-    
-    const storedApiKey = localStorage.getItem('apiKey');
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    }
-    
-    const storedApiUrl = localStorage.getItem('apiUrl');
-    if (storedApiUrl) {
-      setApiUrl(storedApiUrl);
-    }
-    
-    const storedModel = localStorage.getItem('model');
-    if (storedModel) {
-      setModel(storedModel);
-    }
-  }, []);
-
-  // Save conversations to local storage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('conversations', JSON.stringify(conversations));
-  }, [conversations]);
+  const [state, dispatch] = useReducer(chatReducer, initialState);
   
+  // Apply theme
   useEffect(() => {
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    document.documentElement.setAttribute('data-theme', state.theme);
+    localStorage.setItem("app-theme", state.theme);
+  }, [state.theme]);
   
+  // Apply font size
   useEffect(() => {
-    localStorage.setItem('fontSize', fontSize);
-  }, [fontSize]);
-  
+    document.documentElement.setAttribute('data-font-size', state.fontSize);
+    localStorage.setItem("app-font-size", state.fontSize);
+  }, [state.fontSize]);
+
+  // Save API key to localStorage when it changes
   useEffect(() => {
-    if (apiKey) localStorage.setItem('apiKey', apiKey);
-  }, [apiKey]);
-  
-  useEffect(() => {
-    if (apiUrl) localStorage.setItem('apiUrl', apiUrl);
-  }, [apiUrl]);
-  
-  useEffect(() => {
-    if (model) localStorage.setItem('model', model);
-  }, [model]);
-
-  const addMessage = useCallback((message: Message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-  }, []);
-
-  const updateMessage = useCallback((id: string, updates: Partial<Message>) => {
-    setMessages(prevMessages =>
-      prevMessages.map(msg => (msg.id === id ? { ...msg, ...updates } : msg))
-    );
-  }, []);
-
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
-
-  const clearConversation = useCallback((conversationId: string) => {
-    setMessages(prevMessages => prevMessages.filter(msg => {
-      const firstMessage = prevMessages[0];
-      return firstMessage && firstMessage.id !== conversationId;
-    }));
-  }, []);
-
-  const deleteConversation = useCallback((conversationId: string) => {
-    setConversations(prevConversations =>
-      prevConversations.filter(conversation => conversation.id !== conversationId)
-    );
-    if (currentConversationId === conversationId) {
-      setCurrentConversationId(null);
-      clearMessages();
+    if (state.apiKey) {
+      localStorage.setItem("gemini-api-key", state.apiKey);
     }
-  }, [clearMessages, currentConversationId]);
-
-  const setCurrentConversation = useCallback((conversationId: string | null) => {
-    setCurrentConversationId(conversationId);
-    if (conversationId) {
-      // Load messages for the selected conversation
-      setMessages([]);
-    } else {
-      // Clear messages if no conversation is selected
-      clearMessages();
+  }, [state.apiKey]);
+  
+  // Save API URL to localStorage when it changes
+  useEffect(() => {
+    if (state.apiUrl) {
+      localStorage.setItem("gemini-api-url", state.apiUrl);
     }
-  }, [clearMessages]);
+  }, [state.apiUrl]);
+  
+  // Save model to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("app-model", state.model);
+  }, [state.model]);
+  
+  // Save conversations to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem("conversations", JSON.stringify(state.conversations));
+  }, [state.conversations]);
 
-  const updateConversationTitle = useCallback((conversationId: string, newTitle: string) => {
-    setConversations(prevConversations =>
-      prevConversations.map(conversation =>
-        conversation.id === conversationId ? { ...conversation, title: newTitle } : conversation
-      )
-    );
-  }, []);
-
-  const createNewConversation = useCallback(() => {
-    const newConvId = uuidv4();
-    setCurrentConversationId(newConvId);
-    setConversations(prev => [
-      {
-        id: newConvId,
-        title: "New Conversation",
-        lastUpdatedAt: new Date(),
-      },
-      ...prev
-    ]);
-    clearMessages();
-  }, [clearMessages]);
-
-  const updateConversationTime = (conversationId: string | null) => {
-    if (!conversationId) return;
-    setConversations(prev =>
-      prev.map(conversation =>
-        conversation.id === conversationId ? { ...conversation, lastUpdatedAt: new Date() } : conversation
-      )
-    );
+  const setApiKey = (key: string) => {
+    dispatch({ type: "SET_API_KEY", apiKey: key });
+  };
+  
+  const setApiUrl = (url: string) => {
+    dispatch({ type: "SET_API_URL", apiUrl: url });
   };
 
+  const clearMessages = () => {
+    dispatch({ type: "CLEAR_MESSAGES" });
+  };
+  
+  const setTheme = (theme: string) => {
+    dispatch({ type: "SET_THEME", theme });
+  };
+  
+  const setFontSize = (fontSize: string) => {
+    dispatch({ type: "SET_FONT_SIZE", fontSize });
+  };
+  
+  const setModel = (model: string) => {
+    dispatch({ type: "SET_MODEL", model });
+  };
+  
+  const createNewConversation = () => {
+    const conversation = createInitialConversation();
+    dispatch({ type: "CREATE_CONVERSATION", conversation });
+  };
+  
+  const setCurrentConversation = (id: string) => {
+    dispatch({ type: "SET_CURRENT_CONVERSATION", id });
+  };
+  
+  const updateConversationTitle = (id: string, title: string) => {
+    dispatch({ type: "UPDATE_CONVERSATION_TITLE", id, title });
+  };
+  
+  const clearConversation = (id: string) => {
+    dispatch({ type: "CLEAR_CONVERSATION", id });
+  };
+  
+  const deleteConversation = (id: string) => {
+    dispatch({ type: "DELETE_CONVERSATION", id });
+  };
+
+  // Function to send a message and get a response
   const sendMessage = async (content: string) => {
-    // Create a temporary ID for the user message
-    const tempUserMsgId = uuidv4();
-    const tempAiMsgId = uuidv4();
+    if (!content.trim()) return;
     
-    // Check if we're in an active conversation
-    if (!currentConversationId) {
-      const newConvId = uuidv4();
-      setCurrentConversationId(newConvId);
-      const newTitle = extractTitleFromContent(content);
-      
-      setConversations(prev => [
-        {
-          id: newConvId,
-          title: newTitle,
-          lastUpdatedAt: new Date(),
-        },
-        ...prev
-      ]);
+    // Generate unique IDs
+    const userMessageId = `user-${Date.now()}`;
+    const assistantMessageId = `assistant-${Date.now()}`;
+    
+    // Add user message
+    dispatch({
+      type: "ADD_MESSAGE",
+      message: {
+        id: userMessageId,
+        role: "user",
+        content,
+        timestamp: new Date(),
+      },
+    });
+    
+    // Add placeholder for assistant message
+    dispatch({
+      type: "ADD_MESSAGE",
+      message: {
+        id: assistantMessageId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+        isLoading: true,
+      },
+    });
+    
+    dispatch({ type: "SET_PROCESSING", isProcessing: true });
+    
+    // Check if API key exists
+    if (!state.apiKey) {
+      dispatch({
+        type: "UPDATE_MESSAGE",
+        id: assistantMessageId,
+        content:
+          "<p>Please set your Google Gemini API key in the settings first.</p>",
+      });
+      dispatch({ type: "SET_LOADING", id: assistantMessageId, isLoading: false });
+      dispatch({ type: "SET_PROCESSING", isProcessing: false });
+      return;
     }
     
-    // Add the user message immediately
-    const userMessage: Message = {
-      id: tempUserMsgId,
-      role: 'user',
-      content,
-      timestamp: Date.now(),
-    };
-    
-    addMessage(userMessage);
-    
-    // Create a temporary AI message to show loading
-    const loadingMessage: Message = {
-      id: tempAiMsgId,
-      role: 'assistant',
-      content: '...',
-      timestamp: Date.now(),
-      isLoading: true,
-    };
-    
-    addMessage(loadingMessage);
-    setIsProcessing(true);
-    
     try {
-      // Format messages for API - omit loading messages and include context
-      const formattedMessages = messages
-        .filter(msg => !msg.isLoading) // Filter out loading messages
-        .concat(userMessage) // Add the current user message
-        .slice(-10) // Only take the last 10 messages for context
-        .map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.content }]
-        })) as GeminiMessage[];
+      const controller = new AbortController();
       
-      // Add user context with role "user" - Gemini doesn't support system role
-      formattedMessages.unshift({
-        role: "user",
-        parts: [{ text: "You are HydroGen AI, a helpful, respectful, and accurate assistant. Always provide factual information and cite sources when possible. If you're unsure about something, be honest about your limitations. Remember this context when answering the questions." }]
-      });
-      
-      // Get response from Gemini API
-      const response = await generateCompletionWithGemini(formattedMessages);
-      
-      // Check if the title needs to be updated (for new conversations)
-      if (conversations.find(c => c.id === currentConversationId)?.title === "New Conversation") {
-        const newTitle = extractTitleFromContent(content);
-        updateConversationTitle(currentConversationId, newTitle);
+      // Extract model ID from the URL or use the one in state
+      let modelId = state.model;
+      // If URL contains a model ID, parse it
+      if (state.apiUrl.includes('/models/')) {
+        const urlParts = state.apiUrl.split('/models/');
+        if (urlParts.length > 1) {
+          const modelPart = urlParts[1].split(':')[0];
+          if (modelPart) {
+            modelId = modelPart;
+          }
+        }
       }
       
-      // Update the AI message with the response
-      updateMessage(tempAiMsgId, {
-        content: response,
-        isLoading: false,
+      const response = await fetch(`${state.apiUrl}?key=${state.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Answer this question accurately and helpfully: "${content}"
+
+              RESPONSE FORMAT:
+              - Use HTML for structure (<h2>, <h3> for headings, <p> for paragraphs)
+              - Use <strong> for key concepts and <em> for definitions
+              - Use <ul>, <ol>, <li> for lists
+              - Use <blockquote> for quotes
+              - Use <table>, <tr>, <th>, <td> for data tables
+              - Use <code> for code snippets and equations
+              - Use <a href=""> for citations
+
+              CONTENT STRUCTURE:
+              1. Begin with a clear, direct answer to the question (2-3 sentences)
+              2. Provide an executive summary with key takeaways (bullet points)
+              3. Give necessary background information and context
+              4. Present a detailed explanation with:
+              • Step-by-step breakdowns when applicable
+              • Evidence and data from reliable sources
+              • Multiple perspectives when the topic is debated
+              • Visual descriptions or analogies for complex concepts
+              5. Address common misconceptions or frequently asked questions
+              6. Include practical applications or real-world examples
+              7. Conclude with future implications or next steps
+              8. Add references to credible sources
+
+              QUALITY GUIDELINES:
+              - Ensure factual accuracy and cite reliable sources
+              - Use clear, accessible language for all expertise levels
+              - Explain technical terms when they first appear
+              - Provide balanced coverage of different viewpoints
+              - Distinguish clearly between facts and opinions
+              - Acknowledge limitations in current knowledge
+              - Organize information logically with smooth transitions
+              - Use concrete examples to illustrate abstract concepts
+              - Tailor depth based on the complexity of the question
+
+              Respond in a helpful, informative tone that's accessible to beginners but substantive enough for experts.`
+            }]
+          }]
+        }),
+        signal: controller.signal
       });
       
-      // Update the conversation's last updated time
-      updateConversationTime(currentConversationId);
+      if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const generatedText = data.candidates[0].content.parts[0].text || "No response generated.";
+      
+      // Update the assistant message with the response
+      dispatch({
+        type: "UPDATE_MESSAGE",
+        id: assistantMessageId,
+        content: generatedText,
+      });
       
     } catch (error) {
-      console.error('Error sending message:', error);
+      let errorMessage = "Failed to get a response.";
+      if (error instanceof Error) {
+        errorMessage = `Error: ${error.message}`;
+        console.error(error);
+      }
       
-      // Update the AI message with an error
-      updateMessage(tempAiMsgId, {
-        content: 'Sorry, there was an error processing your request. Please try again later.',
-        isLoading: false,
-        isError: true,
+      dispatch({
+        type: "UPDATE_MESSAGE",
+        id: assistantMessageId,
+        content: `<p class="text-red-500">${errorMessage}</p>`,
       });
       
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
-        variant: 'destructive',
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
       });
     } finally {
-      setIsProcessing(false);
+      dispatch({ type: "SET_LOADING", id: assistantMessageId, isLoading: false });
+      dispatch({ type: "SET_PROCESSING", isProcessing: false });
     }
   };
 
-  const contextValue: ChatContextType = {
-    messages,
-    addMessage,
-    sendMessage,
-    isProcessing,
-    clearMessages,
-    clearConversation,
-    deleteConversation,
-    conversations,
-    currentConversationId,
-    setCurrentConversation,
-    updateConversationTitle,
-    createNewConversation,
-    theme,
-    setTheme,
-    fontSize,
-    setFontSize,
-    apiKey,
-    setApiKey,
-    apiUrl,
-    setApiUrl,
-    model,
-    setModel,
-  };
-
   return (
-    <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>
+    <ChatContext.Provider
+      value={{
+        messages: state.messages,
+        apiKey: state.apiKey,
+        apiUrl: state.apiUrl,
+        theme: state.theme,
+        fontSize: state.fontSize,
+        conversations: state.conversations,
+        currentConversationId: state.currentConversationId,
+        model: state.model,
+        setApiKey,
+        setApiUrl,
+        sendMessage,
+        clearMessages,
+        isProcessing: state.isProcessing,
+        setTheme,
+        setFontSize,
+        createNewConversation,
+        setCurrentConversation,
+        updateConversationTitle,
+        clearConversation,
+        deleteConversation,
+        setModel,
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
   );
+};
+
+export const useChat = () => {
+  const context = useContext(ChatContext);
+  if (context === undefined) {
+    throw new Error("useChat must be used within a ChatProvider");
+  }
+  return context;
 };

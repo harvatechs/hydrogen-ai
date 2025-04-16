@@ -1,15 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Search, Settings, Trash2, User, LogOut, Edit2, X, Check, Moon, Sun, HelpCircle, Plus, MessageSquare, PanelLeftClose, PanelLeft, Image, Youtube, Sparkles, Palette, Cpu } from "lucide-react";
+import { Search, Settings, Trash2, User, LogOut, Edit2, X, Check, Moon, Sun, HelpCircle, Plus, MessageSquare } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { AtomThemes } from "./AtomThemes";
-import { YouTubeSummarizer } from "./YouTubeSummarizer";
-import { AIModels } from "./AIModels";
-import { ImageGenerator } from "./ImageGenerator";
 export function Sidebar() {
   const {
     clearMessages,
@@ -29,13 +25,12 @@ export function Sidebar() {
   const [editTitle, setEditTitle] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
   const editInputRef = useRef<HTMLInputElement>(null);
-  const [showAtomThemes, setShowAtomThemes] = useState(false);
-  const [showYouTubeTools, setShowYouTubeTools] = useState(false);
-  const [showAIModels, setShowAIModels] = useState(false);
-  const [showImageGenerator, setShowImageGenerator] = useState(false);
+
+  // Filter conversations based on search term
   const filteredConversations = conversations.filter(chat => chat.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // Group conversations by date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
@@ -51,11 +46,15 @@ export function Sidebar() {
     pastMonth: filteredConversations.filter(chat => chat.lastUpdatedAt >= pastMonth && chat.lastUpdatedAt < pastWeek),
     older: filteredConversations.filter(chat => chat.lastUpdatedAt < pastMonth)
   };
+
+  // Focus on edit input when editing starts
   useEffect(() => {
     if (editingId && editInputRef.current) {
       editInputRef.current.focus();
     }
   }, [editingId]);
+
+  // Handle search command for web search
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchTerm.startsWith('/web ')) {
       const query = searchTerm.replace('/web ', '').trim();
@@ -114,16 +113,6 @@ export function Sidebar() {
       description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
     });
   };
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
-  };
-  if (!sidebarVisible) {
-    return <div className="absolute top-4 left-4 z-50">
-        <Button variant="outline" size="icon" onClick={toggleSidebar} className="rounded-full bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 light:bg-primary light:hover:bg-primary/90" aria-label="Show Sidebar">
-          <PanelLeft className="h-5 w-5 text-primary-foreground" />
-        </Button>
-      </div>;
-  }
   const renderConversationGroup = (title: string, conversations: typeof filteredConversations) => {
     if (conversations.length === 0) return null;
     return <div key={title}>
@@ -161,11 +150,7 @@ export function Sidebar() {
         </div>
       </div>;
   };
-  return <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10 relative">
-      <div className="absolute top-3 right-3 z-10">
-        
-      </div>
-
+  return <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10">
       <div className="p-2">
         <Button variant="outline" onClick={createNewConversation} className="w-full justify-start text-left border-white/10 dark:border-white/10 dark:hover:bg-white/5 light:border-black/10 light:hover:bg-black/5 mb-1 bg-transparent text-inherit">
           <Plus className="mr-2 h-4 w-4" />
@@ -175,33 +160,6 @@ export function Sidebar() {
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search or type /web to search..." className="pl-9 bg-transparent dark:border-white/10 light:border-black/10 focus-visible:ring-muted" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onKeyDown={handleSearchKeyDown} />
-        </div>
-      </div>
-      
-      <div className="px-2 py-1">
-        <div className="text-xs font-medium text-muted-foreground mb-1 px-2">
-          AI Tools
-        </div>
-        <div className="grid grid-cols-2 gap-1.5 mb-2">
-          <Button variant="outline" size="sm" onClick={() => setShowAtomThemes(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
-            <Sparkles className="h-3.5 w-3.5 text-yellow-500" />
-            <span className="text-xs">Atom Themes</span>
-          </Button>
-          
-          <Button variant="outline" size="sm" onClick={() => setShowAIModels(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
-            <Cpu className="h-3.5 w-3.5 text-violet-500" />
-            <span className="text-xs">AI Models</span>
-          </Button>
-          
-          <Button variant="outline" size="sm" onClick={() => setShowYouTubeTools(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
-            <Youtube className="h-3.5 w-3.5 text-red-500" />
-            <span className="text-xs">YouTube</span>
-          </Button>
-          
-          <Button variant="outline" size="sm" onClick={() => setShowImageGenerator(true)} className="flex items-center justify-start gap-1.5 h-auto py-1.5 dark:bg-transparent light:bg-transparent dark:hover:bg-white/5 light:hover:bg-black/5">
-            <Image className="h-3.5 w-3.5 text-blue-500" />
-            <span className="text-xs">Image Gen</span>
-          </Button>
         </div>
       </div>
       
@@ -224,10 +182,7 @@ export function Sidebar() {
             Clear conversation
           </Button>
           
-          <Button variant="ghost" onClick={toggleTheme} className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
-            {theme === 'dark' ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          </Button>
+          
           
           <Button variant="ghost" className="w-full justify-start dark:hover:bg-white/5 light:hover:bg-black/5">
             <HelpCircle className="mr-2 h-4 w-4" />
@@ -248,6 +203,7 @@ export function Sidebar() {
         </Button>
       </div>
       
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="dark:bg-black/90 dark:border-white/10 light:bg-white light:border-black/10">
           <DialogHeader>
@@ -264,30 +220,6 @@ export function Sidebar() {
               Delete
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={showAtomThemes} onOpenChange={setShowAtomThemes}>
-        <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-3xl h-[80vh]">
-          <AtomThemes onClose={() => setShowAtomThemes(false)} />
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={showYouTubeTools} onOpenChange={setShowYouTubeTools}>
-        <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh]">
-          <YouTubeSummarizer onClose={() => setShowYouTubeTools(false)} />
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={showAIModels} onOpenChange={setShowAIModels}>
-        <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh]">
-          <AIModels onClose={() => setShowAIModels(false)} />
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={showImageGenerator} onOpenChange={setShowImageGenerator}>
-        <DialogContent className="dark:bg-black/95 dark:border-white/10 light:bg-white/95 light:border-black/10 max-w-2xl h-[80vh]">
-          <ImageGenerator onClose={() => setShowImageGenerator(false)} />
         </DialogContent>
       </Dialog>
     </div>;
