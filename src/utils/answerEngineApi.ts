@@ -94,8 +94,14 @@ export async function fetchAnswer(query: string): Promise<AnswerResponse> {
       };
     }
     
+    // Extract the text from the response
+    const rawContent = data.candidates[0].content.parts[0].text;
+    
+    // Process the content to enhance formatting if needed
+    const processedContent = enhanceContentFormatting(rawContent);
+    
     return {
-      content: data.candidates[0].content.parts[0].text,
+      content: processedContent,
       isError: false
     };
   } catch (error) {
@@ -106,4 +112,30 @@ export async function fetchAnswer(query: string): Promise<AnswerResponse> {
       errorMessage: error instanceof Error ? error.message : 'An unexpected error occurred'
     };
   }
+}
+
+/**
+ * Enhance content formatting to make it more visually appealing
+ */
+function enhanceContentFormatting(content: string): string {
+  // Basic safety check to remove any potentially harmful scripts
+  let safeContent = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  
+  // Make sure all links open in a new tab
+  safeContent = safeContent.replace(/<a([^>]*)>/gi, '<a$1 target="_blank" rel="noopener noreferrer">');
+  
+  // Add syntax highlighting for code blocks (optional enhancement)
+  safeContent = safeContent.replace(/<code>([\s\S]*?)<\/code>/gi, (match, p1) => {
+    return `<code class="bg-black/30 px-1 py-0.5 rounded text-yellow-200">${p1}</code>`;
+  });
+  
+  // Add table styling
+  safeContent = safeContent.replace(/<table>/gi, '<table class="border-collapse w-full my-4">');
+  safeContent = safeContent.replace(/<th>/gi, '<th class="border border-gray-600 px-4 py-2 bg-black/20">');
+  safeContent = safeContent.replace(/<td>/gi, '<td class="border border-gray-700 px-4 py-2">');
+  
+  // Highlight blockquotes
+  safeContent = safeContent.replace(/<blockquote>/gi, '<blockquote class="border-l-4 border-gemini-yellow/50 pl-4 py-2 my-4 italic text-gray-300">');
+  
+  return safeContent;
 }

@@ -8,7 +8,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider, Sidebar as ShadcnSidebar, SidebarContent, SidebarInset } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { PanelLeft, X, HelpCircle } from "lucide-react";
+import { PanelLeft, X, HelpCircle, Sparkles, Info } from "lucide-react";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import StudentTools from "@/components/StudentTools";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,7 +28,7 @@ const ThemeHandler = ({
     htmlElement.classList.remove("light", "dark");
     if (theme === "system") {
       // Check system preference
-      const systemPrefersDark = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       htmlElement.classList.add(systemPrefersDark ? "dark" : "light");
     } else {
       htmlElement.classList.add(theme);
@@ -47,6 +47,7 @@ const AppContent = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showStudentTools, setShowStudentTools] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
 
   // Handle window resize to detect mobile screens
   useEffect(() => {
@@ -94,9 +95,51 @@ const AppContent = () => {
               </div>
               <div className="flex-1" onClick={() => setShowMobileMenu(false)}></div>
             </div>}
+
+          {/* Project Info Panel */}
+          {showInfo && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex">
+            <div className="m-auto bg-card w-full max-w-xl p-6 rounded-lg border shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">About Vireon (Beta)</h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowInfo(false)}>
+                  <X size={18} />
+                </Button>
+              </div>
+              <div className="space-y-4">
+                <p>
+                  <span className="font-semibold">Vireon</span> is an AI-powered answer engine designed to be the ultimate research 
+                  assistant for students, researchers, and curious minds.
+                </p>
+                <div>
+                  <h3 className="font-semibold text-sm mb-2">Key Features:</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <li>AI-driven insights with Gemini API</li>
+                    <li>Real-time web search results with Google Search</li>
+                    <li>Custom AI-powered tools called "Atoms"</li>
+                    <li>Privacy-first design (data stored locally)</li>
+                    <li>Responsive design for all devices</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm mb-2">Available Atoms:</h3>
+                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <li>YouTube Summarizer - Generate summaries from videos</li>
+                    <li>More Atoms coming soon!</li>
+                  </ul>
+                </div>
+                <div className="text-sm text-muted-foreground border-t pt-4 mt-4">
+                  This is a beta version of Vireon. More features are coming soon!
+                </div>
+              </div>
+            </div>
+          </div>}
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
-            <Header onOpenSettings={() => setShowSettings(true)} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen || showMobileMenu} />
+            <Header 
+              onOpenSettings={() => setShowSettings(true)} 
+              toggleSidebar={toggleSidebar} 
+              sidebarOpen={sidebarOpen || showMobileMenu} 
+            />
             
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute bottom-0 left-0 w-full h-1/2 dark:bg-gradient-to-t dark:from-black/30 dark:to-transparent light:bg-gradient-to-t light:from-white/30 light:to-transparent opacity-30"></div>
@@ -120,7 +163,8 @@ const AppContent = () => {
                 className={showStudentTools ? "bg-gemini-purple hover:bg-gemini-purple/90 text-white" : ""}
                 onClick={toggleTools}
               >
-                Answer Engine
+                <Sparkles className="h-4 w-4 mr-2" />
+                Vireon
               </Button>
               <Button 
                 variant={!showStudentTools ? "default" : "outline"}
@@ -154,14 +198,21 @@ const AppContent = () => {
               </Button>
             </div>}
           
-          {/* Help Button */}
+          {/* Info Button */}
           <div className="fixed bottom-24 right-4 z-20">
             <Tooltip>
               <TooltipTrigger asChild>
-                
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-card shadow-md border-white/10"
+                  onClick={() => setShowInfo(true)}
+                >
+                  <Info className="h-5 w-5" />
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Help & Support</p>
+                <p>About Vireon</p>
               </TooltipContent>
             </Tooltip>
           </div>
