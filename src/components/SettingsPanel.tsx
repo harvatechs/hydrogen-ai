@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,9 +15,13 @@ import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { Slider } from "@/components/ui/slider";
 import { Moon, Sun, Palette, Zap, Book, Globe, PenSquare, RefreshCw, Save, Eye, MessageSquareText, Info, FileText, 
-  Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key, X } from "lucide-react";
+  Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key, X, ChevronLeft, Trash2, Code } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -41,6 +44,8 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const [key, setKey] = useState(apiKey || "");
   const [url, setUrl] = useState(apiUrl || "");
   const [selectedModel, setSelectedModel] = useState(model || "gemini-2.0-flash");
+  const [selectedTheme, setSelectedTheme] = useState(theme);
+  const [selectedFontSize, setSelectedFontSize] = useState(fontSize);
   const [activeTab, setActiveTab] = useState("appearance");
   
   // Additional settings state
@@ -89,6 +94,17 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
     }
   };
   
+  // Save appearance settings
+  const handleSaveAppearance = () => {
+    setTheme(selectedTheme);
+    setFontSize(selectedFontSize);
+    
+    toast({
+      title: "Appearance Settings Saved",
+      description: "Your display preferences have been updated."
+    });
+  };
+  
   const handleSaveApiSettings = () => {
     if (key.trim()) {
       setApiKey(key.trim());
@@ -128,16 +144,28 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   
   // Save model parameters
   const handleSaveModelParams = () => {
+    // In a real implementation, this would save these parameters to a context or API
     toast({
       title: "Model Parameters Saved",
       description: "Your model configuration has been updated."
     });
   };
   
+  // Save behavior settings
+  const handleSaveBehaviorSettings = () => {
+    // In a real implementation, this would save these parameters to a context or API
+    toast({
+      title: "Behavior Settings Saved",
+      description: "Your AI behavior preferences have been updated."
+    });
+  };
+  
   // Save all settings
   const handleSaveAllSettings = () => {
+    handleSaveAppearance();
     handleSaveApiSettings();
     handleSaveModelParams();
+    handleSaveBehaviorSettings();
     
     toast({
       title: "All Settings Saved",
@@ -148,531 +176,276 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto flex flex-col">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-        <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-sm border-b border-white/10 p-4">
-          <TabsList className="grid grid-cols-4 w-full bg-black/40">
-            <TabsTrigger value="appearance" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
-              <Palette size={14} className="mb-1" />
-              <span>Display</span>
-            </TabsTrigger>
-            <TabsTrigger value="models" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
-              <Zap size={14} className="mb-1" />
-              <span>Models</span>
-            </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
-              <MessageSquareText size={14} className="mb-1" />
-              <span>Behavior</span>
-            </TabsTrigger>
-            <TabsTrigger value="about" className="flex flex-col items-center py-2 px-2 text-xs data-[state=active]:text-white">
-              <Info size={14} className="mb-1" />
-              <span>About</span>
-            </TabsTrigger>
-          </TabsList>
+    <div className="w-full h-full flex flex-col relative bg-gradient-to-b from-background to-background/95">
+      {/* Header */}
+      <div className="sticky top-0 z-30 bg-background/90 backdrop-blur-md border-b border-white/10 p-4 flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <Button 
+            onClick={onClose} 
+            variant="ghost" 
+            size="sm" 
+            className="h-9 w-9 rounded-full p-0 dark:hover:bg-white/10 light:hover:bg-black/10"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="sr-only">Back</span>
+          </Button>
+          <div>
+            <h2 className="text-xl font-semibold">Settings</h2>
+            <p className="text-xs text-muted-foreground">Customize your experience</p>
+          </div>
         </div>
-        
-        <div className="p-4 space-y-6">
-          {/* Appearance Tab */}
-          <TabsContent value="appearance" className="space-y-6">
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Eye className="h-4 w-4 mr-2" />
-                Theme
-              </h3>
-              <RadioGroup value={theme} onValueChange={setTheme} className="grid grid-cols-3 gap-2">
-                <Label className="flex flex-col items-center space-y-2 cursor-pointer">
-                  <div className={`h-20 w-full rounded-md border ${theme === 'dark' ? 'border-white' : 'border-white/10'} bg-black p-2 flex items-center justify-center`}>
-                    <Moon size={24} className="text-white/70" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="dark" id="theme-dark" />
-                    <span>Dark</span>
-                  </div>
-                </Label>
-                
-                <Label className="flex flex-col items-center space-y-2 cursor-pointer">
-                  <div className={`h-20 w-full rounded-md border ${theme === 'light' ? 'border-white' : 'border-white/10'} bg-white p-2 flex items-center justify-center`}>
-                    <Sun size={24} className="text-black/70" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="light" id="theme-light" />
-                    <span>Light</span>
-                  </div>
-                </Label>
-                
-                <Label className="flex flex-col items-center space-y-2 cursor-pointer">
-                  <div className={`h-20 w-full rounded-md border ${theme === 'system' ? 'border-white' : 'border-white/10'} bg-gradient-to-r from-black to-white p-2 flex items-center justify-center`}>
-                    <Laptop size={24} className="text-white/70" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="system" id="theme-system" />
-                    <span>System</span>
-                  </div>
-                </Label>
-              </RadioGroup>
-            </div>
-            
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <PenSquare className="h-4 w-4 mr-2" />
-                Text Size
-              </h3>
-              <RadioGroup value={fontSize} onValueChange={setFontSize} className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="small" id="font-small" />
-                    <Label htmlFor="font-small" className="cursor-pointer">Small</Label>
-                  </div>
-                  <div className="text-sm font-size-small">Aa</div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="medium" id="font-medium" />
-                    <Label htmlFor="font-medium" className="cursor-pointer">Medium</Label>
-                  </div>
-                  <div className="text-base font-size-normal">Aa</div>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="large" id="font-large" />
-                    <Label htmlFor="font-large" className="cursor-pointer">Large</Label>
-                  </div>
-                  <div className="text-lg font-size-large">Aa</div>
-                </div>
-              </RadioGroup>
-            </div>
-            
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Globe className="h-4 w-4 mr-2" />
-                Language
-              </h3>
-              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                <SelectTrigger className="bg-black/30 border-white/10">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent className="bg-black border-white/10">
-                  <SelectItem value="english">English</SelectItem>
-                  <SelectItem value="spanish">Spanish</SelectItem>
-                  <SelectItem value="french">French</SelectItem>
-                  <SelectItem value="german">German</SelectItem>
-                  <SelectItem value="chinese">Chinese</SelectItem>
-                  <SelectItem value="japanese">Japanese</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Volume2 className="h-4 w-4 mr-2" />
-                Voice Settings
-              </h3>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="voice-enabled" className="cursor-pointer">Voice responses</Label>
-                <Switch 
-                  id="voice-enabled" 
-                  checked={voiceEnabled} 
-                  onCheckedChange={setVoiceEnabled}
-                />
-              </div>
+        <Button 
+          onClick={handleSaveAllSettings} 
+          size="sm" 
+          className="bg-primary/90 hover:bg-primary text-primary-foreground rounded-full px-4"
+        >
+          <Save className="h-4 w-4 mr-2" />
+          Save All
+        </Button>
+      </div>
+      
+      {/* Content */}
+      <div className="flex-1 flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <div className="sticky top-[73px] z-20 bg-background/90 backdrop-blur-md p-4">
+            <TabsList className="grid grid-cols-4 w-full">
+              <TabsTrigger value="appearance">
+                <Palette className="h-4 w-4 mr-2" />
+                Display
+              </TabsTrigger>
+              <TabsTrigger value="models">
+                <Zap className="h-4 w-4 mr-2" />
+                Models
+              </TabsTrigger>
+              <TabsTrigger value="advanced">
+                <MessageSquareText className="h-4 w-4 mr-2" />
+                Behavior
+              </TabsTrigger>
+              <TabsTrigger value="about">
+                <Info className="h-4 w-4 mr-2" />
+                About
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <ScrollArea className="flex-1 p-4">
+            <TabsContent value="appearance" className="p-4 border rounded-lg">
+              <h3 className="text-lg font-medium mb-4">Appearance Settings</h3>
               
-              <div className={voiceEnabled ? "space-y-3" : "space-y-3 opacity-50 pointer-events-none"}>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label>Voice volume</Label>
-                    <span className="text-sm text-muted-foreground">{Math.round(voiceVolume[0] * 100)}%</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <VolumeX size={16} className="text-muted-foreground" />
-                    <Slider 
-                      value={voiceVolume} 
-                      onValueChange={setVoiceVolume} 
-                      max={1} 
-                      step={0.1} 
-                      className="flex-1"
-                    />
-                    <Volume2 size={16} className="text-muted-foreground" />
-                  </div>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Theme</h4>
+                  <RadioGroup value={theme} onValueChange={setTheme} className="flex flex-col space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="dark" id="theme-dark" />
+                      <Label htmlFor="theme-dark" className="flex items-center cursor-pointer">
+                        <Moon className="h-4 w-4 mr-2" />
+                        Dark
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="light" id="theme-light" />
+                      <Label htmlFor="theme-light" className="flex items-center cursor-pointer">
+                        <Sun className="h-4 w-4 mr-2" />
+                        Light
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="system" id="theme-system" />
+                      <Label htmlFor="theme-system" className="flex items-center cursor-pointer">
+                        <Laptop className="h-4 w-4 mr-2" />
+                        System
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label>Voice type</Label>
-                  <Select defaultValue="female">
-                    <SelectTrigger className="bg-black/30 border-white/10">
-                      <SelectValue placeholder="Select voice" />
+                <Separator className="my-4" />
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Font Size</h4>
+                  <RadioGroup value={fontSize} onValueChange={setFontSize} className="flex space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="sm" id="font-sm" />
+                      <Label htmlFor="font-sm" className="cursor-pointer">Small</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="md" id="font-md" />
+                      <Label htmlFor="font-md" className="cursor-pointer">Medium</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="lg" id="font-lg" />
+                      <Label htmlFor="font-lg" className="cursor-pointer">Large</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <Separator className="my-4" />
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Code Highlighting Theme</h4>
+                  <Select value={codeHighlightTheme} onValueChange={setCodeHighlightTheme}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a theme" />
                     </SelectTrigger>
-                    <SelectContent className="bg-black border-white/10">
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="neutral">Neutral</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="github">GitHub</SelectItem>
+                      <SelectItem value="monokai">Monokai</SelectItem>
+                      <SelectItem value="dracula">Dracula</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-            </div>
-          </TabsContent>
-          
-          {/* Models Tab */}
-          <TabsContent value="models" className="space-y-6">
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Zap className="h-4 w-4 mr-2" />
-                Model Selection
-              </h3>
-              <div className="grid gap-3">
-                {Object.entries(modelInfo).map(([id, info]) => (
-                  <div 
-                    key={id}
-                    className={`flex flex-col p-3 rounded-lg border ${selectedModel === id ? 'border-white bg-glassy' : 'border-white/10 hover:bg-black/20'} cursor-pointer transition-colors`}
-                    onClick={() => setSelectedModel(id)}
-                  >
-                    <div className="flex items-start">
-                      <RadioGroup value={selectedModel} onValueChange={setSelectedModel} className="flex">
-                        <RadioGroupItem 
-                          value={id} 
-                          id={`model-${id}`}
-                          className="mt-1"
-                        />
-                      </RadioGroup>
-                      <div className="ml-3 space-y-1">
-                        <div className="flex items-center">
-                          <span className="font-medium">{info.name}</span>
-                          {id.includes("2.0") && <Badge className="ml-2 text-[10px] bg-glassy text-white">Latest</Badge>}
-                        </div>
-                        <p className="text-xs text-muted-foreground">{info.description}</p>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          <Badge variant="outline" className="text-[10px]">{info.tokens} tokens</Badge>
-                          <Badge variant="outline" className="text-[10px]">{info.speed}</Badge>
-                          {info.capabilities.slice(0, 2).map((cap, i) => (
-                            <Badge key={i} variant="outline" className="text-[10px]">{cap}</Badge>
-                          ))}
-                          {info.capabilities.length > 2 && (
-                            <Badge variant="outline" className="text-[10px]">+{info.capabilities.length - 2} more</Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            </TabsContent>
             
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Key className="h-4 w-4 mr-2" />
-                API Configuration
-              </h3>
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  <Label htmlFor="api-key">Google Gemini API Key</Label>
-                  <Input
-                    id="api-key"
-                    type="password"
-                    placeholder="API Key"
-                    value={key}
+            <TabsContent value="models" className="p-4 border rounded-lg">
+              <h3 className="text-lg font-medium mb-4">Model Settings</h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">API Key</h4>
+                  <Input 
+                    type="password" 
+                    value={key} 
                     onChange={(e) => setKey(e.target.value)}
-                    className="font-mono text-xs bg-black/30 border-white/10"
+                    placeholder="Enter your Google Gemini API key" 
+                    className="bg-black/20 border-white/10"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Get your API key from{" "}
-                    <a
-                      href="https://ai.google.dev/tutorials/setup"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-white hover:underline"
-                    >
-                      Google AI Studio
-                    </a>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Get your API key from the <a href="https://makersuite.google.com/app/apikey" className="text-primary hover:underline" target="_blank" rel="noreferrer">Google AI Studio</a>
                   </p>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="api-url">API Endpoint URL</Label>
-                  <Input
-                    id="api-url"
-                    type="text"
-                    placeholder="API URL"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    className="font-mono text-xs bg-black/30 border-white/10"
-                  />
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Model Selection</h4>
+                  <RadioGroup value={selectedModel} onValueChange={setSelectedModel} className="space-y-3">
+                    {Object.entries(modelInfo).map(([id, info]) => (
+                      <div key={id} className="flex items-start space-x-3 p-3 rounded-lg border border-white/10 bg-white/5">
+                        <RadioGroupItem value={id} id={`model-${id}`} className="mt-1" />
+                        <div className="space-y-1.5">
+                          <Label htmlFor={`model-${id}`} className="font-medium cursor-pointer">
+                            {info.name}
+                          </Label>
+                          <p className="text-sm text-muted-foreground">{info.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </RadioGroup>
                 </div>
                 
-                <div className="flex space-x-2 pt-2">
+                <div className="flex justify-between">
                   <Button 
-                    onClick={handleSaveApiSettings} 
-                    className="flex-1 glass-button text-white hover:bg-glassy-hover"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Save API Settings
-                  </Button>
-                  <Button 
+                    variant="outline" 
                     onClick={handleResetApiSettings}
-                    variant="outline"
-                    className="flex-1 border-white/20 hover:bg-glassy"
+                    className="border-white/10 hover:bg-white/5"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Reset to Default
                   </Button>
+                  <Button onClick={handleSaveApiSettings} className="bg-primary">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save API Settings
+                  </Button>
                 </div>
               </div>
-            </div>
+            </TabsContent>
             
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Zap className="h-4 w-4 mr-2" />
-                Model Parameters
-              </h3>
+            <TabsContent value="advanced" className="p-4 border rounded-lg">
+              <h3 className="text-lg font-medium mb-4">Advanced Settings</h3>
+              
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label>Temperature</Label>
-                    <span className="text-sm text-muted-foreground">{temperature[0].toFixed(1)}</span>
-                  </div>
-                  <Slider 
-                    value={temperature} 
-                    onValueChange={setTemperature} 
-                    max={1} 
-                    step={0.1} 
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>More Focused</span>
-                    <span>More Creative</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label>Response Length</Label>
-                    <span className="text-sm text-muted-foreground">
-                      {responseLength[0] < 0.3 ? "Concise" : responseLength[0] < 0.7 ? "Balanced" : "Detailed"}
-                    </span>
-                  </div>
-                  <Slider 
-                    value={responseLength} 
-                    onValueChange={setResponseLength} 
-                    max={1} 
-                    step={0.1} 
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Shorter</span>
-                    <span>Longer</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="system-prompt">System Prompt</Label>
-                  <Input
-                    id="system-prompt"
-                    placeholder="Enter a custom system prompt"
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                    className="bg-black/30 border-white/10"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Set instructions that guide how the AI responds.
-                  </p>
-                </div>
-                
-                <Button 
-                  onClick={handleSaveModelParams} 
-                  className="w-full glass-button text-white hover:bg-glassy-hover border border-white/20"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Parameters
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-          
-          {/* Advanced Tab */}
-          <TabsContent value="advanced" className="space-y-6">
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <MessageSquareText className="h-4 w-4 mr-2" />
-                Response Behavior
-              </h3>
-              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="streaming" className="cursor-pointer">Response Streaming</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Receive response tokens in real-time
-                    </p>
+                    <Label className="text-sm">Streaming Responses</Label>
+                    <p className="text-xs text-muted-foreground">Show AI responses as they are generated</p>
                   </div>
                   <Switch 
-                    id="streaming" 
                     checked={streamingEnabled}
                     onCheckedChange={setStreamingEnabled}
                   />
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="citations" className="cursor-pointer">Auto Citations</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Automatically generate citations for responses
-                    </p>
-                  </div>
-                  <Switch 
-                    id="citations"
-                    checked={citationsEnabled}
-                    onCheckedChange={setCitationsEnabled}
-                  />
-                </div>
+                <Separator />
                 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="code-highlight" className="cursor-pointer">Code Highlight Theme</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Choose styling for code blocks
-                    </p>
-                  </div>
-                  <Select value={codeHighlightTheme} onValueChange={setCodeHighlightTheme}>
-                    <SelectTrigger className="w-36 bg-black/30 border-white/10">
-                      <SelectValue placeholder="Select theme" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-black border-white/10">
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="github">GitHub</SelectItem>
-                      <SelectItem value="monokai">Monokai</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <HardDrive className="h-4 w-4 mr-2" />
-                Data Management
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="history" className="cursor-pointer">Save Chat History</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Store conversations in local storage
-                    </p>
+                    <Label className="text-sm">Save Chat History</Label>
+                    <p className="text-xs text-muted-foreground">Store conversations for later reference</p>
                   </div>
                   <Switch 
-                    id="history" 
                     checked={historyEnabled}
                     onCheckedChange={setHistoryEnabled}
                   />
                 </div>
                 
+                <Separator />
+                
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="save-disk" className="cursor-pointer">Auto-export Conversations</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Save finished conversations to disk as text files
-                    </p>
+                    <Label className="text-sm">Voice Output</Label>
+                    <p className="text-xs text-muted-foreground">Enable text-to-speech for AI responses</p>
                   </div>
                   <Switch 
-                    id="save-disk"
-                    checked={saveToDisk}
-                    onCheckedChange={setSaveToDisk}
+                    checked={voiceEnabled}
+                    onCheckedChange={setVoiceEnabled}
                   />
                 </div>
                 
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    className="w-full text-red-500 border-red-500/20 hover:bg-red-500/10 hover:text-red-400"
-                  >
-                    Clear All Local Data
+                <div className="flex justify-end mt-4">
+                  <Button onClick={handleSaveModelParams} className="bg-primary">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Settings
                   </Button>
                 </div>
               </div>
-            </div>
+            </TabsContent>
             
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <BellRing className="h-4 w-4 mr-2" />
-                Notifications
-              </h3>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="notifications" className="cursor-pointer">Desktop Notifications</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Get notified when responses are ready
+            <TabsContent value="about" className="p-4 border rounded-lg">
+              <h3 className="text-lg font-medium mb-4">About</h3>
+              
+              <div className="space-y-4">
+                <div className="flex justify-center py-4">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold">HydroGen AI</h2>
+                    <p className="text-sm text-muted-foreground">Version 2.0.0</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-1">About</h4>
+                  <p className="text-sm text-muted-foreground">
+                    HydroGen AI is a powerful chat interface for Google's Gemini AI models, 
+                    featuring a range of productivity tools and a clean, modern interface.
                   </p>
                 </div>
-                <Switch 
-                  id="notifications"
-                  checked={notificationsEnabled}
-                  onCheckedChange={setNotificationsEnabled}
-                />
-              </div>
-            </div>
-          </TabsContent>
-          
-          {/* About Tab */}
-          <TabsContent value="about" className="space-y-6">
-            <div className="bg-black/40 rounded-lg p-4 space-y-4 border border-white/10">
-              <div className="text-center py-4">
-                <div className="w-16 h-16 bg-glassy rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Zap className="h-8 w-8 text-white" />
+                
+                <div>
+                  <h4 className="text-sm font-medium mb-1">Features</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• YouTube Video Summarization</li>
+                    <li>• Flashcard Generation</li>
+                    <li>• Web Search Integration</li>
+                    <li>• Voice Input/Output</li>
+                    <li>• Customizable Interface</li>
+                  </ul>
                 </div>
-                <h3 className="text-xl font-bold text-white">HydroGen AI</h3>
-                <p className="text-sm text-muted-foreground">Version 1.0.0</p>
-                <p className="text-sm mt-4">
-                  A modern AI assistant powered by Google Gemini models,
-                  designed for students and professionals.
-                </p>
               </div>
-              
-              <div className="pt-4 space-y-2">
-                <Button variant="outline" className="w-full border-white/20 hover:bg-glassy">
-                  Check for Updates
-                </Button>
-                <Button variant="outline" className="w-full border-white/10 hover:bg-white/5">
-                  View Documentation
-                </Button>
-                <Button variant="outline" className="w-full border-white/10 hover:bg-white/5">
-                  Privacy Policy
-                </Button>
-              </div>
-            </div>
-            
-            <div className="bg-black/40 rounded-lg p-4 space-y-2 border border-white/10">
-              <h3 className="text-md font-medium text-white flex items-center">
-                <Zap className="h-4 w-4 mr-2" />
-                Powered By
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Google Gemini 2.0 AI models
-              </p>
-              
-              <h3 className="text-md font-medium text-white flex items-center pt-2">
-                <Book className="h-4 w-4 mr-2" />
-                Created For
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Students and professionals seeking knowledge and insights
-              </p>
-            </div>
-          </TabsContent>
-        </div>
-      </Tabs>
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
+      </div>
       
-      <div className="sticky bottom-0 w-full bg-black/80 backdrop-blur-sm border-t border-white/10 p-4">
-        <div className="flex gap-3">
-          <Button onClick={onClose} variant="outline" className="flex-1">
-            <X className="h-4 w-4 mr-2" />
-            Close
-          </Button>
-          <Button onClick={handleSaveAllSettings} className="flex-1 glass-button text-white hover:bg-glassy-hover">
-            <Save className="h-4 w-4 mr-2" />
-            Save All Settings
-          </Button>
-        </div>
+      {/* Footer */}
+      <div className="sticky bottom-0 bg-background/90 backdrop-blur-md p-4 flex justify-between items-center border-t border-white/10">
+        <Button onClick={onClose} variant="outline" className="border-white/10 hover:bg-white/5">
+          Cancel
+        </Button>
+        <Button onClick={handleSaveAllSettings} className="bg-primary/90 hover:bg-primary">
+          <Save className="h-4 w-4 mr-2" />
+          Save All Changes
+        </Button>
       </div>
     </div>
   );

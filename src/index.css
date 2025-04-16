@@ -40,6 +40,15 @@
     --sidebar-ring: 0 0% 60%;
     
     --radius: 0.5rem;
+    
+    /* Sidebar transition timings - simplified */
+    --sidebar-transition-duration: 200ms;
+    --sidebar-transition-timing-function: ease-out;
+    
+    /* Sidebar widths */
+    --sidebar-width-expanded: 18rem;
+    --sidebar-width-collapsed: 4rem;
+    --sidebar-width-mobile: 16rem;
   }
 
   .light {
@@ -117,6 +126,50 @@
 }
 
 @layer components {
+  /* New minimal sidebar transition */
+  .sidebar-minimal-transition {
+    transition: transform var(--sidebar-transition-duration) var(--sidebar-transition-timing-function);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+  
+  /* Legacy sidebar transition classes - simplified */
+  .sidebar-transition {
+    transition: transform var(--sidebar-transition-duration) var(--sidebar-transition-timing-function);
+    will-change: transform;
+  }
+  
+  .sidebar-width-transition {
+    transition: width var(--sidebar-transition-duration) var(--sidebar-transition-timing-function);
+    will-change: width;
+  }
+  
+  .main-content-transition {
+    transition: margin-left var(--sidebar-transition-duration) var(--sidebar-transition-timing-function);
+    will-change: margin-left;
+  }
+
+  /* Tooltip animation for collapsed sidebar items */
+  .sidebar-tooltip {
+    transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
+    transform-origin: left center;
+  }
+  
+  .sidebar-tooltip[data-state="delayed-open"] {
+    animation: tooltip-slide-in 150ms ease-out forwards;
+  }
+  
+  @keyframes tooltip-slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
   /* Button styling with hover effects that maintain text color */
   .btn-custom {
     @apply rounded-lg px-4 py-2 transition-all duration-200 font-medium;
@@ -199,239 +252,349 @@
     @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   
-  /* Feature card */
+  /* Enhanced feature cards */
   .feature-card {
-    @apply p-6 rounded-xl transition-all duration-300 h-full;
+    @apply transition-all duration-300 rounded-xl overflow-hidden;
   }
   
   .dark .feature-card {
-    @apply bg-secondary/50 border-white/5 hover:bg-secondary/70;
+    @apply bg-white/5 border-white/10 hover:border-gemini-purple/30;
   }
   
   .light .feature-card {
-    @apply bg-white border border-black/5 hover:shadow-lg hover:translate-y-[-2px] shadow-sm;
+    @apply bg-white/90 border-black/5 shadow-sm hover:shadow-md hover:border-gemini-purple/30;
   }
   
-  /* CTA button */
+  /* CTA button with gradient */
   .cta-button {
-    @apply rounded-full text-white font-medium py-3 px-8 transition-all duration-300;
+    @apply bg-gradient-to-r from-gemini-purple to-purple-600 text-white border-0 hover:translate-y-[-2px] transition-all duration-300 shadow-lg shadow-gemini-purple/20;
   }
   
   .dark .cta-button {
-    @apply bg-gemini-gradient hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
+    @apply from-gemini-purple to-purple-600;
   }
   
   .light .cta-button {
-    @apply bg-gemini-gradient hover:opacity-90 hover:shadow-xl hover:shadow-purple-500/20;
+    @apply from-gemini-purple to-purple-500;
   }
 }
 
-/* Typography */
+/* Animation delay classes */
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2000ms;
+}
+
+/* Font size helpers */
 .font-size-small {
-  font-size: 0.875rem;
+  @apply text-sm md:text-base;
 }
 
 .font-size-normal {
-  font-size: 1rem;
+  @apply text-base md:text-lg;
 }
 
 .font-size-large {
-  font-size: 1.125rem;
+  @apply text-lg md:text-xl;
 }
 
-/* Hover Effects */
+/* Advanced button hover effect */
 .btn-hover-effect {
   @apply relative overflow-hidden;
 }
 
 .btn-hover-effect::after {
-  @apply content-[''] absolute inset-0 bg-white/5 opacity-0 transition-opacity duration-300;
+  @apply content-[''] absolute inset-0 bg-white/0 transition-all duration-300;
 }
 
 .btn-hover-effect:hover::after {
-  @apply opacity-100;
+  @apply bg-white/10;
 }
 
-/* Typing Animation */
+/* Typing animation for demo */
 .typing-animation {
-  position: relative;
-  overflow: hidden;
+  @apply relative inline-block;
+  animation: cursor-blink 1s step-end infinite;
 }
 
 .typing-animation::before {
-  content: "";
+  content: '';
   position: absolute;
+  right: -4px;
   top: 0;
-  left: 0;
-  width: 10px;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: typing-pulse 1.5s linear infinite;
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.7);
+  animation: typing-pulse 1s infinite;
 }
 
 .light .typing-animation::before {
-  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.2), transparent);
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Particle animation for floating dots */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-100px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Count up animation for stats */
+.animate-count-up {
+  @apply relative;
+  counter-reset: count 0;
+  animation: count-up 2s forwards ease-out;
+}
+
+@keyframes count-up {
+  from {
+    counter-increment: count 0;
+  }
+  to {
+    counter-increment: count attr(data-value);
+  }
+}
+
+.animate-count-up::after {
+  @apply absolute inset-0;
+  content: counter(count);
 }
 
 @keyframes typing-pulse {
-  0% {
-    left: -10px;
+  0%, 100% {
+    opacity: 1;
   }
-  100% {
-    left: 100%;
+  50% {
+    opacity: 0;
   }
 }
 
-/* Additional custom animations */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
+  animation: fade-in 0.8s ease-out forwards;
 }
 
 @keyframes scale-in {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .animate-scale-in {
-  animation: scale-in 0.2s ease-out forwards;
+  animation: scale-in 0.4s ease-out forwards;
 }
 
-/* Markdown content styling */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Rest of the existing CSS remains the same */
+
 .chat-message-content p {
-  margin-bottom: 0.75rem;
+  @apply mb-4;
 }
 
 .chat-message-content h1, 
 .chat-message-content h2, 
 .chat-message-content h3, 
-.chat-message-content h4 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  font-weight: 600;
+.chat-message-content h4, 
+.chat-message-content h5, 
+.chat-message-content h6 {
+  @apply font-bold mb-2 mt-6;
 }
 
 .dark .chat-message-content h1, 
 .dark .chat-message-content h2, 
 .dark .chat-message-content h3, 
-.dark .chat-message-content h4 {
-  color: white;
+.dark .chat-message-content h4, 
+.dark .chat-message-content h5, 
+.dark .chat-message-content h6 {
+  @apply text-white;
 }
 
 .light .chat-message-content h1, 
 .light .chat-message-content h2, 
 .light .chat-message-content h3, 
-.light .chat-message-content h4 {
-  color: #333;
+.light .chat-message-content h4, 
+.light .chat-message-content h5, 
+.light .chat-message-content h6 {
+  @apply text-gray-900;
 }
 
 .chat-message-content ul, 
 .chat-message-content ol {
-  margin-left: 1.5rem;
-  margin-bottom: 1rem;
+  @apply pl-6 mb-4;
 }
 
 .chat-message-content ul {
-  list-style-type: disc;
+  @apply list-disc;
 }
 
 .chat-message-content ol {
-  list-style-type: decimal;
+  @apply list-decimal;
 }
 
 .chat-message-content a {
-  color: #3b82f6;
-  text-decoration: none;
+  @apply text-gemini-purple underline;
 }
 
 .chat-message-content a:hover {
-  text-decoration: underline;
+  @apply opacity-80;
 }
 
 .chat-message-content code {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-  font-size: 0.9em;
+  @apply px-1.5 py-0.5 rounded text-sm font-mono;
 }
 
+/* Dark mode code blocks */
 .dark .chat-message-content code {
-  background: rgba(255, 255, 255, 0.1);
+  @apply bg-gray-800 text-gray-200;
 }
 
 .light .chat-message-content code {
-  background: rgba(0, 0, 0, 0.05);
+  @apply bg-gray-100 text-gray-900;
 }
 
 .chat-message-content pre {
-  border-radius: 6px;
-  padding: 1rem;
-  overflow-x: auto;
-  margin-bottom: 1rem;
+  @apply p-3 rounded-lg overflow-x-auto mb-4 font-mono text-sm;
 }
 
+/* Dark mode code blocks */
 .dark .chat-message-content pre {
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  @apply bg-gray-800 text-gray-200;
 }
 
 .light .chat-message-content pre {
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  @apply bg-gray-100 text-gray-900;
 }
 
 .chat-message-content blockquote {
-  padding-left: 1rem;
-  margin-left: 0;
-  font-style: italic;
+  @apply pl-4 border-l-4 italic my-4;
 }
 
+/* Dark mode blockquotes */
 .dark .chat-message-content blockquote {
-  border-left: 3px solid rgba(255, 255, 255, 0.5);
-  color: rgba(255, 255, 255, 0.7);
+  @apply border-gray-600 text-gray-400;
 }
 
 .light .chat-message-content blockquote {
-  border-left: 3px solid rgba(0, 0, 0, 0.3);
-  color: rgba(0, 0, 0, 0.7);
+  @apply border-gray-300 text-gray-600;
 }
 
-/* Responsive media queries */
+/* Mobile styles */
 @media (max-width: 640px) {
   .hide-on-mobile {
-    display: none;
+    @apply hidden;
   }
   
   .mobile-full-width {
-    width: 100%;
+    @apply w-full;
   }
   
   h1 {
-    font-size: 1.75rem;
+    @apply text-2xl;
   }
   
   h2 {
-    font-size: 1.5rem;
+    @apply text-xl;
   }
 }
 
 @media (min-width: 768px) {
   .md-hide-on-desktop {
-    display: none;
+    @apply hidden;
   }
 }
 
-/* Animation for shimmer effect */
+/* Shimmer loading effect */
 .shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
   background-size: 200% 100%;
-  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.2) 75%, rgba(255,255,255,0) 100%);
-  animation: shimmer 2s infinite linear;
+  animation: shimmer 2s infinite;
 }
 
 .light .shimmer {
-  background-image: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0) 100%);
+  background-size: 200% 100%;
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  /* Reduce transition duration on mobile for better performance */
+  :root {
+    --sidebar-transition-duration: 150ms;
+  }
+  
+  /* Improve touch targets for better mobile accessibility */
+  button, 
+  [role="button"],
+  .sidebar-menu-button,
+  .button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Fix for iOS overscroll issues */
+  .overflow-auto,
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Optimize sidebar for mobile */
+  .sidebar-minimal-transition {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  /* Prevent background scrolling when sidebar is open */
+  body[data-sidebar-open="true"] {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Add top safe area for notched phones */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .h-screen,
+  .h-full,
+  .min-h-screen {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
 }

@@ -1,5 +1,4 @@
-
-export type AtomType = 'youtube' | 'flashcard' | 'mindmap' | 'studyguide';
+export type AtomType = 'youtube' | 'flashcard' | 'mindmap' | 'studyguide' | 'websearch';
 
 export interface AtomCommand {
   type: AtomType;
@@ -26,6 +25,8 @@ export const parseAtomCommand = (message: string): AtomCommand | null => {
     type = 'mindmap';
   } else if (command === 'studyguide' || command === 'study' || command === 'sg') {
     type = 'studyguide';
+  } else if (command === 'web' || command === 'search' || command === 'websearch') {
+    type = 'websearch';
   }
   
   if (!type) return null;

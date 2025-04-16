@@ -1,0 +1,84 @@
+/* Enhanced UI/UX styles for HydroGen AI */
+
+/* Improved button hover states */
+.sidebar-button:hover {
+  color: white !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease;
+}
+
+/* Improved input focus states */
+.enhanced-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2) !important;
+}
+
+/* Settings panel improvements */
+.settings-tab.active {
+  background-color: rgba(var(--primary-rgb), 0.1) !important;
+  color: var(--primary) !important;
+  border-bottom: 2px solid var(--primary) !important;
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for transitions */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Improved scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Dark mode specific styles */
+.dark {
+  --primary-rgb: 146, 95, 240;
+  --border-hover: rgba(255, 255, 255, 0.2);
+}
+
+/* Light mode specific styles */
+.light {
+  --primary-rgb: 124, 58, 237;
+  --border-hover: rgba(0, 0, 0, 0.2);
+}
+
+/* Improved focus outline for accessibility */
+:focus-visible {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px;
+} 

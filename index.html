@@ -2,24 +2,47 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>quest-scribe-gemini-ai</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>HydroGen - AI-Powered Answer Engine</title>
+    <meta name="description" content="AI-Powered Answer Engine — Where Curiosity Meets AI Magic" />
+    <meta name="author" content="HarVa Groups in collaboration with FreakVinci Open Labs and OpenMatrix" />
 
-    <meta property="og:title" content="quest-scribe-gemini-ai" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta property="og:title" content="HydroGen - AI-Powered Answer Engine" />
+    <meta property="og:description" content="Where Curiosity Meets AI Magic. An experimental project by HarVa Groups in collaboration with FreakVinci Open Labs and OpenMatrix." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:title" content="HydroGen - AI-Powered Answer Engine" />
+    <meta name="twitter:description" content="Where Curiosity Meets AI Magic — by HarVa Groups, FreakVinci Open Labs & OpenMatrix." />
+    
+    <!-- Mobile touch optimizations -->
+    <style>
+      * {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      
+      html, body {
+        overscroll-behavior-y: none;
+        position: fixed;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+      }
+      
+      #root {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

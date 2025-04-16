@@ -8,15 +8,12 @@ import { toast } from "@/components/ui/use-toast";
 import { AIVoiceInput } from "@/components/ui/ai-voice-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { searchGoogle } from "@/utils/searchUtils";
-import { SearchResults } from "./SearchResults";
 import { parseAtomCommand, AtomType } from "@/types/atoms";
 
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [searchResults, setSearchResults] = useState<any>(null);
-  const [isSearching, setIsSearching] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const {
     sendMessage,
@@ -86,12 +83,6 @@ export function ChatInput() {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
     
-    if (message.trim().startsWith('/web ')) {
-      const searchTerm = message.trim().replace('/web ', '');
-      await handleWebSearch(searchTerm);
-      return;
-    }
-    
     // Check if it's an atom command
     const atomCommand = parseAtomCommand(message.trim());
     if (atomCommand) {
@@ -118,38 +109,9 @@ export function ChatInput() {
       return;
     }
 
-    toast({
-      title: "Searching the web",
-      description: `Looking up: "${searchTerm}"`
-    });
-    setIsSearching(true);
+    // Use the atom system instead
+    setActiveAtom('websearch', searchTerm);
     setMessage("");
-
-    try {
-      const results = await searchGoogle(searchTerm);
-      setIsSearching(false);
-
-      if (results && results.items && results.items.length > 0) {
-        setSearchResults(results);
-        toast({
-          title: "Search results found",
-          description: `Found ${results.items.length} results for "${searchTerm}"`
-        });
-      } else {
-        toast({
-          title: "No results found",
-          description: "Try a different search term",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      setIsSearching(false);
-      toast({
-        title: "Search failed",
-        description: "There was an error searching the web. Please try again.",
-        variant: "destructive"
-      });
-    }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -254,10 +216,6 @@ export function ChatInput() {
     inputRef.current?.focus();
   };
 
-  const handleCloseSearch = () => {
-    setSearchResults(null);
-  };
-
   return (
     <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
       <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
@@ -266,13 +224,33 @@ export function ChatInput() {
             <div className="flex items-center space-x-1 ml-2">
               <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.json,.md" />
               
-              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Pro Search" onClick={handleProSearch}>
-                <Zap className="h-4 w-4" />
+              <Button 
+                type="button" 
+                size="icon" 
+                variant="ghost" 
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
+                title="Add Files"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <FileUp className="h-4 w-4" />
               </Button>
               
-              {message.trim().startsWith('/web') && <span className="text-xs text-gemini-purple bg-gemini-purple/10 px-2 py-1 rounded-full">
+              <Button 
+                type="button" 
+                size="icon" 
+                variant="ghost" 
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
+                title="Web Search"
+                onClick={() => setActiveAtom('websearch', '')}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+              
+              {message.trim().startsWith('/web') || message.trim().startsWith('/search') ? (
+                <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
                   Web Search Mode
-                </span>}
+                </span>
+              ) : null}
 
               {message.trim().startsWith('/youtube') && <span className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded-full">
                   YouTube Summary Mode
@@ -325,16 +303,6 @@ export function ChatInput() {
           HydroGen AI may display inaccurate info, including about people, places, or facts
         </div>
       </form>
-      
-      {searchResults && <SearchResults results={searchResults.items} searchInfo={searchResults.searchInformation} searchTerm={message || ""} onClose={handleCloseSearch} />}
-      
-      {isSearching && <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-card p-6 rounded-xl shadow-xl flex flex-col items-center gap-4 max-w-md w-full">
-            <Loader2 className="h-10 w-10 text-gemini-purple animate-spin" />
-            <h3 className="text-xl font-medium">Searching the web...</h3>
-            <p className="text-muted-foreground text-center">Fetching the most relevant results for your query</p>
-          </div>
-        </div>}
     </div>
   );
 }
