@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useReducer, useState } from "react";
 import { Message, MessageRole } from "../types/message";
 import { toast } from "@/components/ui/use-toast";
@@ -33,6 +32,8 @@ interface ChatState {
   conversations: Conversation[];
   currentConversationId: string | null;
   model: string;
+  activeAtom: AtomType | null;
+  atomParams: string;
 }
 
 interface Conversation {
@@ -58,7 +59,8 @@ type ChatAction =
   | { type: "CLEAR_CONVERSATION"; id: string }
   | { type: "DELETE_CONVERSATION"; id: string }
   | { type: "SET_MODEL"; model: string }
-  | { type: "CLEAR_MESSAGES" };
+  | { type: "CLEAR_MESSAGES" }
+  | { type: "SET_ACTIVE_ATOM"; atomType: AtomType | null; params?: string };
 
 interface ChatContextProps {
   messages: Message[];
@@ -69,6 +71,8 @@ interface ChatContextProps {
   conversations: Conversation[];
   currentConversationId: string | null;
   model: string;
+  activeAtom: AtomType | null;
+  atomParams: string;
   setApiKey: (key: string) => void;
   setApiUrl: (url: string) => void;
   sendMessage: (content: string) => Promise<void>;
@@ -82,6 +86,8 @@ interface ChatContextProps {
   clearConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
   setModel: (model: string) => void;
+  setActiveAtom: (type: AtomType | null, params?: string) => void;
+  handleAtomResult: (result: string) => void;
 }
 
 // Get stored API key or use default
@@ -165,6 +171,8 @@ const initialState: ChatState = {
   conversations: getStoredConversations(),
   currentConversationId: null,
   model: getStoredModel(),
+  activeAtom: null,
+  atomParams: '',
 };
 
 // If no conversations exist, create an initial one
@@ -436,6 +444,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         messages: newMessages,
       };
     }
+    case "SET_ACTIVE_ATOM":
+      return {
+        ...state,
+        activeAtom: action.atomType,
+        atomParams: action.params || '',
+      };
     default:
       return state;
   }
@@ -528,6 +542,28 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   
   const deleteConversation = (id: string) => {
     dispatch({ type: "DELETE_CONVERSATION", id });
+  };
+
+  const setActiveAtom = (atomType: AtomType | null, params: string = '') => {
+    dispatch({ type: "SET_ACTIVE_ATOM", atomType, params });
+  };
+  
+  const handleAtomResult = (result: string) => {
+    // Create a system message with the result
+    const assistantMessageId = `assistant-${Date.now()}`;
+    
+    dispatch({
+      type: "ADD_MESSAGE",
+      message: {
+        id: assistantMessageId,
+        role: "assistant",
+        content: result,
+        timestamp: new Date(),
+      },
+    });
+    
+    // Clear the active atom
+    setActiveAtom(null);
   };
 
   // Function to send a message and get a response
@@ -692,6 +728,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         conversations: state.conversations,
         currentConversationId: state.currentConversationId,
         model: state.model,
+        activeAtom: state.activeAtom,
+        atomParams: state.atomParams,
         setApiKey,
         setApiUrl,
         sendMessage,
@@ -705,6 +743,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         clearConversation,
         deleteConversation,
         setModel,
+        setActiveAtom,
+        handleAtomResult,
       }}
     >
       {children}

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { PanelLeft, PanelRightClose, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SettingsPanel } from "@/components/SettingsPanel";
+import { YouTubeSummarizer } from "@/atoms/YouTubeSummarizer";
+import { FlashcardMaker } from "@/atoms/FlashcardMaker";
 
 // Theme application component
 const ThemeHandler = ({
@@ -20,30 +22,46 @@ const ThemeHandler = ({
   const {
     theme
   } = useChat();
+  
   useEffect(() => {
-    // Apply theme to html element
     const htmlElement = document.documentElement;
     htmlElement.classList.remove("light", "dark");
     if (theme === "system") {
-      // Check system preference
       const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       htmlElement.classList.add(systemPrefersDark ? "dark" : "light");
     } else {
       htmlElement.classList.add(theme);
     }
   }, [theme]);
+  
   return <>{children}</>;
 };
+
 const AppContent = () => {
   const {
     fontSize,
-    theme
+    theme,
+    activeAtom,
+    atomParams,
+    setActiveAtom,
+    handleAtomResult
   } = useChat();
+  
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  
   const toggleSidebar = () => {
     setSidebarOpen(prevState => !prevState);
   };
+  
+  const closeAtom = () => {
+    setActiveAtom(null);
+  };
+  
+  const handleAtomSubmit = (result: string) => {
+    handleAtomResult(result);
+  };
+  
   return <ThemeHandler>
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
@@ -75,7 +93,20 @@ const AppContent = () => {
             <ChatInput />
           </SidebarInset>
           
-          {/* Settings Panel */}
+          {activeAtom === 'youtube' && (
+            <YouTubeSummarizer 
+              onClose={closeAtom} 
+              onSubmit={handleAtomSubmit} 
+            />
+          )}
+          
+          {activeAtom === 'flashcard' && (
+            <FlashcardMaker
+              onClose={closeAtom}
+              onSubmit={handleAtomSubmit}
+            />
+          )}
+          
           {showSettings && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
               <div className="fixed left-0 top-0 h-full w-full max-w-md dark:bg-black/95 light:bg-white/95 shadow-lg dark:border-r dark:border-white/10 light:border-r light:border-black/10 overflow-hidden md:left-[16rem]">
                 <div className="flex items-center justify-between p-4 border-b dark:border-white/10 light:border-black/10">
@@ -91,9 +122,11 @@ const AppContent = () => {
       </SidebarProvider>
     </ThemeHandler>;
 };
+
 const Index = () => {
   return <ChatProvider>
       <AppContent />
     </ChatProvider>;
 };
+
 export default Index;
