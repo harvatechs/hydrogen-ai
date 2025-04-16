@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -22,7 +21,6 @@ const ThemeHandler = ({
   const {
     theme
   } = useChat();
-  
   useEffect(() => {
     // Apply theme to html element
     const htmlElement = document.documentElement;
@@ -35,21 +33,18 @@ const ThemeHandler = ({
       htmlElement.classList.add(theme);
     }
   }, [theme]);
-  
   return <>{children}</>;
 };
-
 const AppContent = () => {
   const {
     fontSize,
     theme
   } = useChat();
-  
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [showSettings, setShowSettings] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  
+
   // Handle window resize to detect mobile screens
   useEffect(() => {
     const handleResize = () => {
@@ -59,11 +54,9 @@ const AppContent = () => {
         setSidebarOpen(false);
       }
     };
-    
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [sidebarOpen]);
-  
   const toggleSidebar = () => {
     if (isMobile) {
       setShowMobileMenu(!showMobileMenu);
@@ -71,9 +64,7 @@ const AppContent = () => {
       setSidebarOpen(!sidebarOpen);
     }
   };
-  
-  return (
-    <ThemeHandler>
+  return <ThemeHandler>
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
           dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
@@ -81,30 +72,22 @@ const AppContent = () => {
           font-size-${fontSize}`}>
           
           {/* Desktop Sidebar */}
-          {sidebarOpen && !isMobile && (
-            <ShadcnSidebar className="hidden md:flex">
+          {sidebarOpen && !isMobile && <ShadcnSidebar className="hidden md:flex">
               <SidebarContent>
                 <Sidebar />
               </SidebarContent>
-            </ShadcnSidebar>
-          )}
+            </ShadcnSidebar>}
           
           {/* Mobile Menu Overlay */}
-          {showMobileMenu && isMobile && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex md:hidden">
+          {showMobileMenu && isMobile && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex md:hidden">
               <div className="w-4/5 max-w-xs h-full">
                 <Sidebar />
               </div>
               <div className="flex-1" onClick={() => setShowMobileMenu(false)}></div>
-            </div>
-          )}
+            </div>}
           
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
-            <Header 
-              onOpenSettings={() => setShowSettings(true)}
-              toggleSidebar={toggleSidebar} 
-              sidebarOpen={sidebarOpen || showMobileMenu}
-            />
+            <Header onOpenSettings={() => setShowSettings(true)} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen || showMobileMenu} />
             
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute bottom-0 left-0 w-full h-1/2 dark:bg-gradient-to-t dark:from-black/30 dark:to-transparent light:bg-gradient-to-t light:from-white/30 light:to-transparent opacity-30"></div>
@@ -113,9 +96,7 @@ const AppContent = () => {
             
             <div className="flex-1 relative overflow-hidden">
               {/* Student Tools Section */}
-              <div className="px-4 pt-4 md:px-6">
-                <StudentTools />
-              </div>
+              
               
               <ScrollArea className="h-[calc(100vh-200px)]">
                 <ChatHistory />
@@ -126,50 +107,30 @@ const AppContent = () => {
           </SidebarInset>
           
           {/* Settings Panel */}
-          {showSettings && (
-            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
+          {showSettings && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
               <div className="fixed left-0 top-0 h-full w-full max-w-md dark:bg-black/95 light:bg-white/95 shadow-lg dark:border-r dark:border-white/10 light:border-r light:border-black/10 overflow-hidden md:left-[16rem]">
                 <div className="flex items-center justify-between p-4 border-b dark:border-white/10 light:border-black/10">
                   <h2 className="text-lg font-semibold dark:text-white light:text-black">Settings</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setShowSettings(false)} 
-                    className="dark:hover:bg-white/5 light:hover:bg-black/5"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)} className="dark:hover:bg-white/5 light:hover:bg-black/5">
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
                 <SettingsPanel onClose={() => setShowSettings(false)} />
               </div>
-            </div>
-          )}
+            </div>}
           
           {/* Sidebar toggle when sidebar is closed */}
-          {!sidebarOpen && !showMobileMenu && !isMobile && (
-            <div className="absolute top-4 left-4 z-10">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={() => setSidebarOpen(true)} 
-                className="h-8 w-8 rounded-full bg-background/50 backdrop-blur-sm border-white/10"
-              >
+          {!sidebarOpen && !showMobileMenu && !isMobile && <div className="absolute top-4 left-4 z-10">
+              <Button variant="outline" size="icon" onClick={() => setSidebarOpen(true)} className="h-8 w-8 rounded-full bg-background/50 backdrop-blur-sm border-white/10">
                 <PanelLeft className="h-4 w-4" />
               </Button>
-            </div>
-          )}
+            </div>}
           
           {/* Help Button */}
           <div className="fixed bottom-24 right-4 z-20">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-gemini-purple text-white shadow-lg hover:bg-gemini-purple/90"
-                >
-                  <HelpCircle className="h-5 w-5" />
-                </Button>
+                
               </TooltipTrigger>
               <TooltipContent>
                 <p>Help & Support</p>
@@ -178,16 +139,11 @@ const AppContent = () => {
           </div>
         </div>
       </SidebarProvider>
-    </ThemeHandler>
-  );
+    </ThemeHandler>;
 };
-
 const Index = () => {
-  return (
-    <ChatProvider>
+  return <ChatProvider>
       <AppContent />
-    </ChatProvider>
-  );
+    </ChatProvider>;
 };
-
 export default Index;
