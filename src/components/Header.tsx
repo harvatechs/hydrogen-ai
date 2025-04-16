@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Settings, PanelLeft, PanelLeftClose, Moon, Sun, MessageSquare, BetaIcon, Menu } from "lucide-react";
+import { Settings, PanelLeft, PanelLeftClose, Moon, Sun, MessageSquare, Menu } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 
