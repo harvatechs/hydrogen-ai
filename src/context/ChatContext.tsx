@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -44,7 +45,54 @@ interface ChatContextType {
   setFontSize: (size: 'small' | 'normal' | 'large') => void;
 }
 
-import { generateCompletionWithGemini } from "@/utils/geminiApi";
+// Gemini API configuration with explicit type
+interface GeminiMessage {
+  role: "user" | "model" | "system";
+  content: string;
+}
+
+// Function to call the Gemini API
+const generateCompletionWithGemini = async (messages: GeminiMessage[]): Promise<string> => {
+  const API_KEY = 'AIzaSyApy8Nw8M6PeUWtKapURmaZnuH4lWogN6I';
+  const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  
+  try {
+    const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: messages.map(msg => ({
+          role: msg.role,
+          parts: [{ text: msg.content }]
+        })),
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Failed to generate response');
+    }
+
+    const data = await response.json();
+    if (data.candidates && data.candidates[0] && 
+        data.candidates[0].content && 
+        data.candidates[0].content.parts && 
+        data.candidates[0].content.parts[0]) {
+      return data.candidates[0].content.parts[0].text;
+    } else {
+      throw new Error('Unexpected response format from API');
+    }
+  } catch (error) {
+    console.error('Error calling Gemini API:', error);
+    throw error;
+  }
+};
 
 export const ChatContext = createContext<ChatContextType>({
   messages: [],
@@ -245,11 +293,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         .map(msg => ({
           role: msg.role === 'user' ? 'user' : 'model',
           content: msg.content,
-        }));
+        })) as GeminiMessage[];
       
       // Add a system message for better context
-      const systemMessage = {
-        role: 'system' as const,
+      const systemMessage: GeminiMessage = {
+        role: 'system',
         content: 'You are HydroGen AI, a helpful, respectful, and accurate assistant. Always provide factual information and cite sources when possible. If you\'re unsure about something, be honest about your limitations.'
       };
       
