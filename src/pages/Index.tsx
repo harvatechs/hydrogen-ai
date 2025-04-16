@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -35,6 +36,7 @@ const ThemeHandler = ({
   }, [theme]);
   return <>{children}</>;
 };
+
 const AppContent = () => {
   const {
     fontSize,
@@ -44,6 +46,7 @@ const AppContent = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showStudentTools, setShowStudentTools] = useState(true);
 
   // Handle window resize to detect mobile screens
   useEffect(() => {
@@ -57,6 +60,7 @@ const AppContent = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [sidebarOpen]);
+  
   const toggleSidebar = () => {
     if (isMobile) {
       setShowMobileMenu(!showMobileMenu);
@@ -64,6 +68,11 @@ const AppContent = () => {
       setSidebarOpen(!sidebarOpen);
     }
   };
+  
+  const toggleTools = () => {
+    setShowStudentTools(!showStudentTools);
+  };
+  
   return <ThemeHandler>
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
@@ -96,14 +105,33 @@ const AppContent = () => {
             
             <div className="flex-1 relative overflow-hidden">
               {/* Student Tools Section */}
-              
-              
-              <ScrollArea className="h-[calc(100vh-200px)]">
-                <ChatHistory />
-              </ScrollArea>
+              {showStudentTools ? (
+                <StudentTools />
+              ) : (
+                <ScrollArea className="h-[calc(100vh-200px)]">
+                  <ChatHistory />
+                </ScrollArea>
+              )}
             </div>
             
-            <ChatInput />
+            <div className="flex justify-center space-x-2 py-2">
+              <Button 
+                variant={showStudentTools ? "default" : "outline"} 
+                className={showStudentTools ? "bg-gemini-purple hover:bg-gemini-purple/90 text-white" : ""}
+                onClick={toggleTools}
+              >
+                Answer Engine
+              </Button>
+              <Button 
+                variant={!showStudentTools ? "default" : "outline"}
+                className={!showStudentTools ? "bg-gemini-purple hover:bg-gemini-purple/90 text-white" : ""}
+                onClick={toggleTools}
+              >
+                Chat
+              </Button>
+            </div>
+            
+            {!showStudentTools && <ChatInput />}
           </SidebarInset>
           
           {/* Settings Panel */}
@@ -141,9 +169,11 @@ const AppContent = () => {
       </SidebarProvider>
     </ThemeHandler>;
 };
+
 const Index = () => {
   return <ChatProvider>
       <AppContent />
     </ChatProvider>;
 };
+
 export default Index;
