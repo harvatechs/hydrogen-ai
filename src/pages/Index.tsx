@@ -1,15 +1,16 @@
 
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
-import { Header } from "@/components/Header"; // Using our custom Header component
+import { Header } from "@/components/Header";
 import { ChatHistory } from "@/components/ChatHistory";
 import { ChatInput } from "@/components/ChatInput";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider, Sidebar as ShadcnSidebar, SidebarContent, SidebarInset } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { PanelLeft, X } from "lucide-react";
+import { PanelLeft, X, HelpCircle } from "lucide-react";
 import { SettingsPanel } from "@/components/SettingsPanel";
+import StudentTools from "@/components/StudentTools";
 
 // Theme application component
 const ThemeHandler = ({
@@ -20,6 +21,7 @@ const ThemeHandler = ({
   const {
     theme
   } = useChat();
+  
   useEffect(() => {
     // Apply theme to html element
     const htmlElement = document.documentElement;
@@ -32,6 +34,7 @@ const ThemeHandler = ({
       htmlElement.classList.add(theme);
     }
   }, [theme]);
+  
   return <>{children}</>;
 };
 
@@ -40,28 +43,66 @@ const AppContent = () => {
     fontSize,
     theme
   } = useChat();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
   
-  return <ThemeHandler>
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  // Handle window resize to detect mobile screens
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [sidebarOpen]);
+  
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setShowMobileMenu(!showMobileMenu);
+    } else {
+      setSidebarOpen(!sidebarOpen);
+    }
+  };
+  
+  return (
+    <ThemeHandler>
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
           dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
           light:bg-gradient-to-br light:from-white light:via-white/95 light:to-white/90 
           font-size-${fontSize}`}>
-          {sidebarOpen && (
-            <ShadcnSidebar className="md:flex">
+          
+          {/* Desktop Sidebar */}
+          {sidebarOpen && !isMobile && (
+            <ShadcnSidebar className="hidden md:flex">
               <SidebarContent>
                 <Sidebar />
               </SidebarContent>
             </ShadcnSidebar>
           )}
           
+          {/* Mobile Menu Overlay */}
+          {showMobileMenu && isMobile && (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex md:hidden">
+              <div className="w-4/5 max-w-xs h-full">
+                <Sidebar />
+              </div>
+              <div className="flex-1" onClick={() => setShowMobileMenu(false)}></div>
+            </div>
+          )}
+          
           <SidebarInset className="flex flex-col h-screen relative transition-all duration-300 ease-in-out w-full">
             <Header 
               onOpenSettings={() => setShowSettings(true)}
-              toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
-              sidebarOpen={sidebarOpen}
+              toggleSidebar={toggleSidebar} 
+              sidebarOpen={sidebarOpen || showMobileMenu}
             />
             
             <div className="absolute inset-0 pointer-events-none">
@@ -70,7 +111,12 @@ const AppContent = () => {
             </div>
             
             <div className="flex-1 relative overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-130px)]">
+              {/* Student Tools Section */}
+              <div className="px-4 pt-4 md:px-6">
+                <StudentTools />
+              </div>
+              
+              <ScrollArea className="h-[calc(100vh-200px)]">
                 <ChatHistory />
               </ScrollArea>
             </div>
@@ -79,20 +125,27 @@ const AppContent = () => {
           </SidebarInset>
           
           {/* Settings Panel */}
-          {showSettings && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
+          {showSettings && (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:left-[16rem]">
               <div className="fixed left-0 top-0 h-full w-full max-w-md dark:bg-black/95 light:bg-white/95 shadow-lg dark:border-r dark:border-white/10 light:border-r light:border-black/10 overflow-hidden md:left-[16rem]">
                 <div className="flex items-center justify-between p-4 border-b dark:border-white/10 light:border-black/10">
                   <h2 className="text-lg font-semibold dark:text-white light:text-black">Settings</h2>
-                  <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)} className="dark:hover:bg-white/5 light:hover:bg-black/5">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setShowSettings(false)} 
+                    className="dark:hover:bg-white/5 light:hover:bg-black/5"
+                  >
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
                 <SettingsPanel onClose={() => setShowSettings(false)} />
               </div>
-            </div>}
+            </div>
+          )}
           
           {/* Sidebar toggle when sidebar is closed */}
-          {!sidebarOpen && (
+          {!sidebarOpen && !showMobileMenu && !isMobile && (
             <div className="absolute top-4 left-4 z-10">
               <Button 
                 variant="outline" 
@@ -104,15 +157,29 @@ const AppContent = () => {
               </Button>
             </div>
           )}
+          
+          {/* Help Button */}
+          <div className="fixed bottom-24 right-4 z-20">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-10 w-10 rounded-full bg-gemini-purple text-white shadow-lg hover:bg-gemini-purple/90"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </SidebarProvider>
-    </ThemeHandler>;
+    </ThemeHandler>
+  );
 };
 
 const Index = () => {
-  return <ChatProvider>
+  return (
+    <ChatProvider>
       <AppContent />
-    </ChatProvider>;
+    </ChatProvider>
+  );
 };
 
 export default Index;

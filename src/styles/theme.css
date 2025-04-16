@@ -1,0 +1,134 @@
+
+/* Theme Variables and Common Styles */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html, body {
+    @apply overflow-x-hidden scroll-smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground min-h-screen antialiased;
+  }
+}
+
+/* Gradient backgrounds */
+.bg-gradient-purple {
+  @apply bg-gradient-to-br from-purple-600 to-indigo-700;
+}
+
+.bg-gradient-blue {
+  @apply bg-gradient-to-r from-blue-400 to-indigo-500;
+}
+
+.bg-gradient-teal {
+  @apply bg-gradient-to-r from-teal-400 to-emerald-500;
+}
+
+.bg-gradient-sunset {
+  @apply bg-gradient-to-r from-orange-500 to-pink-500;
+}
+
+/* Glass effects */
+.glass-effect {
+  @apply backdrop-blur-md;
+}
+
+.dark .glass-effect {
+  @apply bg-white/5 border-white/10;
+}
+
+.light .glass-effect {
+  @apply bg-black/5 border-black/10;
+}
+
+/* Dark mode pattern overlay */
+.pattern-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Enhanced scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+.dark {
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-track: rgba(0, 0, 0, 0.3);
+}
+
+.light {
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+  --scrollbar-track: rgba(0, 0, 0, 0.05);
+}
+
+/* Improved focus styles */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* Better mobile tap targets */
+.tap-target {
+  @apply touch-manipulation;
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* Improved accessible contrast for light mode */
+.light .improved-contrast {
+  @apply text-gray-900;
+}
+
+.light .improved-contrast-bg {
+  @apply bg-gray-100;
+}
+
+/* Improved transitions */
+.smooth-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Mobile media queries */
+@media (max-width: 640px) {
+  .sm-text-center {
+    text-align: center;
+  }
+  
+  .sm-p-4 {
+    padding: 1rem;
+  }
+  
+  .sm-mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .md-text-center {
+    text-align: center;
+  }
+  
+  .md-p-6 {
+    padding: 1.5rem;
+  }
+}

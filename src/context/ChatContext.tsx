@@ -1,276 +1,319 @@
 import React, {
   createContext,
-  useContext,
   useState,
   useEffect,
+  useContext,
   useCallback,
-} from "react";
-import { v4 as uuidv4 } from "uuid";
-import {
-  ChatMessage,
-  Conversation,
-  Theme,
-  FontSize,
-  OpenRouterResponse,
-} from "@/types/message";
-import { generateCompletionWithOpenRouter } from "@/utils/openRouterApi";
+} from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { toast } from "@/components/ui/use-toast";
+
+export type Role = 'user' | 'assistant';
+
+export interface Message {
+  id: string;
+  role: Role;
+  content: string;
+  timestamp: Date;
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  lastUpdatedAt: Date;
+}
 
 interface ChatContextType {
+  messages: Message[];
+  addMessage: (message: Message) => void;
+  sendMessage: (content: string) => Promise<void>;
+  isProcessing: boolean;
+  clearMessages: () => void;
+  clearConversation: (conversationId: string) => void;
+  deleteConversation: (conversationId: string) => void;
   conversations: Conversation[];
   currentConversationId: string | null;
-  currentConversation: Conversation | null;
-  messages: ChatMessage[];
-  addMessage: (message: ChatMessage) => void;
-  sendMessage: (content: string) => Promise<void>;
-  startNewConversation: () => void;
-  clearMessages: () => void;
-  updateConversationTitle: (id: string, title: string) => void;
-  setCurrentConversation: (id: string) => void;
-  clearConversation: (id: string) => void;
-  deleteConversation: (id: string) => void;
+  setCurrentConversation: (conversationId: string | null) => void;
+  updateConversationTitle: (conversationId: string, newTitle: string) => void;
   createNewConversation: () => void;
-  isProcessing: boolean;
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  fontSize: FontSize;
-  setFontSize: (fontSize: FontSize) => void;
-  model: string;
-  setModel: (model: string) => void;
-  apiKey: string;
-  setApiKey: (key: string) => void;
-  apiUrl: string;
-  setApiUrl: (url: string) => void;
+  theme: 'dark' | 'light' | 'system';
+  setTheme: (theme: 'dark' | 'light' | 'system') => void;
+  fontSize: 'small' | 'normal' | 'large';
+  setFontSize: (size: 'small' | 'normal' | 'large') => void;
 }
 
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
+import { generateCompletionWithGemini } from "@/utils/geminiApi";
 
-interface ChatProviderProps {
-  children: React.ReactNode;
-}
+export const ChatContext = createContext<ChatContextType>({
+  messages: [],
+  addMessage: () => {},
+  sendMessage: async () => {},
+  isProcessing: false,
+  clearMessages: () => {},
+  clearConversation: () => {},
+  deleteConversation: () => {},
+  conversations: [],
+  currentConversationId: null,
+  setCurrentConversation: () => {},
+  updateConversationTitle: () => {},
+  createNewConversation: () => {},
+  theme: 'dark',
+  setTheme: () => {},
+  fontSize: 'normal',
+  setFontSize: () => {},
+});
 
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [currentConversationId, setCurrentConversationId] =
-    useState<string | null>(null);
+export const useChat = () => useContext(ChatContext);
+
+// Function to extract a title from the content
+const extractTitleFromContent = (content: string) => {
+  const maxLength = 50;
+  const trimmedContent = content.trim();
+  
+  if (trimmedContent.length <= maxLength) {
+    return trimmedContent;
+  } else {
+    return trimmedContent.substring(0, maxLength).trim() + "...";
+  }
+};
+
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [theme, setTheme] = useState<Theme>("system");
-  const [fontSize, setFontSize] = useState<FontSize>("normal");
-  const [model, setModel] = useState<string>("openai/gpt-3.5-turbo");
-  const [apiKey, setApiKey] = useState<string>(localStorage.getItem('openRouterApiKey') || "");
-  const [apiUrl, setApiUrl] = useState<string>(localStorage.getItem('openRouterApiUrl') || "");
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
+  const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
 
+  // Load conversations from local storage on mount
   useEffect(() => {
-    const storedConversations = localStorage.getItem("conversations");
+    const storedConversations = localStorage.getItem('conversations');
     if (storedConversations) {
       setConversations(JSON.parse(storedConversations));
-    } else {
-      const defaultConversation: Conversation = {
-        id: uuidv4(),
-        title: "New conversation",
-        messages: [],
-        lastUpdatedAt: new Date(),
-      };
-      setConversations([defaultConversation]);
-      setCurrentConversationId(defaultConversation.id);
+    }
+    
+    const storedTheme = localStorage.getItem('theme') as 'dark' | 'light' | 'system' | null;
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
+    
+    const storedFontSize = localStorage.getItem('fontSize') as 'small' | 'normal' | 'large' | null;
+    if (storedFontSize) {
+      setFontSize(storedFontSize);
     }
   }, []);
 
+  // Save conversations to local storage whenever it changes
   useEffect(() => {
-    localStorage.setItem("conversations", JSON.stringify(conversations));
+    localStorage.setItem('conversations', JSON.stringify(conversations));
   }, [conversations]);
-
+  
   useEffect(() => {
-    if (apiKey) {
-      localStorage.setItem('openRouterApiKey', apiKey);
-    }
-    if (apiUrl) {
-      localStorage.setItem('openRouterApiUrl', apiUrl);
-    }
-  }, [apiKey, apiUrl]);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  
+  useEffect(() => {
+    localStorage.setItem('fontSize', fontSize);
+  }, [fontSize]);
 
-  const currentConversation = React.useMemo(() => {
-    return (
-      conversations.find((conversation) => conversation.id === currentConversationId) ||
-      null
+  const addMessage = useCallback((message: Message) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+  }, []);
+
+  const updateMessage = useCallback((id: string, updates: Partial<Message>) => {
+    setMessages(prevMessages =>
+      prevMessages.map(msg => (msg.id === id ? { ...msg, ...updates } : msg))
     );
-  }, [conversations, currentConversationId]);
+  }, []);
 
-  const messages = React.useMemo(() => {
-    return currentConversation?.messages || [];
-  }, [currentConversation]);
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, []);
 
-  const addMessage = (message: ChatMessage) => {
-    setConversations((prevConversations) => {
-      return prevConversations.map((conversation) => {
-        if (conversation.id === currentConversationId) {
-          return {
-            ...conversation,
-            messages: [...conversation.messages, message],
-            lastUpdatedAt: new Date(),
-          };
-        } else {
-          return conversation;
-        }
-      });
-    });
-  };
+  const clearConversation = useCallback((conversationId: string) => {
+    setMessages(prevMessages => prevMessages.filter(msg => {
+      const firstMessage = prevMessages[0];
+      return firstMessage && firstMessage.id !== conversationId;
+    }));
+  }, []);
 
-  const sendMessage = useCallback(
-    async (content: string) => {
-      if (!currentConversationId) {
-        console.error("No conversation selected");
-        return;
-      }
+  const deleteConversation = useCallback((conversationId: string) => {
+    setConversations(prevConversations =>
+      prevConversations.filter(conversation => conversation.id !== conversationId)
+    );
+    if (currentConversationId === conversationId) {
+      setCurrentConversationId(null);
+      clearMessages();
+    }
+  }, [clearMessages, currentConversationId]);
 
-      setIsProcessing(true);
+  const setCurrentConversation = useCallback((conversationId: string | null) => {
+    setCurrentConversationId(conversationId);
+    if (conversationId) {
+      // Load messages for the selected conversation
+      setMessages([]);
+    } else {
+      // Clear messages if no conversation is selected
+      clearMessages();
+    }
+  }, [clearMessages]);
 
-      const userMessage: ChatMessage = {
-        id: uuidv4(),
-        role: "user",
-        content: content,
-        timestamp: Date.now(),
-      };
+  const updateConversationTitle = useCallback((conversationId: string, newTitle: string) => {
+    setConversations(prevConversations =>
+      prevConversations.map(conversation =>
+        conversation.id === conversationId ? { ...conversation, title: newTitle } : conversation
+      )
+    );
+  }, []);
 
-      addMessage(userMessage);
+  const createNewConversation = useCallback(() => {
+    const newConvId = uuidv4();
+    setCurrentConversationId(newConvId);
+    setConversations(prev => [
+      {
+        id: newConvId,
+        title: "New Conversation",
+        lastUpdatedAt: new Date(),
+      },
+      ...prev
+    ]);
+    clearMessages();
+  }, [clearMessages]);
 
-      try {
-        const apiMessages = [
-          ...currentConversation.messages.map((message) => ({
-            role: message.role,
-            content: message.content,
-          })),
-          { role: userMessage.role, content: userMessage.content },
-        ];
-
-        const response: OpenRouterResponse = await generateCompletionWithOpenRouter(
-          apiMessages,
-          model
-        );
-
-        const aiMessage: ChatMessage = {
-          id: uuidv4(),
-          role: "assistant",
-          content: response.choices[0].message.content,
-          timestamp: Date.now(),
-        };
-
-        addMessage(aiMessage);
-      } catch (error: any) {
-        addMessage({
-          id: uuidv4(),
-          role: "assistant",
-          content: `Sorry, I had an error: ${error.message}`,
-          timestamp: Date.now(),
-        });
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    [addMessage, currentConversation, currentConversationId, model]
-  );
-
-  const startNewConversation = () => {
-    const newConversation: Conversation = {
-      id: uuidv4(),
-      title: "New conversation",
-      messages: [],
-      lastUpdatedAt: new Date(),
-    };
-    setConversations([newConversation, ...conversations]);
-    setCurrentConversationId(newConversation.id);
-  };
-
-  const createNewConversation = () => {
-    startNewConversation();
-  };
-
-  const clearMessages = () => {
-    setConversations((prevConversations) => {
-      return prevConversations.map((conversation) => {
-        if (conversation.id === currentConversationId) {
-          return { ...conversation, messages: [] };
-        } else {
-          return conversation;
-        }
-      });
-    });
-  };
-
-  const updateConversationTitle = (id: string, title: string) => {
-    setConversations((prevConversations) =>
-      prevConversations.map((conversation) =>
-        conversation.id === id ? { ...conversation, title } : conversation
+  const updateConversationTime = (conversationId: string | null) => {
+    if (!conversationId) return;
+    setConversations(prev =>
+      prev.map(conversation =>
+        conversation.id === conversationId ? { ...conversation, lastUpdatedAt: new Date() } : conversation
       )
     );
   };
 
-  const setCurrentConversation = (id: string) => {
-    setCurrentConversationId(id);
-  };
-
-  const clearConversation = (id: string) => {
-    setConversations((prevConversations) =>
-      prevConversations.map((conversation) =>
-        conversation.id === id ? { ...conversation, messages: [] } : conversation
-      )
-    );
-  };
-
-  const deleteConversation = (id: string) => {
-    setConversations((prevConversations) =>
-      prevConversations.filter((conversation) => conversation.id !== id)
-    );
-    if (currentConversationId === id) {
-      if (conversations.length > 1) {
-        const remainingConversations = conversations.filter(c => c.id !== id);
-        setCurrentConversationId(remainingConversations[0].id);
-      } else {
-        const newConversation: Conversation = {
-          id: uuidv4(),
-          title: "New conversation",
-          messages: [],
+  const sendMessage = async (content: string) => {
+    // Create a temporary ID for the user message
+    const tempUserMsgId = uuidv4();
+    const tempAiMsgId = uuidv4();
+    
+    // Check if we're in an active conversation
+    if (!currentConversationId) {
+      const newConvId = uuidv4();
+      setCurrentConversationId(newConvId);
+      const newTitle = extractTitleFromContent(content);
+      
+      setConversations(prev => [
+        {
+          id: newConvId,
+          title: newTitle,
           lastUpdatedAt: new Date(),
-        };
-        setConversations([newConversation]);
-        setCurrentConversationId(newConversation.id);
+        },
+        ...prev
+      ]);
+    }
+    
+    // Add the user message immediately
+    const userMessage: Message = {
+      id: tempUserMsgId,
+      role: 'user',
+      content,
+      timestamp: new Date(),
+    };
+    
+    addMessage(userMessage);
+    
+    // Create a temporary AI message to show loading
+    const loadingMessage: Message = {
+      id: tempAiMsgId,
+      role: 'assistant',
+      content: '...',
+      timestamp: new Date(),
+      isLoading: true,
+    };
+    
+    addMessage(loadingMessage);
+    setIsProcessing(true);
+    
+    try {
+      // Format messages for API
+      const apiMessages = messages
+        .filter(msg => !msg.isLoading) // Filter out loading messages
+        .concat(userMessage) // Add the current user message
+        .slice(-10) // Only take the last 10 messages for context
+        .map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'model',
+          content: msg.content,
+        }));
+      
+      // Add a system message for better context
+      const systemMessage = {
+        role: 'system' as const,
+        content: 'You are HydroGen AI, a helpful, respectful, and accurate assistant. Always provide factual information and cite sources when possible. If you\'re unsure about something, be honest about your limitations.'
+      };
+      
+      // Get response from Gemini API
+      const response = await generateCompletionWithGemini([
+        systemMessage,
+        ...apiMessages
+      ]);
+      
+      // Check if the title needs to be updated (for new conversations)
+      if (conversations.find(c => c.id === currentConversationId)?.title === "New Conversation") {
+        const newTitle = extractTitleFromContent(content);
+        updateConversationTitle(currentConversationId, newTitle);
       }
+      
+      // Update the AI message with the response
+      updateMessage(tempAiMsgId, {
+        content: response,
+        isLoading: false,
+      });
+      
+      // Update the conversation's last updated time
+      updateConversationTime(currentConversationId);
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Update the AI message with an error
+      updateMessage(tempAiMsgId, {
+        content: 'Sorry, there was an error processing your request. Please try again later.',
+        isLoading: false,
+        isError: true,
+      });
+      
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const value: ChatContextType = {
-    conversations,
-    currentConversationId,
-    currentConversation,
+  const contextValue: ChatContextType = {
     messages,
     addMessage,
     sendMessage,
-    startNewConversation,
+    isProcessing,
     clearMessages,
-    updateConversationTitle,
-    setCurrentConversation,
     clearConversation,
     deleteConversation,
+    conversations,
+    currentConversationId,
+    setCurrentConversation,
+    updateConversationTitle,
     createNewConversation,
-    isProcessing,
     theme,
     setTheme,
     fontSize,
     setFontSize,
-    model,
-    setModel,
-    apiKey,
-    setApiKey,
-    apiUrl,
-    setApiUrl
   };
 
-  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
-};
-
-export const useChat = (): ChatContextType => {
-  const context = useContext(ChatContext);
-  if (context === undefined) {
-    throw new Error("useChat must be used within a ChatProvider");
-  }
-  return context;
+  return (
+    <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>
+  );
 };
