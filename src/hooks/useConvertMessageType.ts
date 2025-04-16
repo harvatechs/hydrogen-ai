@@ -1,5 +1,5 @@
 
-import { Message } from "@/context/ChatContext";
+import { Message, Role } from "@/context/ChatContext";
 import { ChatMessage, MessageRole } from "@/types/message";
 
 // This hook converts between Message from ChatContext and ChatMessage from types
@@ -18,8 +18,13 @@ export function useConvertMessageType() {
 
   // Convert ChatMessage from types to Message from ChatContext
   const convertToContextMessage = (chatMessage: ChatMessage): Message => {
-    // Filter out 'function' role if it's not compatible with Context Message role
-    const safeRole = chatMessage.role === 'function' ? 'assistant' : chatMessage.role;
+    // Filter out roles not compatible with Context Message role
+    let safeRole: Role = 'assistant'; // Default fallback
+    
+    // Only assign role if it's compatible with Context Message Role
+    if (chatMessage.role === 'user' || chatMessage.role === 'assistant') {
+      safeRole = chatMessage.role as Role;
+    }
     
     return {
       id: chatMessage.id,
