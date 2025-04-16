@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,7 +40,6 @@ const App = () => {
   
   // Fix scrolling issues
   useEffect(() => {
-    // Add smooth scrolling to the entire document
     document.documentElement.style.scrollBehavior = 'smooth';
     document.documentElement.style.height = '100%';
     document.body.style.minHeight = '100vh';
@@ -55,17 +55,19 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner className="toaster-container" />
-      <BrowserRouter>
-        <div className="min-h-screen w-full">
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/app" element={<Index />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner className="toaster-container" />
+        <BrowserRouter>
+          <div className="min-h-screen w-full">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/app" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };

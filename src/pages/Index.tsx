@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PanelLeft, X, HelpCircle } from "lucide-react";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import StudentTools from "@/components/StudentTools";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Theme application component
 const ThemeHandler = ({
@@ -28,7 +29,7 @@ const ThemeHandler = ({
     htmlElement.classList.remove("light", "dark");
     if (theme === "system") {
       // Check system preference
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const systemPrefersDark = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
       htmlElement.classList.add(systemPrefersDark ? "dark" : "light");
     } else {
       htmlElement.classList.add(theme);
@@ -76,7 +77,7 @@ const AppContent = () => {
       <SidebarProvider>
         <div className={`flex w-full h-screen overflow-hidden 
           dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
-          light:bg-gradient-to-br light:from-white light:via-white/95 light:to-white/90 
+          light:bg-gradient-to-br light:from-gray-50 light:via-gray-50 light:to-white
           font-size-${fontSize}`}>
           
           {/* Desktop Sidebar */}
@@ -107,7 +108,7 @@ const AppContent = () => {
             
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute bottom-0 left-0 w-full h-1/2 dark:bg-gradient-to-t dark:from-black/30 dark:to-transparent light:bg-gradient-to-t light:from-white/30 light:to-transparent opacity-30"></div>
-              <div className="absolute top-0 right-0 w-1/3 h-1/3 dark:bg-black/20 light:bg-white/20 rounded-full blur-3xl"></div>
+              <div className="absolute top-0 right-0 w-1/3 h-1/3 dark:bg-primary/5 light:bg-primary/5 rounded-full blur-3xl"></div>
             </div>
             
             <div className="flex-1 relative overflow-hidden">
@@ -160,13 +161,20 @@ const AppContent = () => {
           
           {/* Help Button */}
           <div className="fixed bottom-24 right-4 z-20">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-10 w-10 rounded-full bg-gemini-purple text-white shadow-lg hover:bg-gemini-purple/90"
-            >
-              <HelpCircle className="h-5 w-5" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-10 w-10 rounded-full bg-gemini-purple text-white shadow-lg hover:bg-gemini-purple/90"
+                >
+                  <HelpCircle className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Help & Support</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </SidebarProvider>

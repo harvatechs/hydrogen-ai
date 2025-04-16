@@ -15,7 +15,7 @@ export interface Message {
   id: string;
   role: Role;
   content: string;
-  timestamp: Date;
+  timestamp: number;
   isLoading?: boolean;
   isError?: boolean;
 }
@@ -43,12 +43,20 @@ interface ChatContextType {
   setTheme: (theme: 'dark' | 'light' | 'system') => void;
   fontSize: 'small' | 'normal' | 'large';
   setFontSize: (size: 'small' | 'normal' | 'large') => void;
+  apiKey?: string;
+  setApiKey?: (key: string) => void;
+  apiUrl?: string;
+  setApiUrl?: (url: string) => void;
+  model?: string;
+  setModel?: (model: string) => void;
 }
 
 // Gemini API configuration with explicit type
 interface GeminiMessage {
-  role: "user" | "model" | "system";
-  content: string;
+  role: "user" | "model";
+  parts: {
+    text: string;
+  }[];
 }
 
 // Function to call the Gemini API
@@ -63,10 +71,7 @@ const generateCompletionWithGemini = async (messages: GeminiMessage[]): Promise<
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: messages.map(msg => ({
-          role: msg.role,
-          parts: [{ text: msg.content }]
-        })),
+        contents: messages,
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 2048,
@@ -136,6 +141,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
+  const [apiKey, setApiKey] = useState<string>('');
+  const [apiUrl, setApiUrl] = useState<string>('');
+  const [model, setModel] = useState<string>('gemini-2.0-flash');
 
   // Load conversations from local storage on mount
   useEffect(() => {
@@ -153,6 +161,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     if (storedFontSize) {
       setFontSize(storedFontSize);
     }
+    
+    const storedApiKey = localStorage.getItem('apiKey');
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+    }
+    
+    const storedApiUrl = localStorage.getItem('apiUrl');
+    if (storedApiUrl) {
+      setApiUrl(storedApiUrl);
+    }
+    
+    const storedModel = localStorage.getItem('model');
+    if (storedModel) {
+      setModel(storedModel);
+    }
   }, []);
 
   // Save conversations to local storage whenever it changes
@@ -167,6 +190,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     localStorage.setItem('fontSize', fontSize);
   }, [fontSize]);
+  
+  useEffect(() => {
+    if (apiKey) localStorage.setItem('apiKey', apiKey);
+  }, [apiKey]);
+  
+  useEffect(() => {
+    if (apiUrl) localStorage.setItem('apiUrl', apiUrl);
+  }, [apiUrl]);
+  
+  useEffect(() => {
+    if (model) localStorage.setItem('model', model);
+  }, [model]);
 
   const addMessage = useCallback((message: Message) => {
     setMessages((prevMessages) => [...prevMessages, message]);
@@ -267,7 +302,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       id: tempUserMsgId,
       role: 'user',
       content,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
     
     addMessage(userMessage);
@@ -277,7 +312,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       id: tempAiMsgId,
       role: 'assistant',
       content: '...',
-      timestamp: new Date(),
+      timestamp: Date.now(),
       isLoading: true,
     };
     
@@ -285,27 +320,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsProcessing(true);
     
     try {
-      // Format messages for API
-      const apiMessages = messages
+      // Format messages for API - omit loading messages and include context
+      const formattedMessages = messages
         .filter(msg => !msg.isLoading) // Filter out loading messages
         .concat(userMessage) // Add the current user message
         .slice(-10) // Only take the last 10 messages for context
         .map(msg => ({
           role: msg.role === 'user' ? 'user' : 'model',
-          content: msg.content,
+          parts: [{ text: msg.content }]
         })) as GeminiMessage[];
       
-      // Add a system message for better context
-      const systemMessage: GeminiMessage = {
-        role: 'system',
-        content: 'You are HydroGen AI, a helpful, respectful, and accurate assistant. Always provide factual information and cite sources when possible. If you\'re unsure about something, be honest about your limitations.'
-      };
+      // Add user context with role "user" - Gemini doesn't support system role
+      formattedMessages.unshift({
+        role: "user",
+        parts: [{ text: "You are HydroGen AI, a helpful, respectful, and accurate assistant. Always provide factual information and cite sources when possible. If you're unsure about something, be honest about your limitations. Remember this context when answering the questions." }]
+      });
       
       // Get response from Gemini API
-      const response = await generateCompletionWithGemini([
-        systemMessage,
-        ...apiMessages
-      ]);
+      const response = await generateCompletionWithGemini(formattedMessages);
       
       // Check if the title needs to be updated (for new conversations)
       if (conversations.find(c => c.id === currentConversationId)?.title === "New Conversation") {
@@ -359,6 +391,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     setTheme,
     fontSize,
     setFontSize,
+    apiKey,
+    setApiKey,
+    apiUrl,
+    setApiUrl,
+    model,
+    setModel,
   };
 
   return (

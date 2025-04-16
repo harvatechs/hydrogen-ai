@@ -20,15 +20,15 @@
 
 /* Glass card effect */
 .glass-card {
-  @apply backdrop-blur-lg border rounded-xl;
+  @apply backdrop-blur-lg border rounded-xl transition-all duration-200;
 }
 
 .dark .glass-card {
-  @apply bg-white/5 border-white/10;
+  @apply bg-white/5 border-white/10 hover:bg-white/10;
 }
 
 .light .glass-card {
-  @apply bg-white/70 border-black/5 shadow-sm;
+  @apply bg-white/70 border-black/5 shadow-sm hover:shadow-md;
 }
 
 /* Professional Card Styles */
@@ -134,15 +134,15 @@
 
 /* Student Tools Styling */
 .student-tools {
-  @apply p-5 rounded-xl border mb-4;
+  @apply p-5 rounded-xl border mb-4 transition-all duration-200;
 }
 
 .dark .student-tools {
-  @apply border-white/10 bg-white/5;
+  @apply border-white/10 bg-white/5 hover:bg-white/10;
 }
 
 .light .student-tools {
-  @apply border-gray-200 bg-white shadow-sm;
+  @apply border-gray-200 bg-white shadow-sm hover:shadow-md;
 }
 
 .student-tools h2 {
@@ -175,15 +175,15 @@
 
 /* Shared UI Components */
 .app-section {
-  @apply p-4 mb-5 rounded-xl border;
+  @apply p-4 mb-5 rounded-xl border transition-all duration-200;
 }
 
 .dark .app-section {
-  @apply border-white/10 bg-white/5;
+  @apply border-white/10 bg-white/5 hover:bg-white/10;
 }
 
 .light .app-section {
-  @apply border-gray-200 bg-white shadow-sm;
+  @apply border-gray-200 bg-white shadow-sm hover:shadow-md;
 }
 
 /* Web Search Styling */
@@ -212,15 +212,48 @@
 }
 
 .search-result-title {
-  @apply text-lg font-medium mb-1 text-blue-500 hover:underline;
+  @apply text-lg font-medium mb-1 hover:underline;
+}
+
+.dark .search-result-title {
+  @apply text-blue-400;
+}
+
+.light .search-result-title {
+  @apply text-blue-600;
 }
 
 .search-result-snippet {
   @apply text-sm;
 }
 
+.dark .search-result-snippet {
+  @apply text-gray-300;
+}
+
+.light .search-result-snippet {
+  @apply text-gray-700;
+}
+
 .search-result-url {
-  @apply text-xs text-green-600 mt-1 truncate;
+  @apply text-xs truncate;
+}
+
+.dark .search-result-url {
+  @apply text-green-400;
+}
+
+.light .search-result-url {
+  @apply text-green-600;
+}
+
+/* Button hover effects */
+.btn-hover-effect {
+  @apply transition-all duration-200;
+}
+
+.btn-hover-effect:hover {
+  @apply translate-y-[-1px] shadow-md;
 }
 
 /* Mobile Responsive Enhancements */

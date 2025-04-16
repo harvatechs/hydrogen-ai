@@ -27,6 +27,8 @@ p {
   --text-secondary: #333333;
   --text-tertiary: #555555;
   --text-muted: #6b7280;
+  
+  color-scheme: light;
 }
 
 .dark {
@@ -34,6 +36,8 @@ p {
   --text-secondary: rgba(255, 255, 255, 0.9);
   --text-tertiary: rgba(255, 255, 255, 0.8);
   --text-muted: rgba(255, 255, 255, 0.6);
+  
+  color-scheme: dark;
 }
 
 .text-primary {
@@ -58,6 +62,23 @@ p {
 
 .dark .link {
   @apply text-white underline transition-all duration-200 hover:text-white/80;
+}
+
+/* Explicit light mode styles for improved visibility */
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  @apply text-gray-900;
+}
+
+.light p, .light span, .light div {
+  @apply text-gray-800;
+}
+
+.light .text-muted-foreground {
+  @apply text-gray-600;
+}
+
+.light .glass-card {
+  @apply bg-white/70 backdrop-blur-md border-gray-200 shadow-sm;
 }
 
 .font-size-small {

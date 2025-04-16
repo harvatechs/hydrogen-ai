@@ -12,10 +12,11 @@ import {
   Lightbulb 
 } from 'lucide-react';
 import { 
-  HoverCard, 
-  HoverCardContent, 
-  HoverCardTrigger 
-} from '@/components/ui/hover-card';
+  Tooltip, 
+  TooltipContent, 
+  TooltipTrigger 
+} from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 const StudentTools = () => {
   const tools = [
@@ -78,23 +79,27 @@ const StudentTools = () => {
       
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {tools.map((tool) => (
-          <HoverCard key={tool.name}>
-            <HoverCardTrigger asChild>
-              <div className="tool-item flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer">
+          <Tooltip key={tool.name}>
+            <TooltipTrigger asChild>
+              <div 
+                className={cn(
+                  "tool-item flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-200 hover:bg-primary/5 cursor-pointer",
+                  "dark:hover:bg-white/10 light:hover:bg-black/5"
+                )}
+              >
                 <tool.icon className={`h-6 w-6 mb-2 ${tool.color}`} />
                 <span className="text-sm font-medium">{tool.name}</span>
               </div>
-            </HoverCardTrigger>
-            <HoverCardContent className="w-64 p-3">
+            </TooltipTrigger>
+            <TooltipContent className="p-2">
               <div className="flex space-x-2">
-                <tool.icon className={`h-5 w-5 mt-0.5 ${tool.color}`} />
+                <tool.icon className={`h-4 w-4 mt-0.5 ${tool.color}`} />
                 <div>
-                  <h4 className="text-sm font-semibold">{tool.name}</h4>
-                  <p className="text-xs text-muted-foreground">{tool.description}</p>
+                  <p className="text-xs">{tool.description}</p>
                 </div>
               </div>
-            </HoverCardContent>
-          </HoverCard>
+            </TooltipContent>
+          </Tooltip>
         ))}
       </div>
     </div>

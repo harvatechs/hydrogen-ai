@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Lightbulb } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import useConvertMessageType from "@/hooks/useConvertMessageType";
 
 export function ChatHistory() {
   const {
@@ -14,6 +15,7 @@ export function ChatHistory() {
     isProcessing
   } = useChat();
   
+  const { convertToChatMessage } = useConvertMessageType();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [recommendedQuestions, setRecommendedQuestions] = useState<string[]>([]);
 
@@ -85,7 +87,7 @@ export function ChatHistory() {
         <Sparkles className="h-8 w-8 text-gemini-yellow" />
       </div>
       
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-3">
         Welcome to HydroGen AI
       </h1>
       
@@ -135,7 +137,7 @@ export function ChatHistory() {
       ) : (
         <div className="py-4 max-w-4xl mx-auto">
           {messages.map(message => (
-            <ChatMessageComponent key={message.id} message={message} />
+            <ChatMessageComponent key={message.id} message={convertToChatMessage(message)} />
           ))}
           {isProcessing && renderSkeletonLoader()}
           <div ref={messagesEndRef} />
