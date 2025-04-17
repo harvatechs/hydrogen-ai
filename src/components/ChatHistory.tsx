@@ -1,14 +1,11 @@
+
 import { useRef, useEffect, useState } from "react";
 import { useChat } from "@/context/ChatContext";
 import { ChatMessage } from "./ChatMessage";
 import { Button } from "@/components/ui/button";
-import { 
-  Search, Sparkles, Globe, BookOpen, FileText, PanelRight, 
-  Lightbulb, Zap, Code2, PenLine, Youtube, Brain, Calendar 
-} from "lucide-react";
+import { Search, Sparkles, Globe, BookOpen, FileText, PanelRight, Lightbulb, Zap, Code2, PenLine, Youtube, Brain, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { generateConversationLabel } from "@/utils/conversationLabels";
 
 export function ChatHistory() {
   const {
@@ -61,61 +58,100 @@ export function ChatHistory() {
 
   const emptyStateContent = () => (
     <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
-      <div className="w-24 h-24 mb-6 bg-gradient-to-br from-gemini-purple/40 to-gemini-yellow/40 rounded-full flex items-center justify-center shadow-2xl">
-        <Sparkles className="h-12 w-12 text-gemini-yellow animate-pulse-slow" />
+      <div className="w-16 h-16 mb-6 bg-gemini-yellow/20 rounded-full flex items-center justify-center">
+        <Sparkles className="h-8 w-8 text-gemini-yellow" />
       </div>
       
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gradient mb-6 bg-gradient-to-br from-white via-white/90 to-white/70 bg-clip-text text-transparent">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-6">
         Welcome to HydroGen AI
       </h1>
       
       <div className="w-full max-w-2xl mb-8">
-        <div className="glass-morphism rounded-2xl p-6 border border-white/10 shadow-2xl backdrop-blur-lg mb-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism mb-6">
           <h3 className="text-lg font-medium text-gemini-yellow mb-4 flex items-center">
-            <Lightbulb className="h-5 w-5 mr-2 flex-shrink-0 animate-pulse" />
-            Quick Knowledge Paths
+            <Lightbulb className="h-4 w-4 mr-2 flex-shrink-0" />
+            Popular Questions
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { 
-                icon: Brain, 
-                text: "Quantum Computing", 
-                query: "Explain quantum computing in simple terms",
-                color: "text-blue-400"
-              },
-              { 
-                icon: Zap, 
-                text: "AI Breakthroughs", 
-                query: "What are the latest breakthroughs in AI?",
-                color: "text-yellow-400"
-              },
-              { 
-                icon: Globe, 
-                text: "Climate Impact", 
-                query: "How does climate change affect biodiversity?",
-                color: "text-green-400"
-              },
-              { 
-                icon: PenLine, 
-                text: "Energy Sources", 
-                query: "Compare renewable vs non-renewable energy",
-                color: "text-purple-400"
-              }
-            ].map(({ icon: Icon, text, query, color }) => (
-              <Button 
-                key={text}
-                variant="outline" 
-                className={`
-                  justify-start text-left glass-card 
-                  hover:bg-white/10 hover:border-white/30 
-                  transition-all group
-                `}
-                onClick={() => sendMessage(query)}
-              >
-                <Icon className={`h-4 w-4 mr-2 flex-shrink-0 ${color} group-hover:animate-pulse`} />
-                <span className="truncate">{text}</span>
-              </Button>
-            ))}
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              onClick={() => sendMessage("Explain quantum computing in simple terms")}
+            >
+              <Brain className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Explain quantum computing</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              onClick={() => sendMessage("What are the latest breakthroughs in AI?")}
+            >
+              <Zap className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Latest AI breakthroughs</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              onClick={() => sendMessage("How does climate change affect biodiversity?")}
+            >
+              <Globe className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Climate change effects</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              onClick={() => sendMessage("Compare renewable vs non-renewable energy")}
+            >
+              <PenLine className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Compare energy sources</span>
+            </Button>
+          </div>
+        </div>
+        
+        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
+          <h3 className="text-lg font-medium text-blue-400 mb-4 flex items-center">
+            <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
+            Special Tools
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all"
+              onClick={() => sendMessage("/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+            >
+              <Youtube className="h-4 w-4 mr-2 flex-shrink-0 text-red-400" />
+              <span className="truncate">YouTube Summarizer</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/30 transition-all"
+              onClick={() => sendMessage("/flashcard Introduction to quantum physics")}
+            >
+              <PanelRight className="h-4 w-4 mr-2 flex-shrink-0 text-blue-400" />
+              <span className="truncate">Create Flashcards</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30 transition-all"
+              onClick={() => sendMessage("/web Latest AI breakthroughs")}
+            >
+              <Search className="h-4 w-4 mr-2 flex-shrink-0 text-green-400" />
+              <span className="truncate">Web Search</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-yellow-500/10 hover:text-yellow-400 hover:border-yellow-500/30 transition-all"
+              onClick={() => sendMessage("What are the major historical events in 2023?")}
+            >
+              <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-yellow-400" />
+              <span className="truncate">Recent History</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -123,20 +159,13 @@ export function ChatHistory() {
   );
 
   return (
-    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col relative">
-      {/* Subtle background gradient */}
-      <div className="absolute inset-0 pointer-events-none opacity-50 z-0">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-gemini-purple/10 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/3 bg-gradient-to-tr from-gemini-yellow/10 to-transparent rounded-full blur-3xl"></div>
-      </div>
-
-      {!messages || messages.length === 0 || 
-       (messages.length === 1 && messages[0].role === "assistant") ? (
-        <div className="flex-1 flex items-center justify-center z-10">
+    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col">
+      {!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant") ? (
+        <div className="flex-1 flex items-center justify-center">
           {emptyStateContent()}
         </div>
       ) : (
-        <div className="py-4 max-w-4xl mx-auto w-full relative z-10">
+        <div className="py-4 max-w-4xl mx-auto w-full">
           {messages.map(message => (
             <ChatMessage key={message.id} message={message} />
           ))}
@@ -144,9 +173,6 @@ export function ChatHistory() {
           <div ref={messagesEndRef} />
         </div>
       )}
-
-      {/* Smooth scroll fade gradient */}
-      <div className="sticky bottom-0 h-16 w-full bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none z-20"></div>
     </div>
   );
 }
