@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -17,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SettingsPanel } from "@/components/SettingsPanel";
+import { EnhancedSettingsPanel } from "@/components/EnhancedSettingsPanel";
 import { YouTubeSummarizer } from "@/atoms/YouTubeSummarizer";
 import { FlashcardMaker } from "@/atoms/FlashcardMaker";
 import { WebSearchAtom } from "@/atoms/WebSearchAtom";
@@ -152,17 +151,7 @@ const AppContent = () => {
           
           {renderAtomContent()}
           
-          {showSettings && <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-              <div className="fixed left-0 top-0 h-full w-full max-w-md dark:bg-black/95 light:bg-white/95 shadow-lg dark:border-r dark:border-white/10 light:border-r light:border-black/10 overflow-hidden">
-                <div className="flex items-center justify-between p-4 border-b dark:border-white/10 light:border-black/10">
-                  <h2 className="text-lg font-semibold dark:text-white light:text-black">Settings</h2>
-                  <Button variant="ghost" size="icon" onClick={() => setShowSettings(false)} className="dark:hover:bg-white/5 light:hover:bg-black/5">
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                <SettingsPanel onClose={() => setShowSettings(false)} />
-              </div>
-            </div>}
+          {showSettings && <EnhancedSettingsPanel onClose={() => setShowSettings(false)} />}
         </div>
       </SidebarProvider>
     </ThemeHandler>;

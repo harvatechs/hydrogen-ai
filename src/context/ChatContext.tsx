@@ -610,55 +610,184 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
       
+      // Get temperature and response length settings
+      const temperature = parseFloat(localStorage.getItem("app-temperature") || "0.7");
+      const responseLength = parseFloat(localStorage.getItem("app-response-length") || "0.5");
+      
+      // Calculate max output tokens based on response length preference
+      // Shorter = ~500 tokens, Medium = ~1000 tokens, Longer = ~2000 tokens
+      const maxOutputTokens = Math.floor(500 + (responseLength * 1500));
+      
       // Extract previous context for follow-up questions
       const relevantContext = state.messages.slice(-6); // Get recent messages for context
       const conversationContext = relevantContext.map(msg => 
         `${msg.role === 'user' ? 'Human' : 'AI'}: ${msg.content.replace(/<[^>]*>/g, '')}`
       ).join('\n');
-        
-      const response = await fetch(`${state.apiUrl}?key=${state.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are HydroGen AI, a helpful, advanced assistant powered by Google's Gemini technology.
-
-              CONVERSATION HISTORY FOR CONTEXT (use this for follow-up questions):
-              ${conversationContext}
-
-              Answer this question accurately and helpfully: "${content}"
-
-              RESPONSE FORMAT:
-              - Use HTML for structure (<h2>, <h3> for headings, <p> for paragraphs)
-              - Use <strong> for key concepts and <em> for definitions
-              - Use <ul>, <ol>, <li> for lists
-              - Use <blockquote> for quotes
-              - Use <table>, <tr>, <th>, <td> for data tables
-              - Use <code> for code snippets and equations
-              - Always use semantic HTML5 for proper structure`
-            }]
-          }]
-        }),
-        signal: controller.signal
-      });
       
-      if (!response.ok) {
-        throw new Error(`API responded with status: ${response.status}`);
+      // Get custom system prompt if available
+      const systemPrompt = localStorage.getItem("app-system-prompt") || "";
+      const systemPromptSection = systemPrompt ? 
+        `\nCUSTOM INSTRUCTIONS:\n${systemPrompt}\n\n` : 
+        "";
+        
+      // Check if streaming is enabled
+      const streamingEnabled = localStorage.getItem("app-streaming-enabled") !== "false";
+      
+      if (streamingEnabled) {
+        try {
+          const streamUrl = `${state.apiUrl}:streamGenerateContent?key=${state.apiKey}`;
+          const response = await fetch(streamUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `You are HydroGen AI, a helpful, advanced assistant powered by Google's Gemini technology.${systemPromptSection}
+
+                  CONVERSATION HISTORY FOR CONTEXT (use this for follow-up questions):
+                  ${conversationContext}
+
+                  Answer this question accurately and helpfully: "${content}"
+
+                  RESPONSE FORMAT:
+                  - Use HTML for structure (<h2>, <h3> for headings, <p> for paragraphs)
+                  - Use <strong> for key concepts and <em> for definitions
+                  - Use <ul>, <ol>, <li> for lists
+                  - Use <blockquote> for quotes
+                  - Use <table>, <tr>, <th>, <td> for data tables
+                  - Use <code> for code snippets and equations
+                  - Always use semantic HTML5 for proper structure`
+                }]
+              }],
+              generationConfig: {
+                temperature: temperature,
+                maxOutputTokens: maxOutputTokens,
+                topP: 0.9,
+                topK: 40
+              }
+            }),
+            signal: controller.signal
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API responded with status: ${response.status}`);
+          }
+          
+          const reader = response.body?.getReader();
+          if (!reader) {
+            throw new Error("Failed to get response stream reader");
+          }
+          
+          let fullText = '';
+          
+          // Read the stream
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            // Convert the chunk to text
+            const chunk = new TextDecoder().decode(value);
+            
+            try {
+              // The stream comes as multiple JSON objects separated by newlines
+              const lines = chunk.split('\n').filter(line => line.trim());
+              
+              for (const line of lines) {
+                try {
+                  const data = JSON.parse(line);
+                  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                  
+                  if (text) {
+                    fullText += text;
+                    // Update the message with what we have so far
+                    dispatch({
+                      type: "UPDATE_MESSAGE",
+                      id: assistantMessageId,
+                      content: fullText,
+                    });
+                  }
+                } catch (e) {
+                  console.warn('Error parsing streaming chunk:', e);
+                }
+              }
+            } catch (e) {
+              console.error('Error processing stream chunk:', e);
+            }
+          }
+          
+          // Final update with complete response
+          if (fullText) {
+            dispatch({
+              type: "UPDATE_MESSAGE",
+              id: assistantMessageId,
+              content: fullText,
+            });
+          } else {
+            throw new Error("No text was generated in the response stream");
+          }
+        } catch (error) {
+          // Fall back to non-streaming if streaming fails
+          console.error("Streaming failed, falling back to standard request", error);
+          await handleNonStreamingRequest();
+        }
+      } else {
+        // Handle non-streaming request
+        await handleNonStreamingRequest();
       }
       
-      const data = await response.json();
-      let generatedText = data.candidates[0].content.parts[0].text || "No response generated.";
-      
-      // Update the assistant message with the response
-      dispatch({
-        type: "UPDATE_MESSAGE",
-        id: assistantMessageId,
-        content: generatedText,
-      });
-      
+      // Non-streaming request function
+      async function handleNonStreamingRequest() {
+        const response = await fetch(`${state.apiUrl}?key=${state.apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are HydroGen AI, a helpful, advanced assistant powered by Google's Gemini technology.${systemPromptSection}
+
+                CONVERSATION HISTORY FOR CONTEXT (use this for follow-up questions):
+                ${conversationContext}
+
+                Answer this question accurately and helpfully: "${content}"
+
+                RESPONSE FORMAT:
+                - Use HTML for structure (<h2>, <h3> for headings, <p> for paragraphs)
+                - Use <strong> for key concepts and <em> for definitions
+                - Use <ul>, <ol>, <li> for lists
+                - Use <blockquote> for quotes
+                - Use <table>, <tr>, <th>, <td> for data tables
+                - Use <code> for code snippets and equations
+                - Always use semantic HTML5 for proper structure`
+              }]
+            }],
+            generationConfig: {
+              temperature: temperature,
+              maxOutputTokens: maxOutputTokens,
+              topP: 0.9,
+              topK: 40
+            }
+          }),
+          signal: controller.signal
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API responded with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        let generatedText = data.candidates[0].content.parts[0].text || "No response generated.";
+        
+        // Update the assistant message with the response
+        dispatch({
+          type: "UPDATE_MESSAGE",
+          id: assistantMessageId,
+          content: generatedText,
+        });
+      }
     } catch (error) {
       let errorMessage = "Failed to get a response.";
       if (error instanceof Error) {

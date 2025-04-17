@@ -15,15 +15,19 @@ import {
   Menu,
   X,
   MoveRight,
-  Star
+  Star,
+  Code,
+  Cpu,
+  Laptop
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const companiesScrollRef = useRef<HTMLDivElement>(null);
 
   // Handle scroll for sticky header effects
   useEffect(() => {
@@ -37,6 +41,33 @@ export default function Landing() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Companies scrolling effect
+  useEffect(() => {
+    if (!companiesScrollRef.current) return;
+    
+    const scrollSpeed = 1;
+    let scrollPos = 0;
+    let animationId: number;
+    
+    const scroll = () => {
+      if (!companiesScrollRef.current) return;
+      
+      scrollPos += scrollSpeed;
+      if (scrollPos >= companiesScrollRef.current.scrollWidth / 2) {
+        scrollPos = 0;
+      }
+      
+      companiesScrollRef.current.style.transform = `translateX(-${scrollPos}px)`;
+      animationId = requestAnimationFrame(scroll);
+    };
+    
+    scroll();
+    
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
   }, []);
 
   // Scroll to section
@@ -146,48 +177,32 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-28 lg:py-36 flex flex-col items-center justify-center text-center px-4">
-        {/* Enhanced background with multiple layers */}
+      <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 flex flex-col items-center justify-center text-center px-4">
+        {/* Enhanced background with minimal layers for better performance */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gemini-purple/20 via-background to-background z-0"></div>
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-gemini-purple/30 rounded-full filter blur-[100px] animate-pulse-slow"></div>
-        <div className="absolute bottom-20 right-1/4 w-72 h-72 bg-blue-500/20 rounded-full filter blur-[100px] animate-pulse-slow animation-delay-2000"></div>
+        <div className="absolute top-20 left-1/4 w-72 h-72 bg-gemini-purple/20 rounded-full filter blur-[100px]"></div>
         
-        {/* Floating particles */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          {[...Array(10)].map((_, i) => (
-            <div 
-              key={i}
-              className="absolute bg-white/10 rounded-full"
-              style={{
-                width: `${Math.random() * 5 + 2}px`,
-                height: `${Math.random() * 5 + 2}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animation: `float ${Math.random() * 10 + 10}s linear infinite`
-              }}
-            ></div>
-          ))}
-        </div>
-        
-        <div className="relative z-10 container max-w-5xl animate-fade-in">
+        <div className="relative z-10 container max-w-6xl mx-auto animate-fade-in">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
           <div className="inline-block mb-4 px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md text-sm font-medium text-white light:text-black border border-white/10 light:border-black/10 shadow-xl shadow-gemini-purple/5">
             <div className="flex items-center space-x-2">
-              <span className="flex h-2 w-2 rounded-full bg-gemini-purple animate-pulse"></span>
+                  <span className="flex h-2 w-2 rounded-full bg-gemini-purple"></span>
               <span>Next-Gen AI-powered knowledge engine</span>
             </div>
           </div>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-gemini-purple dark:from-white dark:to-purple-300 light:from-black light:to-gemini-purple">
-            Where Curiosity Meets<br className="hidden sm:block" /> AI Magic
+                Where Curiosity Meets AI Magic
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/70 light:text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+              <p className="text-lg md:text-xl text-white/70 light:text-gray-600 max-w-lg mb-8 leading-relaxed">
             Ask Anything. Discover Everything. <span className="text-gemini-purple font-medium">Unlock the Answers You Seek.</span>
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
             <Button size="lg" className="w-full sm:w-auto px-8 py-6 rounded-xl bg-gradient-to-r from-gemini-purple to-purple-600 hover:translate-y-[-2px] transition-all duration-300 shadow-xl shadow-gemini-purple/20 border-0 group" asChild>
               <Link to="/app" className="flex items-center justify-center space-x-2">
                 <span>Launch App</span>
@@ -199,11 +214,59 @@ export default function Landing() {
               <span>Learn More</span>
               <ChevronDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
             </Button>
+              </div>
           </div>
           
-          <div className="mt-20 pt-10 border-t border-white/5 light:border-black/5">
+            {/* App Screenshot */}
+            <div className="hidden lg:block relative p-2">
+              <div className="absolute inset-0 bg-gradient-to-r from-gemini-purple/20 to-blue-500/20 rounded-2xl filter blur-[15px] transform scale-95 -z-10"></div>
+              <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="flex items-center gap-2 p-3 bg-black/20 border-b border-white/10">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+                  </div>
+                  <div className="text-xs text-white/60 px-2 py-1 rounded-md bg-white/5 flex-1 text-center">
+                    HydroGen AI Interface
+                  </div>
+                </div>
+                <img 
+                  src="/app-screenshot.png" 
+                  alt="HydroGen AI Interface" 
+                  className="w-full h-auto"
+                  onError={(e) => {
+                    // Fallback image if the screenshot is not available
+                    const target = e.target as HTMLImageElement;
+                    target.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect fill='%23242429' width='800' height='500'/%3E%3Ctext fill='%23a142f4' font-family='Arial' font-size='30' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'%3EHydroGen AI Interface%3C/text%3E%3C/svg%3E";
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Built by attribution */}
+          <div className="mt-16 max-w-4xl mx-auto text-center px-4 py-6 border border-white/10 rounded-xl bg-white/5 backdrop-blur-md">
+            <div className="flex items-center justify-center mb-3">
+              <Code className="h-5 w-5 text-gemini-purple mr-2" />
+              <h3 className="text-lg font-semibold text-white">Experimental AI Project</h3>
+            </div>
+            <p className="text-white/70 text-sm md:text-base">
+              This project was built <span className="text-gemini-purple font-medium">100% with OpenMatrix IDE</span> completely with AI in 30 minutes on a low-end PC as an experiment by <span className="text-white font-medium">HarVa Groups</span> & <span className="text-white font-medium">FreakVinci Open Labz</span>
+            </p>
+          </div>
+          
+          {/* Scrolling companies section */}
+          <div className="mt-12 pt-8 border-t border-white/5 light:border-black/5">
             <p className="text-sm font-medium text-white/50 light:text-black/50 mb-6 uppercase tracking-wider">Trusted by Industry Leaders</p>
-            <div className="flex flex-wrap justify-center gap-8 opacity-60">
+            
+            <div className="relative overflow-hidden mx-auto max-w-7xl">
+              <div 
+                ref={companiesScrollRef}
+                className="flex space-x-6 py-4 whitespace-nowrap"
+                style={{ width: 'max-content' }}
+              >
+                {/* First set of companies */}
               <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
                 <Star className="h-4 w-4 text-gemini-purple mr-2" />
                 TechCorp
@@ -220,161 +283,152 @@ export default function Landing() {
                 <Star className="h-4 w-4 text-gemini-purple mr-2" />
                 StellarTech
               </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  NexaLearn
             </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  ByteWave
           </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  AlphaNode
         </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  Pulse Systems
+          </div>
+          
+                {/* Duplicate set for seamless scrolling */}
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  TechCorp
+                    </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  Futura AI
+                  </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  Quantum Inc
+            </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  StellarTech
+                    </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  NexaLearn
+                  </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  ByteWave
+            </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  AlphaNode
+                    </div>
+                <div className="h-10 px-6 flex items-center justify-center glass-card bg-white/5 hover:bg-white/10 transition-all duration-300 rounded-xl">
+                  <Star className="h-4 w-4 text-gemini-purple mr-2" />
+                  Pulse Systems
+                  </div>
+            </div>
+            
+              {/* Gradient overlays for smooth scrolling effect */}
+              <div className="absolute left-0 top-0 h-full w-12 bg-gradient-to-r from-background to-transparent z-10"></div>
+              <div className="absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10"></div>
+                    </div>
+                  </div>
+            </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 px-4 relative overflow-hidden">
-        {/* Background elements */}
+      <section id="features" className="py-20 px-4 relative overflow-hidden">
+        {/* Background elements - reduced for better performance */}
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-blue-500/10 rounded-full filter blur-[120px]"></div>
-        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-gemini-purple/10 rounded-full filter blur-[120px]"></div>
         
         <div className="container relative z-10">
-          <div className="text-center mb-20 animate-fade-in">
+          <div className="text-center mb-16 animate-fade-in">
             <div className="inline-flex items-center justify-center mb-4 px-5 py-2 rounded-full bg-gemini-purple/10 text-sm font-medium text-gemini-purple border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5">
               <Sparkles className="mr-2 h-4 w-4" />
               Powerful Features
-            </div>
+                    </div>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200 light:from-black light:to-gemini-purple">
               Smart Technology at Your Fingertips
             </h2>
             <p className="text-white/70 light:text-gray-600 max-w-2xl mx-auto text-lg">
               Discover what makes HydroGen the ultimate answer engine for all your knowledge needs
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="group">
-              <Card className="feature-card border border-white/5 bg-white/5 backdrop-blur-lg hover:border-gemini-purple/30 transition-all duration-300 overflow-hidden relative h-full">
-                {/* Card glow effect on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gemini-purple/0 to-gemini-purple/0 group-hover:from-gemini-purple/10 group-hover:to-gemini-purple/0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <CardContent className="p-8 relative z-10">
-                  <div className="mb-6">
-                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-gemini-purple/20">
-                      <Clock className="h-7 w-7 text-gemini-purple" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">Lightning Fast</h3>
-                  <p className="text-white/70 light:text-gray-600 leading-relaxed">
-                    Get answers in milliseconds with our industry-leading 50ms response time, ensuring you never wait for knowledge again.
-                  </p>
-              </CardContent>
-            </Card>
             </div>
             
-            {/* Feature 2 */}
-            <div className="group">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {/* Feature cards here */}
+            {[
+              {
+                icon: <Clock className="h-7 w-7 text-gemini-purple" />,
+                title: "Lightning Fast",
+                description: "Get answers in milliseconds with our industry-leading 50ms response time, ensuring you never wait for knowledge again."
+              },
+              {
+                icon: <Check className="h-7 w-7 text-gemini-purple" />,
+                title: "99.9% Accuracy",
+                description: "Trust our AI to deliver precise, factual answers every time. We've engineered for truth and unmatched reliability."
+              },
+              {
+                icon: <Brain className="h-7 w-7 text-gemini-purple" />,
+                title: "AI-Powered Insights",
+                description: "Our advanced algorithms don't just find answers - they understand context and deliver meaningful insights."
+              },
+              {
+                icon: <MessageSquare className="h-7 w-7 text-gemini-purple" />,
+                title: "Natural Conversations",
+                description: "Ask questions in your own words. Our AI understands natural language and responds in a conversational, human-like manner."
+              },
+              {
+                icon: <Globe className="h-7 w-7 text-gemini-purple" />,
+                title: "Fully Responsive",
+                description: "Access HydroGen from any device. Our interface adapts perfectly to smartphones, tablets, and desktops."
+              },
+              {
+                icon: <Shield className="h-7 w-7 text-gemini-purple" />,
+                title: "Privacy Focused",
+                description: "Your questions and data stay private. We prioritize security and never share your information with third parties."
+              }
+            ].map((feature, index) => (
+              <div className="group" key={index}>
               <Card className="feature-card border border-white/5 bg-white/5 backdrop-blur-lg hover:border-gemini-purple/30 transition-all duration-300 overflow-hidden relative h-full">
+                  {/* Simplified glow effect on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-gemini-purple/0 to-gemini-purple/0 group-hover:from-gemini-purple/10 group-hover:to-gemini-purple/0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
                 
-                <CardContent className="p-8 relative z-10">
+                  <CardContent className="p-6 md:p-8 relative z-10">
                   <div className="mb-6">
-                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-gemini-purple/20">
-                      <Check className="h-7 w-7 text-gemini-purple" />
+                      <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-105 group-hover:bg-gemini-purple/20">
+                        {feature.icon}
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">99.9% Accuracy</h3>
-                  <p className="text-white/70 light:text-gray-600 leading-relaxed">
-                    Trust our AI to deliver precise, factual answers every time. We've engineered for truth and unmatched reliability.
+                    <h3 className="text-xl md:text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">{feature.title}</h3>
+                    <p className="text-white/70 light:text-gray-600 leading-relaxed text-sm md:text-base">
+                      {feature.description}
                   </p>
               </CardContent>
             </Card>
             </div>
-            
-            {/* Feature 3 */}
-            <div className="group">
-              <Card className="feature-card border border-white/5 bg-white/5 backdrop-blur-lg hover:border-gemini-purple/30 transition-all duration-300 overflow-hidden relative h-full">
-                <div className="absolute inset-0 bg-gradient-to-br from-gemini-purple/0 to-gemini-purple/0 group-hover:from-gemini-purple/10 group-hover:to-gemini-purple/0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <CardContent className="p-8 relative z-10">
-                  <div className="mb-6">
-                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-gemini-purple/20">
-                      <Brain className="h-7 w-7 text-gemini-purple" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">AI-Powered Insights</h3>
-                  <p className="text-white/70 light:text-gray-600 leading-relaxed">
-                    Our advanced algorithms don't just find answers - they understand context and deliver meaningful insights.
-                  </p>
-              </CardContent>
-            </Card>
-            </div>
-            
-            {/* Feature 4 */}
-            <div className="group">
-              <Card className="feature-card border border-white/5 bg-white/5 backdrop-blur-lg hover:border-gemini-purple/30 transition-all duration-300 overflow-hidden relative h-full">
-                <div className="absolute inset-0 bg-gradient-to-br from-gemini-purple/0 to-gemini-purple/0 group-hover:from-gemini-purple/10 group-hover:to-gemini-purple/0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <CardContent className="p-8 relative z-10">
-                  <div className="mb-6">
-                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-gemini-purple/20">
-                      <MessageSquare className="h-7 w-7 text-gemini-purple" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">Natural Conversations</h3>
-                  <p className="text-white/70 light:text-gray-600 leading-relaxed">
-                    Ask questions in your own words. Our AI understands natural language and responds in a conversational, human-like manner.
-                  </p>
-              </CardContent>
-            </Card>
-            </div>
-            
-            {/* Feature 5 */}
-            <div className="group">
-              <Card className="feature-card border border-white/5 bg-white/5 backdrop-blur-lg hover:border-gemini-purple/30 transition-all duration-300 overflow-hidden relative h-full">
-                <div className="absolute inset-0 bg-gradient-to-br from-gemini-purple/0 to-gemini-purple/0 group-hover:from-gemini-purple/10 group-hover:to-gemini-purple/0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <CardContent className="p-8 relative z-10">
-                  <div className="mb-6">
-                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-gemini-purple/20">
-                      <Globe className="h-7 w-7 text-gemini-purple" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">Fully Responsive</h3>
-                  <p className="text-white/70 light:text-gray-600 leading-relaxed">
-                    Access HydroGen from any device. Our interface adapts perfectly to smartphones, tablets, and desktops.
-                  </p>
-              </CardContent>
-            </Card>
-            </div>
-            
-            {/* Feature 6 */}
-            <div className="group">
-              <Card className="feature-card border border-white/5 bg-white/5 backdrop-blur-lg hover:border-gemini-purple/30 transition-all duration-300 overflow-hidden relative h-full">
-                <div className="absolute inset-0 bg-gradient-to-br from-gemini-purple/0 to-gemini-purple/0 group-hover:from-gemini-purple/10 group-hover:to-gemini-purple/0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                
-                <CardContent className="p-8 relative z-10">
-                  <div className="mb-6">
-                    <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-gemini-purple/10 border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5 group-hover:shadow-gemini-purple/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-gemini-purple/20">
-                      <Shield className="h-7 w-7 text-gemini-purple" />
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white light:text-black group-hover:text-gemini-purple transition-colors duration-300">Privacy Focused</h3>
-                  <p className="text-white/70 light:text-gray-600 leading-relaxed">
-                    Your questions and data stay private. We prioritize security and never share your information with third parties.
-                  </p>
-              </CardContent>
-            </Card>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-24 px-4 relative overflow-hidden">
+      <section id="how-it-works" className="py-20 px-4 relative overflow-hidden">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/30 to-background"></div>
         
-        {/* Background elements */}
+        {/* Background elements - simplified for performance */}
         <div className="absolute top-1/3 left-10 w-64 h-64 bg-blue-500/10 rounded-full filter blur-[80px]"></div>
-        <div className="absolute bottom-1/3 right-10 w-64 h-64 bg-gemini-purple/10 rounded-full filter blur-[80px]"></div>
         
         <div className="container relative z-10">
-          <div className="text-center mb-20 animate-fade-in">
+          <div className="text-center mb-16 animate-fade-in">
             <div className="inline-flex items-center justify-center mb-4 px-5 py-2 rounded-full bg-gemini-purple/10 text-sm font-medium text-gemini-purple border border-gemini-purple/20 shadow-lg shadow-gemini-purple/5">
               <Zap className="mr-2 h-4 w-4" />
               Simple Process
@@ -902,15 +956,25 @@ export default function Landing() {
           
           <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-white/40 light:text-gray-500 mb-4 md:mb-0">
-              © 2025 HarVa Groups. All rights reserved.
+              © {new Date().getFullYear()} HarVa Groups & FreakVinci Open Labz. All rights reserved.
             </p>
             <div className="flex items-center">
               <p className="text-sm text-white/40 light:text-gray-500 flex items-center">
-                Made with 
+                Built with 
                 <svg className="h-4 w-4 mx-1 text-gemini-purple" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                 </svg>
-                by HarVa Groups
+                using OpenMatrix IDE in 30 minutes
+              </p>
+            </div>
+          </div>
+          
+          {/* Attribution badge */}
+          <div className="mt-8 pt-4 text-center">
+            <div className="inline-flex items-center px-4 py-2 bg-white/5 border border-white/10 rounded-lg">
+              <Code className="h-4 w-4 text-gemini-purple mr-2" />
+              <p className="text-xs text-white/50">
+                <span className="text-gemini-purple font-medium">100% AI-powered</span> project built on a low-end PC by HarVa Groups & FreakVinci Open Labz
               </p>
             </div>
           </div>
