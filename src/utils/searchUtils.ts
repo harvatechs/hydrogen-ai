@@ -3,10 +3,18 @@ export interface SearchResult {
   title: string;
   link: string;
   snippet: string;
+  pagemap?: {
+    cse_image?: Array<{ src: string }>;
+    [key: string]: any;
+  };
 }
 
 export interface SearchResponse {
   items: SearchResult[];
+  searchInformation?: {
+    formattedTotalResults: string;
+    formattedSearchTime: string;
+  };
 }
 
 export async function searchGoogle(query: string): Promise<SearchResponse | null> {
@@ -33,7 +41,11 @@ export async function searchGoogle(query: string): Promise<SearchResponse | null
           link: "https://example.com/3",
           snippet: "A third sample result that would typically contain additional information from another source."
         }
-      ]
+      ],
+      searchInformation: {
+        formattedTotalResults: "3",
+        formattedSearchTime: "0.2"
+      }
     };
   } catch (error) {
     console.error("Search error:", error);
