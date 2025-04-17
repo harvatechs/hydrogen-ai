@@ -1,3 +1,4 @@
+
 /* Enhanced UI/UX styles for HydroGen AI */
 
 /* Improved button hover states */
@@ -82,3 +83,131 @@
   outline: 2px solid var(--primary) !important;
   outline-offset: 2px;
 } 
+
+/* Enhanced content styling for chat messages */
+.chat-message-content h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: #f0c674;
+  border-bottom: 1px solid rgba(240, 198, 116, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.chat-message-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #f0c674;
+}
+
+.chat-message-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #f0c674;
+}
+
+.chat-message-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.chat-message-content ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.chat-message-content ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.chat-message-content li {
+  margin-bottom: 0.5rem;
+}
+
+.chat-message-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.chat-message-content th,
+.chat-message-content td {
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chat-message-content th {
+  background-color: rgba(240, 198, 116, 0.2);
+  font-weight: 600;
+}
+
+.chat-message-content tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.chat-message-content code {
+  font-family: "Fira Code", monospace;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.chat-message-content pre {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.chat-message-content blockquote {
+  border-left: 3px solid rgba(240, 198, 116, 0.5);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+/* Chart and diagram styles */
+.chat-diagram {
+  margin: 1.5rem 0;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.voice-input-button {
+  position: relative;
+}
+
+.voice-input-button.active {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(240, 198, 116, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(240, 198, 116, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(240, 198, 116, 0);
+  }
+}

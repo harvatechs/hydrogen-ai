@@ -1,3 +1,4 @@
+
 export type AtomType = 'youtube' | 'flashcard' | 'mindmap' | 'studyguide' | 'websearch';
 
 export interface AtomCommand {
