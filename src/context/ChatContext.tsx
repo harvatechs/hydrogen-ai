@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useReducer, useState } fro
 import { Message, MessageRole } from "../types/message";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
+import { AtomType } from "@/types/atoms";
 
 // Default API configuration
 const DEFAULT_API_CONFIG = {
