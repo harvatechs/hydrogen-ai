@@ -58,16 +58,16 @@ export function ChatHistory() {
 
   const emptyStateContent = () => (
     <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
-      <div className="w-16 h-16 mb-6 bg-gemini-yellow/20 rounded-full flex items-center justify-center">
-        <Sparkles className="h-8 w-8 text-gemini-yellow" />
+      <div className="w-20 h-20 mb-6 bg-gradient-to-br from-gemini-yellow/30 to-gemini-purple/30 rounded-full flex items-center justify-center">
+        <Sparkles className="h-10 w-10 text-gemini-yellow animate-pulse-slow" />
       </div>
       
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-6">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gradient mb-6">
         Welcome to HydroGen AI
       </h1>
       
       <div className="w-full max-w-2xl mb-8">
-        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism mb-6">
+        <div className="glass-morphism rounded-lg p-6 border border-white/10 shadow-lg backdrop-blur-lg mb-6 transform transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]">
           <h3 className="text-lg font-medium text-gemini-yellow mb-4 flex items-center">
             <Lightbulb className="h-4 w-4 mr-2 flex-shrink-0" />
             Popular Questions
@@ -75,7 +75,7 @@ export function ChatHistory() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
               onClick={() => sendMessage("Explain quantum computing in simple terms")}
             >
               <Brain className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
@@ -84,7 +84,7 @@ export function ChatHistory() {
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
               onClick={() => sendMessage("What are the latest breakthroughs in AI?")}
             >
               <Zap className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
@@ -93,7 +93,7 @@ export function ChatHistory() {
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
               onClick={() => sendMessage("How does climate change affect biodiversity?")}
             >
               <Globe className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
@@ -102,7 +102,7 @@ export function ChatHistory() {
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
               onClick={() => sendMessage("Compare renewable vs non-renewable energy")}
             >
               <PenLine className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
@@ -111,7 +111,7 @@ export function ChatHistory() {
           </div>
         </div>
         
-        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
+        <div className="glass-morphism rounded-lg p-6 border border-white/10 shadow-lg backdrop-blur-lg transform transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px]">
           <h3 className="text-lg font-medium text-blue-400 mb-4 flex items-center">
             <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
             Special Tools
@@ -119,7 +119,7 @@ export function ChatHistory() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all"
               onClick={() => sendMessage("/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
             >
               <Youtube className="h-4 w-4 mr-2 flex-shrink-0 text-red-400" />
@@ -128,7 +128,7 @@ export function ChatHistory() {
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/30 transition-all"
               onClick={() => sendMessage("/flashcard Introduction to quantum physics")}
             >
               <PanelRight className="h-4 w-4 mr-2 flex-shrink-0 text-blue-400" />
@@ -137,7 +137,7 @@ export function ChatHistory() {
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30 transition-all"
               onClick={() => sendMessage("/web Latest AI breakthroughs")}
             >
               <Search className="h-4 w-4 mr-2 flex-shrink-0 text-green-400" />
@@ -146,7 +146,7 @@ export function ChatHistory() {
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-yellow-500/10 hover:text-yellow-400 hover:border-yellow-500/30 transition-all"
+              className="justify-start text-left glass-card hover:bg-yellow-500/10 hover:text-yellow-400 hover:border-yellow-500/30 transition-all"
               onClick={() => sendMessage("What are the major historical events in 2023?")}
             >
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-yellow-400" />
@@ -159,13 +159,19 @@ export function ChatHistory() {
   );
 
   return (
-    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col">
+    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col relative">
+      {/* Subtle background effects */}
+      <div className="absolute inset-0 pointer-events-none opacity-50">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-gemini-purple/5 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-1/2 h-1/3 bg-gradient-to-tr from-gemini-yellow/5 to-transparent rounded-full blur-3xl"></div>
+      </div>
+
       {!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant") ? (
         <div className="flex-1 flex items-center justify-center">
           {emptyStateContent()}
         </div>
       ) : (
-        <div className="py-4 max-w-4xl mx-auto w-full">
+        <div className="py-4 max-w-4xl mx-auto w-full relative z-10">
           {messages.map(message => (
             <ChatMessage key={message.id} message={message} />
           ))}
@@ -173,6 +179,10 @@ export function ChatHistory() {
           <div ref={messagesEndRef} />
         </div>
       )}
+
+      {/* Subtle scroll fade gradient at the bottom */}
+      <div className="sticky bottom-0 h-12 w-full bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
     </div>
   );
 }
+
