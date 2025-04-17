@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -5,7 +6,7 @@ import React, {
   useCallback,
   useEffect
 } from "react";
-import { Message } from "@/types/message";
+import { Message, Conversation } from "@/types/message";
 import { nanoid } from "nanoid";
 import { toast } from "@/components/ui/use-toast";
 import { useCompletion } from "ai/react";
@@ -26,6 +27,26 @@ interface ChatContextProps {
   handleAtomResult: (result: string) => void;
   conversationLabel: string;
   setConversationLabel: React.Dispatch<React.SetStateAction<string>>;
+  
+  // Add missing properties needed by other components
+  apiKey: string;
+  setApiKey: (key: string) => void;
+  apiUrl: string;
+  setApiUrl: (url: string) => void;
+  model: string;
+  setModel: (model: string) => void;
+  setTheme: (theme: string) => void;
+  setFontSize: (size: string) => void;
+  
+  // Conversation management properties
+  conversations: Conversation[];
+  currentConversationId: string | null;
+  setCurrentConversation: (id: string) => void;
+  updateConversationTitle: (id: string, title: string) => void;
+  clearConversation: (id: string) => void;
+  deleteConversation: (id: string) => void;
+  createNewConversation: () => void;
+  clearMessages: () => void;
 }
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
@@ -43,8 +64,54 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeAtom, setActiveAtomState] = useState<string | null>(null);
   const [atomParams, setAtomParams] = useState<string | null>(null);
-  const { fontSize, theme } = useSettings();
+  const { 
+    fontSize, 
+    theme, 
+    setTheme, 
+    setFontSize,
+    apiKey,
+    setApiKey,
+    apiUrl,
+    setApiUrl,
+    model,
+    setModel 
+  } = useSettings();
   const [conversationLabel, setConversationLabel] = useState<string>("New Conversation");
+  
+  // Adding conversation management state
+  const [conversations, setConversations] = useState<Conversation[]>(() => {
+    const saved = localStorage.getItem('conversations');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.map(conv => ({
+          ...conv,
+          createdAt: new Date(conv.createdAt),
+          lastUpdatedAt: new Date(conv.lastUpdatedAt)
+        })) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(() => {
+    const saved = localStorage.getItem('currentConversationId');
+    return saved || null;
+  });
+
+  // Save conversations to localStorage
+  useEffect(() => {
+    localStorage.setItem('conversations', JSON.stringify(conversations));
+  }, [conversations]);
+
+  // Save current conversation ID
+  useEffect(() => {
+    if (currentConversationId) {
+      localStorage.setItem('currentConversationId', currentConversationId);
+    }
+  }, [currentConversationId]);
+
   const { complete, stop } = useCompletion({
     api: "/api/completion",
     id: messages[messages.length - 1]?.id,
@@ -52,7 +119,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       addMessage({
         id: nanoid(),
         role: "assistant",
-        content: completion
+        content: completion,
+        timestamp: new Date()
       });
       setIsProcessing(false);
     },
@@ -61,7 +129,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       addMessage({
         id: nanoid(),
         role: "error",
-        content: `There was an error processing your request. Please try again. ${error.message}`
+        content: `There was an error processing your request. Please try again. ${error.message}`,
+        timestamp: new Date()
       });
       toast({
         title: "Something went wrong.",
@@ -75,7 +144,31 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const label = generateConversationLabel(messages);
     setConversationLabel(label);
+    
+    // Update conversation in the list if it exists
+    if (currentConversationId && messages.length > 0) {
+      updateConversation();
+    }
   }, [messages]);
+
+  const updateConversation = () => {
+    if (!currentConversationId) return;
+    
+    setConversations(prev => {
+      const existing = prev.findIndex(c => c.id === currentConversationId);
+      if (existing >= 0) {
+        const updated = [...prev];
+        updated[existing] = {
+          ...updated[existing],
+          messages: [...messages],
+          title: conversationLabel,
+          lastUpdatedAt: new Date()
+        };
+        return updated;
+      }
+      return prev;
+    });
+  };
 
   const addMessage = useCallback((message: Message) => {
     setMessages(prevMessages => [...prevMessages, message]);
@@ -91,7 +184,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     const newMessage: Message = {
       id: nanoid(),
       role: "user",
-      content: messageContent
+      content: messageContent,
+      timestamp: new Date()
     };
 
     addMessage(newMessage);
@@ -113,7 +207,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           addMessage({
             id: nanoid(),
             role: "assistant",
-            content: "Invalid command. Please try again."
+            content: "Invalid command. Please try again.",
+            timestamp: new Date()
           });
           setIsProcessing(false);
         }
@@ -126,7 +221,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       addMessage({
         id: nanoid(),
         role: "error",
-        content: `There was an error processing your request. Please try again. ${error.message}`
+        content: `There was an error processing your request. Please try again. ${error.message}`,
+        timestamp: new Date()
       });
       toast({
         title: "Something went wrong.",
@@ -145,11 +241,86 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     addMessage({
       id: nanoid(),
       role: "assistant",
-      content: result
+      content: result,
+      timestamp: new Date()
     });
     setIsProcessing(false);
     setActiveAtomState(null);
     setAtomParams(null);
+  };
+
+  // Conversation management functions
+  const createNewConversation = () => {
+    const newId = nanoid();
+    const newConversation: Conversation = {
+      id: newId,
+      title: "New Conversation",
+      messages: [],
+      createdAt: new Date(),
+      lastUpdatedAt: new Date()
+    };
+    
+    setConversations(prev => [newConversation, ...prev]);
+    setCurrentConversationId(newId);
+    setMessages([]);
+    setConversationLabel("New Conversation");
+  };
+
+  const setCurrentConversation = (id: string) => {
+    setCurrentConversationId(id);
+    const conversation = conversations.find(c => c.id === id);
+    if (conversation) {
+      setMessages(conversation.messages);
+      setConversationLabel(conversation.title);
+    }
+  };
+
+  const updateConversationTitle = (id: string, title: string) => {
+    setConversations(prev => 
+      prev.map(conv => 
+        conv.id === id 
+          ? { ...conv, title, lastUpdatedAt: new Date() } 
+          : conv
+      )
+    );
+    
+    if (id === currentConversationId) {
+      setConversationLabel(title);
+    }
+  };
+
+  const clearConversation = (id: string) => {
+    setConversations(prev => 
+      prev.map(conv => 
+        conv.id === id 
+          ? { ...conv, messages: [], lastUpdatedAt: new Date() } 
+          : conv
+      )
+    );
+    
+    if (id === currentConversationId) {
+      setMessages([]);
+    }
+  };
+
+  const deleteConversation = (id: string) => {
+    setConversations(prev => prev.filter(conv => conv.id !== id));
+    
+    if (id === currentConversationId) {
+      const remaining = conversations.filter(conv => conv.id !== id);
+      if (remaining.length > 0) {
+        setCurrentConversation(remaining[0].id);
+      } else {
+        createNewConversation();
+      }
+    }
+  };
+
+  const clearMessages = () => {
+    setMessages([]);
+    if (currentConversationId) {
+      clearConversation(currentConversationId);
+    }
   };
 
   const value = {
@@ -165,7 +336,24 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     atomParams,
     handleAtomResult,
     conversationLabel,
-    setConversationLabel
+    setConversationLabel,
+    // Added properties
+    apiKey,
+    setApiKey,
+    apiUrl,
+    setApiUrl,
+    model,
+    setModel,
+    setTheme,
+    setFontSize,
+    conversations,
+    currentConversationId,
+    setCurrentConversation,
+    updateConversationTitle,
+    clearConversation,
+    deleteConversation,
+    createNewConversation,
+    clearMessages
   };
 
   return (
