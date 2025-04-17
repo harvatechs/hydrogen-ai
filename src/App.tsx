@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
+import { SettingsProvider } from "./context/SettingsContext";
 import "./styles/enhanced-ui.css";
 
 const queryClient = new QueryClient({
@@ -56,19 +58,21 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner position="top-right" className="toaster-container" />
-        <BrowserRouter>
-          <div className="min-h-screen w-full">
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/app" element={<Index />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </TooltipProvider>
+      <SettingsProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner position="top-right" className="toaster-container" />
+          <BrowserRouter>
+            <div className="min-h-screen w-full">
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/app" element={<Index />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </TooltipProvider>
+      </SettingsProvider>
     </QueryClientProvider>
   );
 };

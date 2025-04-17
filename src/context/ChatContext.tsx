@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useEffect, useReducer, useState } from "react";
-import { Message, MessageRole } from "../types/message";
-import { toast } from "@/components/ui/use-toast";
+
+import React, { createContext, useContext, useState, useCallback, useEffect, useReducer } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "@/components/ui/use-toast";
+import { Message, MessageRole } from "../types/message";
 import { AtomType } from "@/types/atoms";
-import { searchGoogle, SearchResult } from "@/utils/searchUtils";
+import { useSettings } from "./SettingsContext";
+import { generateConversationLabel } from "@/utils/conversationLabels";
 
 // Default API configuration
 const DEFAULT_API_CONFIG = {
@@ -23,14 +25,11 @@ interface ChatState {
   apiKey: string;
   apiUrl: string;
   isProcessing: boolean;
-  theme: string;
-  fontSize: string;
   conversations: Conversation[];
   currentConversationId: string | null;
   model: string;
   activeAtom: AtomType | null;
   atomParams: string;
-  contextualMemory: ContextualMemory;
 }
 
 interface Conversation {
@@ -48,8 +47,6 @@ type ChatAction =
   | { type: "SET_API_KEY"; apiKey: string }
   | { type: "SET_API_URL"; apiUrl: string }
   | { type: "SET_PROCESSING"; isProcessing: boolean }
-  | { type: "SET_THEME"; theme: string }
-  | { type: "SET_FONT_SIZE"; fontSize: string }
   | { type: "CREATE_CONVERSATION"; conversation: Conversation }
   | { type: "SET_CURRENT_CONVERSATION"; id: string }
   | { type: "UPDATE_CONVERSATION_TITLE"; id: string; title: string }
@@ -57,20 +54,19 @@ type ChatAction =
   | { type: "DELETE_CONVERSATION"; id: string }
   | { type: "SET_MODEL"; model: string }
   | { type: "CLEAR_MESSAGES" }
-  | { type: "SET_ACTIVE_ATOM"; atomType: AtomType | null; params?: string }
-  | { type: "UPDATE_CONTEXTUAL_MEMORY"; memory: ContextualMemory };
+  | { type: "SET_ACTIVE_ATOM"; atomType: AtomType | null; params?: string };
 
 interface ChatContextProps {
   messages: Message[];
   apiKey: string;
   apiUrl: string;
-  theme: string;
-  fontSize: string;
   conversations: Conversation[];
   currentConversationId: string | null;
   model: string;
   activeAtom: AtomType | null;
   atomParams: string;
+  theme: string;
+  fontSize: string;
   setApiKey: (key: string) => void;
   setApiUrl: (url: string) => void;
   sendMessage: (content: string) => Promise<void>;
@@ -86,17 +82,8 @@ interface ChatContextProps {
   setModel: (model: string) => void;
   setActiveAtom: (type: AtomType | null, params?: string) => void;
   handleAtomResult: (result: string) => void;
-}
-
-// New types for contextual memory
-interface ContextualMemory {
-  recentTopics: string[];
-  entityMentions: Record<string, number>;
-  userPreferences: {
-    preferredStyle?: string;
-    complexityLevel?: 'basic' | 'intermediate' | 'advanced';
-    lastInteractionTime?: Date;
-  };
+  conversationLabel: string;
+  setConversationLabel: (label: string) => void;
 }
 
 // Get stored API key or use default
@@ -107,16 +94,6 @@ const getStoredApiKey = () => {
 // Get stored API URL or use default
 const getStoredApiUrl = () => {
   return localStorage.getItem("gemini-api-url") || DEFAULT_API_CONFIG.url;
-};
-
-// Get stored theme or use default
-const getStoredTheme = () => {
-  return localStorage.getItem("app-theme") || "dark";
-};
-
-// Get stored font size or use default
-const getStoredFontSize = () => {
-  return localStorage.getItem("app-font-size") || "medium";
 };
 
 // Get stored model or use default
@@ -162,7 +139,7 @@ const createInitialConversation = (): Conversation => {
   };
 };
 
-// Initial state with contextual memory
+// Initial state
 const initialState: ChatState = {
   messages: [
     {
@@ -175,18 +152,11 @@ const initialState: ChatState = {
   apiKey: getStoredApiKey(),
   apiUrl: getStoredApiUrl(),
   isProcessing: false,
-  theme: getStoredTheme(),
-  fontSize: getStoredFontSize(),
   conversations: getStoredConversations(),
   currentConversationId: null,
   model: getStoredModel(),
   activeAtom: null,
   atomParams: '',
-  contextualMemory: {
-    recentTopics: [],
-    entityMentions: {},
-    userPreferences: {}
-  }
 };
 
 // If no conversations exist, create an initial one
@@ -204,7 +174,7 @@ if (initialState.conversations.length === 0) {
   }
 }
 
-// Reducer with contextual memory support
+// Reducer
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
     case "ADD_MESSAGE": {
@@ -310,16 +280,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return {
         ...state,
         isProcessing: action.isProcessing,
-      };
-    case "SET_THEME":
-      return {
-        ...state,
-        theme: action.theme,
-      };
-    case "SET_FONT_SIZE":
-      return {
-        ...state,
-        fontSize: action.fontSize,
       };
     case "SET_MODEL":
       return {
@@ -464,14 +424,6 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         activeAtom: action.atomType,
         atomParams: action.params || '',
       };
-    case "UPDATE_CONTEXTUAL_MEMORY":
-      return {
-        ...state,
-        contextualMemory: {
-          ...state.contextualMemory,
-          ...action.memory
-        }
-      };
     default:
       return state;
   }
@@ -484,18 +436,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(chatReducer, initialState);
-  
-  // Apply theme
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', state.theme);
-    localStorage.setItem("app-theme", state.theme);
-  }, [state.theme]);
-  
-  // Apply font size
-  useEffect(() => {
-    document.documentElement.setAttribute('data-font-size', state.fontSize);
-    localStorage.setItem("app-font-size", state.fontSize);
-  }, [state.fontSize]);
+  const { theme, fontSize, setTheme: setThemeSettings, setFontSize: setFontSizeSettings } = useSettings();
+  const [conversationLabel, setConversationLabel] = useState("New Conversation");
 
   // Save API key to localStorage when it changes
   useEffect(() => {
@@ -521,6 +463,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("conversations", JSON.stringify(state.conversations));
   }, [state.conversations]);
 
+  // Update conversation label when messages change
+  useEffect(() => {
+    if (state.messages.length > 0) {
+      const label = generateConversationLabel(state.messages);
+      setConversationLabel(label);
+    }
+  }, [state.messages]);
+
   const setApiKey = (key: string) => {
     dispatch({ type: "SET_API_KEY", apiKey: key });
   };
@@ -533,12 +483,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "CLEAR_MESSAGES" });
   };
   
-  const setTheme = (theme: string) => {
-    dispatch({ type: "SET_THEME", theme });
+  const setTheme = (newTheme: string) => {
+    setThemeSettings(newTheme as any);
   };
   
-  const setFontSize = (fontSize: string) => {
-    dispatch({ type: "SET_FONT_SIZE", fontSize });
+  const setFontSize = (newSize: string) => {
+    setFontSizeSettings(newSize as any);
   };
   
   const setModel = (model: string) => {
@@ -588,65 +538,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     setActiveAtom(null);
   };
 
-  // Function to update contextual memory based on user message
-  const updateContextualMemory = (userMessage: string) => {
-    // Extract potential topics or entities from the message
-    const topics = extractTopics(userMessage);
-    
-    // Update entity mentions
-    const updatedEntityMentions = { ...state.contextualMemory.entityMentions };
-    topics.forEach(topic => {
-      updatedEntityMentions[topic] = (updatedEntityMentions[topic] || 0) + 1;
-    });
-    
-    // Update recent topics (keep only unique, most recent topics)
-    const existingTopics = new Set(state.contextualMemory.recentTopics);
-    topics.forEach(topic => existingTopics.add(topic));
-    const recentTopics = Array.from(existingTopics).slice(-5); // Keep most recent 5
-    
-    dispatch({
-      type: "UPDATE_CONTEXTUAL_MEMORY",
-      memory: {
-        recentTopics,
-        entityMentions: updatedEntityMentions,
-        userPreferences: {
-          ...state.contextualMemory.userPreferences,
-          lastInteractionTime: new Date()
-        }
-      }
-    });
-  };
-  
-  // Simple topic extraction (in a real app, this would be more sophisticated)
-  const extractTopics = (text: string): string[] => {
-    // This is a very simple implementation - in a production app,
-    // you'd want to use NLP libraries or AI services for entity extraction
-    const words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
-    const stopWords = new Set(['this', 'that', 'then', 'than', 'what', 'when', 'where', 'which', 'would', 'could', 'should']);
-    return [...new Set(words.filter(word => !stopWords.has(word)))].slice(0, 3);
-  };
-  
-  // Function to check if search might be needed for time-sensitive queries
-  const mightNeedSearch = (query: string): boolean => {
-    const timeRelatedTerms = ['latest', 'recent', 'news', 'current', 'today', 'yesterday', 'this year', 'this month', 'this week', 'update', 'newest'];
-    return timeRelatedTerms.some(term => query.toLowerCase().includes(term));
-  };
-
-  // Function to generate citation from source
-  const generateCitation = (source: SearchResult): string => {
-    return `<p class="text-xs text-muted-foreground mt-1">Source: <a href="${source.link}" target="_blank" class="underline hover:text-primary">${source.title}</a></p>`;
-  };
-
-  // Enhanced function to send a message and get a response
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
     
     // Generate unique IDs
     const userMessageId = `user-${Date.now()}`;
     const assistantMessageId = `assistant-${Date.now()}`;
-    
-    // Update contextual memory
-    updateContextualMemory(content);
     
     // Add user message
     dispatch({
@@ -689,26 +586,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const controller = new AbortController();
       
-      // Check if we should perform a web search for time-sensitive or trending information
-      let searchResults = null;
-      let searchContext = "";
-      
-      if (mightNeedSearch(content)) {
-        // Show a toast to indicate search is happening
-        toast({
-          title: "Augmenting with web search",
-          description: "Finding the latest information for you...",
-        });
-        
-        searchResults = await searchGoogle(content);
-        if (searchResults && searchResults.items && searchResults.items.length > 0) {
-          // Extract useful context from search results
-          searchContext = searchResults.items.slice(0, 3).map(item => 
-            `Title: ${item.title}\nContent: ${item.snippet}`
-          ).join('\n\n');
-        }
-      }
-      
       // Extract model ID from the URL or use the one in state
       let modelId = state.model;
       // If URL contains a model ID, parse it
@@ -727,16 +604,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       const conversationContext = relevantContext.map(msg => 
         `${msg.role === 'user' ? 'Human' : 'AI'}: ${msg.content.replace(/<[^>]*>/g, '')}`
       ).join('\n');
-      
-      // Add search results to the prompt if available
-      const searchPrompt = searchResults ? 
-        `\n\nRECENT WEB SEARCH RESULTS:\n${searchContext}\n\nBased on these recent results, please incorporate this updated information into your response when relevant.` : 
-        '';
-      
-      // Add contextual memory to the prompt
-      const memoryPrompt = state.contextualMemory.recentTopics.length > 0 ?
-        `\n\nRECENT TOPICS DISCUSSED: ${state.contextualMemory.recentTopics.join(', ')}` :
-        '';
         
       const response = await fetch(`${state.apiUrl}?key=${state.apiKey}`, {
         method: 'POST',
@@ -750,8 +617,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
               CONVERSATION HISTORY FOR CONTEXT (use this for follow-up questions):
               ${conversationContext}
-              ${memoryPrompt}
-              ${searchPrompt}
 
               Answer this question accurately and helpfully: "${content}"
 
@@ -762,34 +627,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
               - Use <blockquote> for quotes
               - Use <table>, <tr>, <th>, <td> for data tables
               - Use <code> for code snippets and equations
-              - Always use semantic HTML5 for proper structure
-
-              CONTENT STRUCTURE:
-              1. Begin with a clear, direct answer to the question (2-3 sentences)
-              2. Provide an executive summary with key takeaways (bullet points)
-              3. Give necessary background information and context
-              4. Present a detailed explanation with:
-              • Step-by-step breakdowns when applicable
-              • Evidence and data from reliable sources
-              • Multiple perspectives when the topic is debated
-              • Visual descriptions or analogies for complex concepts
-              5. Address common misconceptions or frequently asked questions
-              6. Include practical applications or real-world examples
-              7. Conclude with future implications or next steps
-              8. Add references to credible sources at the end
-
-              QUALITY GUIDELINES:
-              - Ensure factual accuracy and cite reliable sources
-              - Use clear, accessible language for all expertise levels
-              - Explain technical terms when they first appear
-              - Provide balanced coverage of different viewpoints
-              - Distinguish clearly between facts and opinions
-              - Acknowledge limitations in current knowledge
-              - Organize information logically with smooth transitions
-              - Use concrete examples to illustrate abstract concepts
-              - Tailor depth based on the complexity of the question
-
-              Respond in a helpful, informative tone that's accessible to beginners but substantive enough for experts.`
+              - Always use semantic HTML5 for proper structure`
             }]
           }]
         }),
@@ -802,25 +640,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       
       const data = await response.json();
       let generatedText = data.candidates[0].content.parts[0].text || "No response generated.";
-      
-      // Add citations if we used search results
-      if (searchResults && searchResults.items && searchResults.items.length > 0) {
-        const citations = searchResults.items.slice(0, 3).map((item, index) => 
-          `<div class="mt-1 p-2 border border-white/10 rounded bg-black/20">
-            <p class="text-xs font-medium">[${index + 1}] <a href="${item.link}" target="_blank" class="text-blue-400 hover:underline">${item.title}</a></p>
-            <p class="text-xs text-muted-foreground">${item.snippet}</p>
-          </div>`
-        ).join('');
-        
-        generatedText += `
-          <div class="mt-4 pt-4 border-t border-white/10">
-            <h4 class="text-sm font-medium mb-2">Sources & Citations</h4>
-            <div class="space-y-2">
-              ${citations}
-            </div>
-          </div>
-        `;
-      }
       
       // Update the assistant message with the response
       dispatch({
@@ -859,8 +678,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         messages: state.messages,
         apiKey: state.apiKey,
         apiUrl: state.apiUrl,
-        theme: state.theme,
-        fontSize: state.fontSize,
+        theme,
+        fontSize,
         conversations: state.conversations,
         currentConversationId: state.currentConversationId,
         model: state.model,
@@ -881,6 +700,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         setModel,
         setActiveAtom,
         handleAtomResult,
+        conversationLabel,
+        setConversationLabel,
       }}
     >
       {children}
