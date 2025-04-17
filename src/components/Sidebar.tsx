@@ -33,10 +33,8 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
-  // Filter conversations based on search term
   const filteredConversations = conversations.filter(chat => chat.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  // Group conversations by date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
@@ -45,6 +43,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   pastWeek.setDate(pastWeek.getDate() - 7);
   const pastMonth = new Date(today);
   pastMonth.setMonth(pastMonth.getMonth() - 1);
+
   const groupedConversations = {
     today: filteredConversations.filter(chat => chat.lastUpdatedAt >= today),
     yesterday: filteredConversations.filter(chat => chat.lastUpdatedAt >= yesterday && chat.lastUpdatedAt < today),
@@ -53,14 +52,12 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     older: filteredConversations.filter(chat => chat.lastUpdatedAt < pastMonth)
   };
 
-  // Focus on edit input when editing starts
   useEffect(() => {
     if (editingId && editInputRef.current) {
       editInputRef.current.focus();
     }
   }, [editingId]);
 
-  // Handle search command for web search
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchTerm.startsWith('/web ')) {
       const query = searchTerm.replace('/web ', '').trim();
@@ -70,19 +67,23 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       }
     }
   };
+
   const handleStartEdit = (id: string, title: string) => {
     setEditingId(id);
     setEditTitle(title);
   };
+
   const handleSaveEdit = () => {
     if (editingId && editTitle.trim()) {
       updateConversationTitle(editingId, editTitle.trim());
       setEditingId(null);
     }
   };
+
   const handleCancelEdit = () => {
     setEditingId(null);
   };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSaveEdit();
@@ -90,10 +91,12 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       handleCancelEdit();
     }
   };
+
   const handleDeleteClick = (id: string) => {
     setConversationToDelete(id);
     setDeleteDialogOpen(true);
   };
+
   const confirmDelete = () => {
     if (conversationToDelete) {
       deleteConversation(conversationToDelete);
@@ -105,6 +108,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     setDeleteDialogOpen(false);
     setConversationToDelete(null);
   };
+
   const handleClear = () => {
     clearMessages();
     toast({
@@ -112,6 +116,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       description: "All messages have been cleared."
     });
   };
+
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
     toast({
@@ -119,8 +124,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
     });
   };
-  
-  // Wrap button with tooltip when collapsed
+
   const withTooltip = (children: React.ReactNode, label: string) => {
     if (!collapsed) return children;
     
@@ -137,10 +141,67 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       </TooltipProvider>
     );
   };
-  
+
+  const renderConversationItem = (chat: any) => {
+    return (
+      <div key={chat.id} className="relative group">
+        {editingId === chat.id ? (
+          <div className="flex items-center px-2">
+            <Input 
+              ref={editInputRef} 
+              value={editTitle} 
+              onChange={e => setEditTitle(e.target.value)} 
+              onKeyDown={handleKeyDown} 
+              className="h-7 text-sm dark:bg-black/20 dark:border-white/10 light:bg-white/80 light:border-black/10" 
+            />
+            <div className="flex space-x-1 ml-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleSaveEdit}>
+                <Check className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCancelEdit}>
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          withTooltip(
+            <Button 
+              variant={chat.id === currentConversationId ? "secondary" : "ghost"} 
+              className={`w-full justify-${collapsed ? 'center' : 'start'} text-left h-auto py-2 ${collapsed ? 'px-2' : 'px-3 pr-7'} rounded-md
+                ${chat.id === currentConversationId 
+                  ? "dark:bg-white/10 dark:text-white light:bg-black/5 light:text-black" 
+                  : "dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black transition-colors"}`} 
+              onClick={() => setCurrentConversation(chat.id)}
+            >
+              <MessageSquare className={`${collapsed ? '' : 'mr-2'} h-4 w-4 flex-shrink-0`} />
+              {!collapsed && (
+                <span className="truncate">
+                  {chat.title}
+                </span>
+              )}
+            </Button>,
+            chat.title
+          )
+        )}
+        
+        {!editingId && chat.id === currentConversationId && !collapsed && (
+          <div className="absolute right-1 top-1.5 hidden group-hover:flex space-x-1">
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => handleStartEdit(chat.id, chat.title)}>
+              <Edit2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteClick(chat.id)}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderConversationGroup = (title: string, conversations: typeof filteredConversations) => {
     if (conversations.length === 0) return null;
-    return <div key={title}>
+    return (
+      <div key={title}>
         {!collapsed && (
           <div className="text-xs font-medium text-muted-foreground mb-2 px-2">
             {title}
@@ -148,57 +209,12 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         )}
         
         <div className="space-y-1 mb-3">
-          {conversations.map(chat => <div key={chat.id} className="relative group">
-              {editingId === chat.id ? (
-                <div className="flex items-center px-2">
-                  <Input 
-                    ref={editInputRef} 
-                    value={editTitle} 
-                    onChange={e => setEditTitle(e.target.value)} 
-                    onKeyDown={handleKeyDown} 
-                    className="h-7 text-sm dark:bg-black/20 dark:border-white/10 light:bg-white/80 light:border-black/10" 
-                  />
-                  <div className="flex space-x-1 ml-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleSaveEdit}>
-                      <Check className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCancelEdit}>
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                withTooltip(
-                  <Button 
-                    variant={chat.id === currentConversationId ? "secondary" : "ghost"} 
-                    className={`w-full justify-${collapsed ? 'center' : 'start'} text-left h-auto py-2 ${collapsed ? 'px-2' : 'px-3 pr-7'} rounded-md
-                      ${chat.id === currentConversationId 
-                        ? "dark:bg-white/10 dark:text-white light:bg-black/5 light:text-black" 
-                        : "dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black transition-colors"}`} 
-                    onClick={() => setCurrentConversation(chat.id)}
-                  >
-                    <MessageSquare className={`${collapsed ? '' : 'mr-2'} h-4 w-4 flex-shrink-0`} />
-                    {!collapsed && <span className="truncate">{chat.title}</span>}
-                  </Button>,
-                  chat.title
-                )
-              )}
-              
-              {!editingId && chat.id === currentConversationId && !collapsed && (
-                <div className="absolute right-1 top-1.5 hidden group-hover:flex space-x-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => handleStartEdit(chat.id, chat.title)}>
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteClick(chat.id)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              )}
-            </div>)}
+          {conversations.map(chat => renderConversationItem(chat))}
         </div>
-      </div>;
+      </div>
+    );
   };
-  
+
   return <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10">
       <div className="p-2">
         <Button 
@@ -277,7 +293,6 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         </Button>
       </div>
       
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="dark:bg-black/90 dark:border-white/10 light:bg-white light:border-black/10">
           <DialogHeader>

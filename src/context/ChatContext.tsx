@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect, useReducer } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "@/components/ui/use-toast";
@@ -188,9 +187,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
                 ...conv, 
                 messages: newMessages,
                 lastUpdatedAt: new Date(),
-                // Update title if this is the second message (after welcome)
+                // Auto-generate title when this is the second message (after welcome and first user message)
                 title: conv.title === "New chat" && newMessages.length === 3 
-                  ? newMessages[1].content.substring(0, 30) + "..." 
+                  ? generateConversationLabel(newMessages)
                   : conv.title
               } 
             : conv
@@ -465,11 +464,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Update conversation label when messages change
   useEffect(() => {
-    if (state.messages.length > 0) {
-      const label = generateConversationLabel(state.messages);
-      setConversationLabel(label);
+    if (state.messages.length > 1 && state.currentConversationId) {
+      const currentConversation = state.conversations.find(c => c.id === state.currentConversationId);
+      if (currentConversation && currentConversation.title === "New chat") {
+        const label = generateConversationLabel(state.messages);
+        setConversationLabel(label);
+        
+        // Update the conversation title
+        if (label !== "New Conversation") {
+          dispatch({ 
+            type: "UPDATE_CONVERSATION_TITLE", 
+            id: state.currentConversationId, 
+            title: label 
+          });
+        }
+      }
     }
-  }, [state.messages]);
+  }, [state.messages, state.currentConversationId, state.conversations]);
 
   const setApiKey = (key: string) => {
     dispatch({ type: "SET_API_KEY", apiKey: key });
