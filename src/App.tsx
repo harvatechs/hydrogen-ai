@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,9 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./styles/enhanced-ui.css";
-import { SettingsProvider } from "./context/SettingsContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +19,25 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  
+  // Check system preference and set initial theme
+  useEffect(() => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+    
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.add(savedTheme);
+    } else if (prefersDark) {
+      setTheme('dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      setTheme('light');
+      document.documentElement.classList.add('light');
+    }
+  }, []);
+  
   // Fix scrolling issues
   useEffect(() => {
     // Add smooth scrolling to the entire document
@@ -39,21 +56,19 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner position="top-right" className="toaster-container" />
-          <BrowserRouter>
-            <div className="min-h-screen w-full">
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/app" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </SettingsProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner position="top-right" className="toaster-container" />
+        <BrowserRouter>
+          <div className="min-h-screen w-full">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/app" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };
