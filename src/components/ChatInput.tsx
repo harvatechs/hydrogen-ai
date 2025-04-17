@@ -9,7 +9,6 @@ import { AIVoiceInput } from "@/components/ui/ai-voice-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { searchGoogle } from "@/utils/searchUtils";
 import { parseAtomCommand, AtomType } from "@/types/atoms";
-
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
@@ -24,7 +23,6 @@ export function ChatInput() {
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recognition, setRecognition] = useState<any>(null);
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -33,7 +31,6 @@ export function ChatInput() {
         recognitionInstance.continuous = false;
         recognitionInstance.interimResults = true;
         recognitionInstance.lang = 'en-US';
-
         recognitionInstance.onstart = () => {
           setIsListening(true);
           toast({
@@ -41,15 +38,10 @@ export function ChatInput() {
             description: "Speak clearly into your microphone"
           });
         };
-
         recognitionInstance.onresult = (event: any) => {
-          const transcript = Array.from(event.results)
-            .map((result: any) => result[0])
-            .map(result => result.transcript)
-            .join('');
+          const transcript = Array.from(event.results).map((result: any) => result[0]).map(result => result.transcript).join('');
           setMessage(transcript);
         };
-
         recognitionInstance.onerror = (event: any) => {
           console.error("Speech recognition error", event.error);
           setIsListening(false);
@@ -59,15 +51,12 @@ export function ChatInput() {
             variant: "destructive"
           });
         };
-
         recognitionInstance.onend = () => {
           setIsListening(false);
         };
-
         setRecognition(recognitionInstance);
       }
     }
-
     return () => {
       if (recognition) {
         try {
@@ -78,11 +67,10 @@ export function ChatInput() {
       }
     };
   }, []);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
-    
+
     // Check if it's an atom command
     const atomCommand = parseAtomCommand(message.trim());
     if (atomCommand) {
@@ -91,7 +79,6 @@ export function ChatInput() {
       setMessage("");
       return;
     }
-    
     const currentMessage = message;
     setMessage("");
     await sendMessage(currentMessage);
@@ -99,7 +86,6 @@ export function ChatInput() {
       inputRef.current?.focus();
     }, 0);
   };
-
   const handleWebSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) {
       toast({
@@ -113,11 +99,9 @@ export function ChatInput() {
     setActiveAtom('websearch', searchTerm);
     setMessage("");
   };
-
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
-
   const toggleVoiceRecognition = () => {
     if (!recognition) {
       toast({
@@ -127,7 +111,6 @@ export function ChatInput() {
       });
       return;
     }
-
     if (isListening) {
       recognition.stop();
       setIsListening(false);
@@ -144,14 +127,12 @@ export function ChatInput() {
       }
     }
   };
-
   const handleVoiceStart = useCallback(() => {
     toast({
       title: "Voice recording started",
       description: "Speak clearly and we'll convert your speech to text."
     });
   }, []);
-
   const handleVoiceStop = useCallback((duration: number) => {
     if (duration > 0) {
       toast({
@@ -163,23 +144,19 @@ export function ChatInput() {
       setShowVoiceInput(false);
     }
   }, []);
-
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       setIsUploading(true);
-
       setTimeout(() => {
         setIsUploading(false);
         toast({
           title: "File uploaded successfully",
           description: `Analyzing ${files[0].name} (${(files[0].size / 1024).toFixed(1)} KB)`
         });
-
         setTimeout(() => {
           setMessage(prev => prev + (prev ? " " : "") + `Analyze the content of this ${files[0].name} file.`);
           e.target.value = '';
@@ -190,7 +167,6 @@ export function ChatInput() {
       }, 1500);
     }
   };
-
   const handleProSearch = () => {
     if (!message.trim()) {
       toast({
@@ -199,58 +175,35 @@ export function ChatInput() {
       });
       return;
     }
-
     toast({
       title: "Advanced research in progress",
       description: `Deep analysis for: "${message}"`
     });
-
     setTimeout(() => {
       sendMessage(`Conduct comprehensive research on: ${message}`);
       setMessage("");
     }, 800);
   };
-
   const handleClearInput = () => {
     setMessage("");
     inputRef.current?.focus();
   };
-
-  return (
-    <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
+  return <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
       <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
         <div className="rounded-xl border glass-card shadow-lg transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center">
             <div className="flex items-center space-x-1 ml-2">
               <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.json,.md" />
               
-              <Button 
-                type="button" 
-                size="icon" 
-                variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                title="Add Files"
-                onClick={() => fileInputRef.current?.click()}
-              >
+              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Add Files" onClick={() => fileInputRef.current?.click()}>
                 <FileUp className="h-4 w-4" />
               </Button>
               
-              <Button 
-                type="button" 
-                size="icon" 
-                variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                title="Web Search"
-                onClick={() => setActiveAtom('websearch', '')}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
               
-              {message.trim().startsWith('/web') || message.trim().startsWith('/search') ? (
-                <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
+              
+              {message.trim().startsWith('/web') || message.trim().startsWith('/search') ? <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
                   Web Search Mode
-                </span>
-              ) : null}
+                </span> : null}
 
               {message.trim().startsWith('/youtube') && <span className="text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded-full">
                   YouTube Summary Mode
@@ -303,6 +256,5 @@ export function ChatInput() {
           HydroGen AI may display inaccurate info, including about people, places, or facts
         </div>
       </form>
-    </div>
-  );
+    </div>;
 }
