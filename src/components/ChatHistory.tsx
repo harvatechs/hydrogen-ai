@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { useChat } from "@/context/ChatContext";
 import { ChatMessage } from "./ChatMessage";
 import { Button } from "@/components/ui/button";
-import { Search, Sparkles, Globe, BookOpen, FileText, PanelRight, Lightbulb, Zap, Code2, PenLine } from "lucide-react";
+import { Search, Sparkles, Globe, BookOpen, FileText, PanelRight, Lightbulb, Zap, Code2, PenLine, Youtube, Brain, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -62,64 +62,95 @@ export function ChatHistory() {
         <Sparkles className="h-8 w-8 text-gemini-yellow" />
       </div>
       
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-3">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-6">
         Welcome to HydroGen AI
       </h1>
-      
-      <p className="text-md text-muted-foreground mb-8 max-w-2xl">
-        Ask me anything about science, technology, philosophy, or any topic that sparks your curiosity.
-      </p>
       
       <div className="w-full max-w-2xl mb-8">
         <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism mb-6">
           <h3 className="text-lg font-medium text-gemini-yellow mb-4 flex items-center">
             <Lightbulb className="h-4 w-4 mr-2 flex-shrink-0" />
-            Quick Commands
+            Popular Questions
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button 
               variant="outline" 
               className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
-              onClick={() => sendMessage("/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+              onClick={() => sendMessage("Explain quantum computing in simple terms")}
             >
-              <FileText className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
-              <span className="truncate">Summarize YouTube Video</span>
+              <Brain className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Explain quantum computing</span>
             </Button>
             
             <Button 
               variant="outline" 
               className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
-              onClick={() => sendMessage("/flashcard What is quantum physics?")}
+              onClick={() => sendMessage("What are the latest breakthroughs in AI?")}
             >
-              <PanelRight className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <Zap className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Latest AI breakthroughs</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              onClick={() => sendMessage("How does climate change affect biodiversity?")}
+            >
+              <Globe className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Climate change effects</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              onClick={() => sendMessage("Compare renewable vs non-renewable energy")}
+            >
+              <PenLine className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <span className="truncate">Compare energy sources</span>
+            </Button>
+          </div>
+        </div>
+        
+        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-white/10 glass-morphism">
+          <h3 className="text-lg font-medium text-blue-400 mb-4 flex items-center">
+            <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
+            Special Tools
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all"
+              onClick={() => sendMessage("/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
+            >
+              <Youtube className="h-4 w-4 mr-2 flex-shrink-0 text-red-400" />
+              <span className="truncate">YouTube Summarizer</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start text-left glass-morphism hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/30 transition-all"
+              onClick={() => sendMessage("/flashcard Introduction to quantum physics")}
+            >
+              <PanelRight className="h-4 w-4 mr-2 flex-shrink-0 text-blue-400" />
               <span className="truncate">Create Flashcards</span>
             </Button>
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
+              className="justify-start text-left glass-morphism hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30 transition-all"
               onClick={() => sendMessage("/web Latest AI breakthroughs")}
             >
-              <Globe className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
+              <Search className="h-4 w-4 mr-2 flex-shrink-0 text-green-400" />
               <span className="truncate">Web Search</span>
             </Button>
             
             <Button 
               variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all"
-              onClick={() => sendMessage("/mindmap History of quantum physics")}
+              className="justify-start text-left glass-morphism hover:bg-yellow-500/10 hover:text-yellow-400 hover:border-yellow-500/30 transition-all"
+              onClick={() => sendMessage("What are the major historical events in 2023?")}
             >
-              <Zap className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
-              <span className="truncate">Create Mind Map</span>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="justify-start text-left glass-morphism hover:bg-gemini-yellow/10 hover:border-gemini-yellow/30 transition-all col-span-1 sm:col-span-2"
-              onClick={() => sendMessage("/studyguide Machine learning fundamentals")}
-            >
-              <BookOpen className="h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" />
-              <span className="truncate">Generate Study Guide</span>
+              <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-yellow-400" />
+              <span className="truncate">Recent History</span>
             </Button>
           </div>
         </div>
@@ -127,13 +158,14 @@ export function ChatHistory() {
     </div>
   );
 
-  // Add null check for messages before checking its length
   return (
-    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4">
+    <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col">
       {!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === "assistant") ? (
-        emptyStateContent()
+        <div className="flex-1 flex items-center justify-center">
+          {emptyStateContent()}
+        </div>
       ) : (
-        <div className="py-4 max-w-4xl mx-auto">
+        <div className="py-4 max-w-4xl mx-auto w-full">
           {messages.map(message => (
             <ChatMessage key={message.id} message={message} />
           ))}

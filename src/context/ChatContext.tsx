@@ -3,6 +3,7 @@ import { Message, MessageRole } from "../types/message";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import { AtomType } from "@/types/atoms";
+import { searchGoogle, SearchResult } from "@/utils/searchUtils";
 
 // Default API configuration
 const DEFAULT_API_CONFIG = {
@@ -13,13 +14,7 @@ const DEFAULT_API_CONFIG = {
 // Initial message shown to the user
 const WELCOME_MESSAGE = `
 <h2>Welcome to HydroGen</h2>
-<p>Ask me anything, and I'll provide detailed, structured answers using Google's Gemini AI.</p>
-<ul>
-  <li>Ask questions on any topic</li>
-  <li>Get detailed explanations with references</li>
-  <li>View response history in your current session</li>
-</ul>
-<p>How can I help you today?</p>
+<p>I'm here to provide detailed answers, visualizations, and insights. Try asking me something!</p>
 `;
 
 // Types
@@ -35,6 +30,7 @@ interface ChatState {
   model: string;
   activeAtom: AtomType | null;
   atomParams: string;
+  contextualMemory: ContextualMemory;
 }
 
 interface Conversation {
@@ -61,7 +57,8 @@ type ChatAction =
   | { type: "DELETE_CONVERSATION"; id: string }
   | { type: "SET_MODEL"; model: string }
   | { type: "CLEAR_MESSAGES" }
-  | { type: "SET_ACTIVE_ATOM"; atomType: AtomType | null; params?: string };
+  | { type: "SET_ACTIVE_ATOM"; atomType: AtomType | null; params?: string }
+  | { type: "UPDATE_CONTEXTUAL_MEMORY"; memory: ContextualMemory };
 
 interface ChatContextProps {
   messages: Message[];
@@ -89,6 +86,17 @@ interface ChatContextProps {
   setModel: (model: string) => void;
   setActiveAtom: (type: AtomType | null, params?: string) => void;
   handleAtomResult: (result: string) => void;
+}
+
+// New types for contextual memory
+interface ContextualMemory {
+  recentTopics: string[];
+  entityMentions: Record<string, number>;
+  userPreferences: {
+    preferredStyle?: string;
+    complexityLevel?: 'basic' | 'intermediate' | 'advanced';
+    lastInteractionTime?: Date;
+  };
 }
 
 // Get stored API key or use default
@@ -154,7 +162,7 @@ const createInitialConversation = (): Conversation => {
   };
 };
 
-// Initial state
+// Initial state with contextual memory
 const initialState: ChatState = {
   messages: [
     {
@@ -174,6 +182,11 @@ const initialState: ChatState = {
   model: getStoredModel(),
   activeAtom: null,
   atomParams: '',
+  contextualMemory: {
+    recentTopics: [],
+    entityMentions: {},
+    userPreferences: {}
+  }
 };
 
 // If no conversations exist, create an initial one
@@ -191,7 +204,7 @@ if (initialState.conversations.length === 0) {
   }
 }
 
-// Reducer
+// Reducer with contextual memory support
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
     case "ADD_MESSAGE": {
@@ -451,6 +464,14 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         activeAtom: action.atomType,
         atomParams: action.params || '',
       };
+    case "UPDATE_CONTEXTUAL_MEMORY":
+      return {
+        ...state,
+        contextualMemory: {
+          ...state.contextualMemory,
+          ...action.memory
+        }
+      };
     default:
       return state;
   }
@@ -567,13 +588,65 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     setActiveAtom(null);
   };
 
-  // Function to send a message and get a response
+  // Function to update contextual memory based on user message
+  const updateContextualMemory = (userMessage: string) => {
+    // Extract potential topics or entities from the message
+    const topics = extractTopics(userMessage);
+    
+    // Update entity mentions
+    const updatedEntityMentions = { ...state.contextualMemory.entityMentions };
+    topics.forEach(topic => {
+      updatedEntityMentions[topic] = (updatedEntityMentions[topic] || 0) + 1;
+    });
+    
+    // Update recent topics (keep only unique, most recent topics)
+    const existingTopics = new Set(state.contextualMemory.recentTopics);
+    topics.forEach(topic => existingTopics.add(topic));
+    const recentTopics = Array.from(existingTopics).slice(-5); // Keep most recent 5
+    
+    dispatch({
+      type: "UPDATE_CONTEXTUAL_MEMORY",
+      memory: {
+        recentTopics,
+        entityMentions: updatedEntityMentions,
+        userPreferences: {
+          ...state.contextualMemory.userPreferences,
+          lastInteractionTime: new Date()
+        }
+      }
+    });
+  };
+  
+  // Simple topic extraction (in a real app, this would be more sophisticated)
+  const extractTopics = (text: string): string[] => {
+    // This is a very simple implementation - in a production app,
+    // you'd want to use NLP libraries or AI services for entity extraction
+    const words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
+    const stopWords = new Set(['this', 'that', 'then', 'than', 'what', 'when', 'where', 'which', 'would', 'could', 'should']);
+    return [...new Set(words.filter(word => !stopWords.has(word)))].slice(0, 3);
+  };
+  
+  // Function to check if search might be needed for time-sensitive queries
+  const mightNeedSearch = (query: string): boolean => {
+    const timeRelatedTerms = ['latest', 'recent', 'news', 'current', 'today', 'yesterday', 'this year', 'this month', 'this week', 'update', 'newest'];
+    return timeRelatedTerms.some(term => query.toLowerCase().includes(term));
+  };
+
+  // Function to generate citation from source
+  const generateCitation = (source: SearchResult): string => {
+    return `<p class="text-xs text-muted-foreground mt-1">Source: <a href="${source.link}" target="_blank" class="underline hover:text-primary">${source.title}</a></p>`;
+  };
+
+  // Enhanced function to send a message and get a response
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
     
     // Generate unique IDs
     const userMessageId = `user-${Date.now()}`;
     const assistantMessageId = `assistant-${Date.now()}`;
+    
+    // Update contextual memory
+    updateContextualMemory(content);
     
     // Add user message
     dispatch({
@@ -616,6 +689,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const controller = new AbortController();
       
+      // Check if we should perform a web search for time-sensitive or trending information
+      let searchResults = null;
+      let searchContext = "";
+      
+      if (mightNeedSearch(content)) {
+        // Show a toast to indicate search is happening
+        toast({
+          title: "Augmenting with web search",
+          description: "Finding the latest information for you...",
+        });
+        
+        searchResults = await searchGoogle(content);
+        if (searchResults && searchResults.items && searchResults.items.length > 0) {
+          // Extract useful context from search results
+          searchContext = searchResults.items.slice(0, 3).map(item => 
+            `Title: ${item.title}\nContent: ${item.snippet}`
+          ).join('\n\n');
+        }
+      }
+      
       // Extract model ID from the URL or use the one in state
       let modelId = state.model;
       // If URL contains a model ID, parse it
@@ -629,6 +722,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
       
+      // Extract previous context for follow-up questions
+      const relevantContext = state.messages.slice(-6); // Get recent messages for context
+      const conversationContext = relevantContext.map(msg => 
+        `${msg.role === 'user' ? 'Human' : 'AI'}: ${msg.content.replace(/<[^>]*>/g, '')}`
+      ).join('\n');
+      
+      // Add search results to the prompt if available
+      const searchPrompt = searchResults ? 
+        `\n\nRECENT WEB SEARCH RESULTS:\n${searchContext}\n\nBased on these recent results, please incorporate this updated information into your response when relevant.` : 
+        '';
+      
+      // Add contextual memory to the prompt
+      const memoryPrompt = state.contextualMemory.recentTopics.length > 0 ?
+        `\n\nRECENT TOPICS DISCUSSED: ${state.contextualMemory.recentTopics.join(', ')}` :
+        '';
+        
       const response = await fetch(`${state.apiUrl}?key=${state.apiKey}`, {
         method: 'POST',
         headers: {
@@ -637,7 +746,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `Answer this question accurately and helpfully: "${content}"
+              text: `You are HydroGen AI, a helpful, advanced assistant powered by Google's Gemini technology.
+
+              CONVERSATION HISTORY FOR CONTEXT (use this for follow-up questions):
+              ${conversationContext}
+              ${memoryPrompt}
+              ${searchPrompt}
+
+              Answer this question accurately and helpfully: "${content}"
 
               RESPONSE FORMAT:
               - Use HTML for structure (<h2>, <h3> for headings, <p> for paragraphs)
@@ -646,7 +762,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
               - Use <blockquote> for quotes
               - Use <table>, <tr>, <th>, <td> for data tables
               - Use <code> for code snippets and equations
-              - Use <a href=""> for citations
+              - Always use semantic HTML5 for proper structure
 
               CONTENT STRUCTURE:
               1. Begin with a clear, direct answer to the question (2-3 sentences)
@@ -660,7 +776,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
               5. Address common misconceptions or frequently asked questions
               6. Include practical applications or real-world examples
               7. Conclude with future implications or next steps
-              8. Add references to credible sources
+              8. Add references to credible sources at the end
 
               QUALITY GUIDELINES:
               - Ensure factual accuracy and cite reliable sources
@@ -685,7 +801,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       
       const data = await response.json();
-      const generatedText = data.candidates[0].content.parts[0].text || "No response generated.";
+      let generatedText = data.candidates[0].content.parts[0].text || "No response generated.";
+      
+      // Add citations if we used search results
+      if (searchResults && searchResults.items && searchResults.items.length > 0) {
+        const citations = searchResults.items.slice(0, 3).map((item, index) => 
+          `<div class="mt-1 p-2 border border-white/10 rounded bg-black/20">
+            <p class="text-xs font-medium">[${index + 1}] <a href="${item.link}" target="_blank" class="text-blue-400 hover:underline">${item.title}</a></p>
+            <p class="text-xs text-muted-foreground">${item.snippet}</p>
+          </div>`
+        ).join('');
+        
+        generatedText += `
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <h4 class="text-sm font-medium mb-2">Sources & Citations</h4>
+            <div class="space-y-2">
+              ${citations}
+            </div>
+          </div>
+        `;
+      }
       
       // Update the assistant message with the response
       dispatch({

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -138,13 +139,15 @@ const AppContent = () => {
               <div className="absolute top-0 right-0 w-1/3 h-1/3 dark:bg-black/20 light:bg-white/20 rounded-full blur-3xl"></div>
             </div>
             
-            <div className="flex-1 relative overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-130px)]">
-                <ChatHistory />
+            <div className="flex-1 relative overflow-hidden flex flex-col">
+              <ScrollArea className="h-[calc(100vh-130px)] flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col">
+                  <ChatHistory />
+                </div>
               </ScrollArea>
+              
+              <ChatInput />
             </div>
-            
-            <ChatInput />
           </div>
           
           {renderAtomContent()}
