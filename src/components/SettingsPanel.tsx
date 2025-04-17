@@ -271,45 +271,45 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                         onClick={() => setTheme('dark')}
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
                             <Moon className="h-4 w-4" />
                             <span className="text-sm font-medium">Dark</span>
                           </div>
-                          <RadioGroupItem value="dark" id="theme-dark" />
+                      <RadioGroupItem value="dark" id="theme-dark" />
                         </div>
                         <div className="h-20 rounded bg-zinc-900 border border-zinc-800 p-2">
                           <div className="h-3 w-3/4 rounded-sm bg-zinc-700 mb-1"></div>
                           <div className="h-3 w-1/2 rounded-sm bg-zinc-700"></div>
                         </div>
-                      </div>
+                    </div>
                       
                       <div 
                         className={`cursor-pointer rounded-lg border p-3 ${theme === 'light' ? 'bg-primary/20 border-primary' : 'border-white/10 bg-white/5'} hover:bg-white/10 hover:border-white/20 transition-all duration-200`}
                         onClick={() => setTheme('light')}
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
                             <Sun className="h-4 w-4" />
                             <span className="text-sm font-medium">Light</span>
                           </div>
-                          <RadioGroupItem value="light" id="theme-light" />
+                      <RadioGroupItem value="light" id="theme-light" />
                         </div>
                         <div className="h-20 rounded bg-gray-100 border border-gray-200 p-2">
                           <div className="h-3 w-3/4 rounded-sm bg-gray-300 mb-1"></div>
                           <div className="h-3 w-1/2 rounded-sm bg-gray-300"></div>
                         </div>
-                      </div>
+                    </div>
                       
                       <div 
                         className={`cursor-pointer rounded-lg border p-3 ${theme === 'system' ? 'bg-primary/20 border-primary' : 'border-white/10 bg-white/5'} hover:bg-white/10 hover:border-white/20 transition-all duration-200`}
                         onClick={() => setTheme('system')}
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
                             <Laptop className="h-4 w-4" />
                             <span className="text-sm font-medium">System</span>
                           </div>
-                          <RadioGroupItem value="system" id="theme-system" />
+                      <RadioGroupItem value="system" id="theme-system" />
                         </div>
                         <div className="h-20 rounded bg-gradient-to-r from-zinc-900 to-gray-200 border border-zinc-800 p-2">
                           <div className="h-3 w-3/4 rounded-sm bg-gradient-to-r from-zinc-700 to-gray-300 mb-1"></div>
@@ -332,13 +332,13 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       >
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-sm font-medium">Small</span>
-                          <RadioGroupItem value="sm" id="font-sm" />
+                      <RadioGroupItem value="sm" id="font-sm" />
                         </div>
                         <div className="flex flex-col items-center space-y-1">
                           <span className="text-xs">Aa</span>
                           <p className="text-xs text-muted-foreground">Compact view</p>
                         </div>
-                      </div>
+                    </div>
                       
                       <div 
                         className={`cursor-pointer rounded-lg border p-3 ${fontSize === 'md' ? 'bg-primary/20 border-primary' : 'border-white/10 bg-white/5'} hover:bg-white/10 hover:border-white/20 transition-all duration-200`}
@@ -346,13 +346,13 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       >
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-sm font-medium">Medium</span>
-                          <RadioGroupItem value="md" id="font-md" />
+                      <RadioGroupItem value="md" id="font-md" />
                         </div>
                         <div className="flex flex-col items-center space-y-1">
                           <span className="text-sm">Aa</span>
                           <p className="text-xs text-muted-foreground">Default size</p>
                         </div>
-                      </div>
+                    </div>
                       
                       <div 
                         className={`cursor-pointer rounded-lg border p-3 ${fontSize === 'lg' ? 'bg-primary/20 border-primary' : 'border-white/10 bg-white/5'} hover:bg-white/10 hover:border-white/20 transition-all duration-200`}
@@ -360,7 +360,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       >
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-sm font-medium">Large</span>
-                          <RadioGroupItem value="lg" id="font-lg" />
+                      <RadioGroupItem value="lg" id="font-lg" />
                         </div>
                         <div className="flex flex-col items-center space-y-1">
                           <span className="text-base">Aa</span>
@@ -417,11 +417,11 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     </span>
                   </h4>
                   <div className="space-y-2">
-                    <Input 
-                      type="password" 
-                      value={key} 
-                      onChange={(e) => setKey(e.target.value)}
-                      placeholder="Enter your Google Gemini API key" 
+                  <Input 
+                    type="password" 
+                    value={key} 
+                    onChange={(e) => setKey(e.target.value)}
+                    placeholder="Enter your Google Gemini API key" 
                       className="bg-black/20 border-white/10 focus-visible:ring-primary"
                     />
                     <div className="flex items-center space-x-1">
@@ -468,9 +468,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                         <RadioGroupItem value={id} id={`model-${id}`} className="mt-1" />
                         <div className="space-y-2 flex-1">
                           <div className="flex items-center justify-between">
-                            <Label htmlFor={`model-${id}`} className="font-medium cursor-pointer">
-                              {info.name}
-                            </Label>
+                          <Label htmlFor={`model-${id}`} className="font-medium cursor-pointer">
+                            {info.name}
+                          </Label>
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="text-xs">
                                 {info.tokens}
@@ -728,8 +728,8 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      HydroGen AI is a powerful chat interface for Google's Gemini AI models, 
+                  <p className="text-sm text-muted-foreground">
+                    HydroGen AI is a powerful chat interface for Google's Gemini AI models, 
                       featuring a range of productivity tools and a clean, modern interface 
                       designed for productivity and a seamless user experience.
                     </p>
@@ -784,7 +784,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                         </div>
                         <div className="text-sm">Code Generation</div>
                       </div>
-                    </div>
+                </div>
                   </CardContent>
                 </Card>
                 
@@ -811,7 +811,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                         <RefreshCw className="h-3.5 w-3.5 mr-1" />
                         Reset Settings
                       </Button>
-                    </div>
+                </div>
                   </CardContent>
                 </Card>
               </div>
