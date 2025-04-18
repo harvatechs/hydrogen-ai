@@ -49,11 +49,18 @@ export function ChatInput() {
       color: "bg-green-500/10 text-green-400 border-green-500/30"
     },
     {
-      icon: <Brain className="h-4 w-4 text-purple-500" />,
+      icon: <Sparkles className="h-4 w-4 text-purple-500" />,
+      title: "AI Summarizer",
+      description: "Summarize any text content",
+      command: "/summarize Paste your text to get a concise summary",
+      color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
+    },
+    {
+      icon: <Brain className="h-4 w-4 text-orange-500" />,
       title: "Compare & Contrast",
       description: "Compare two concepts",
       command: "Compare quantum computing and classical computing",
-      color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
+      color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
     },
     {
       icon: <BookOpen className="h-4 w-4 text-yellow-500" />,
@@ -61,13 +68,6 @@ export function ChatInput() {
       description: "Simple explanation of complex topics",
       command: "Explain quantum entanglement like I'm 5 years old",
       color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
-    },
-    {
-      icon: <Sparkles className="h-4 w-4 text-pink-500" />,
-      title: "Pros & Cons",
-      description: "List advantages and disadvantages",
-      command: "What are the pros and cons of renewable energy?",
-      color: "bg-pink-500/10 text-pink-400 border-pink-500/30"
     }
   ];
 
@@ -264,6 +264,10 @@ export function ChatInput() {
     } else if (message.trim().startsWith('/flashcard')) {
       return <span className="text-xs text-blue-400 bg-blue-500/10 px-2 py-1 rounded-full">
         Flashcard Mode
+      </span>;
+    } else if (message.trim().startsWith('/summarize') || message.trim().startsWith('/sum')) {
+      return <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full">
+        AI Summarizer Mode
       </span>;
     }
     return null;

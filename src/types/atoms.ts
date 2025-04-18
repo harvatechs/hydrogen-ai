@@ -1,5 +1,4 @@
-
-export type AtomType = 'youtube' | 'flashcard' | 'websearch' | null;
+export type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | null;
 
 export interface AtomCommand {
   type: AtomType;
@@ -22,6 +21,11 @@ export function parseAtomCommand(message: string): AtomCommand | null {
       message.substring(5).trim() : 
       message.substring(8).trim();
     return { type: 'websearch', params };
+  } else if (message.startsWith('/summarize') || message.startsWith('/sum')) {
+    const params = message.startsWith('/summarize') ? 
+      message.substring(11).trim() : 
+      message.substring(5).trim();
+    return { type: 'summarize', params };
   }
   return null;
 }

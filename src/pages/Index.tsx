@@ -20,6 +20,7 @@ import { EnhancedSettingsPanel } from "@/components/EnhancedSettingsPanel";
 import { YouTubeSummarizer } from "@/atoms/YouTubeSummarizer";
 import { FlashcardMaker } from "@/atoms/FlashcardMaker";
 import { WebSearchAtom } from "@/atoms/WebSearchAtom";
+import { AISummarizer } from "@/atoms/AISummarizer";
 
 // Theme application component
 const ThemeHandler = ({
@@ -90,6 +91,14 @@ const AppContent = () => {
         return (
           <WebSearchAtom
             initialQuery={atomParams}
+            onClose={closeAtom}
+            onSubmitResult={handleAtomSubmit}
+          />
+        );
+      case 'summarize':
+        return (
+          <AISummarizer
+            initialText={atomParams}
             onClose={closeAtom}
             onSubmitResult={handleAtomSubmit}
           />
