@@ -4,16 +4,9 @@ import { Message } from '@/types/message';
 import { useSettings } from './SettingsContext';
 import { generateConversationLabel } from '@/utils/conversationLabels';
 import { v4 as uuidv4 } from 'uuid';
+import { Conversation } from '@/types/conversation';
 
 type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | null;
-
-// Define conversation interface
-interface Conversation {
-  id: string;
-  title: string;
-  messages: Message[];
-  lastUpdatedAt: Date;
-}
 
 interface IChatContext {
   messages: Message[];
@@ -25,7 +18,7 @@ interface IChatContext {
   model: string;
   setModel: (model: string) => void;
   activeAtom: AtomType;
-  setActiveAtom: (atomType: AtomType) => void;
+  setActiveAtom: (atomType: AtomType, params?: string) => void;
   atomParams: string;
   setAtomParams: (params: string) => void;
   handleAtomResult: (result: string) => void;
@@ -64,7 +57,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedConversations = localStorage.getItem('conversations');
     if (savedConversations) {
       try {
-        return JSON.parse(savedConversations);
+        const parsedConversations = JSON.parse(savedConversations);
+        // Convert string dates to Date objects
+        return parsedConversations.map((conv: any) => ({
+          ...conv,
+          lastUpdatedAt: new Date(conv.lastUpdatedAt)
+        }));
       } catch (e) {
         console.error('Failed to parse saved conversations:', e);
         return [];
@@ -191,13 +189,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = `This is a simulated response to your message: "${content}".\n\nIn a real implementation, this would be replaced with an actual API call to the ${model} model.`;
       
       // Update the assistant message with the response
-      const finalMessages = messages.concat([userMessage, {
+      const finalMessages = [...messages, userMessage, {
         id: assistantMessageId,
         role: 'assistant',
         content: response,
         timestamp: new Date().toISOString(),
         isLoading: false
-      }]);
+      }];
       
       setMessages(finalMessages);
       setIsProcessing(false);
@@ -234,6 +232,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setModel = (newModel: string) => {
     setModelState(newModel);
     localStorage.setItem('model', newModel);
+  };
+  
+  // Fixed: Added optional params parameter
+  const handleSetActiveAtom = (atomType: AtomType, params?: string) => {
+    setActiveAtom(atomType);
+    if (params !== undefined) {
+      setAtomParams(params);
+    } else {
+      setAtomParams('');
+    }
   };
   
   const handleAtomResult = (result: string) => {
@@ -323,7 +331,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         model,
         setModel,
         activeAtom,
-        setActiveAtom,
+        setActiveAtom: handleSetActiveAtom,
         atomParams,
         setAtomParams,
         handleAtomResult,

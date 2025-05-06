@@ -110,9 +110,13 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
     }
   };
   
+  // Track if this is the first render
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
   // Save appearance settings
   const handleSaveAppearance = () => {
-    setTheme(selectedTheme);
+    // Ensure selectedTheme is cast to the correct type
+    setTheme(selectedTheme as 'dark' | 'light' | 'system');
     setFontSize(selectedFontSize);
     localStorage.setItem("app-code-theme", codeHighlightTheme);
     
