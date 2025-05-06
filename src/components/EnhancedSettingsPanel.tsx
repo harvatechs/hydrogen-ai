@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { useSettings } from '@/context/SettingsContext';
+import { useChat } from '@/context/ChatContext';
 import {
   Dialog,
   DialogContent,
@@ -67,15 +69,16 @@ export interface EnhancedSettingsPanelProps {
   open: boolean;
 }
 
-export function EnhancedSettingsPanel({ onClose, open }: EnhancedSettingsPanelProps) {
+export function EnhancedSettingsPanel({ onClose, open = true }: EnhancedSettingsPanelProps) {
   const { theme, setTheme, fontSize, setFontSize } = useSettings();
+  const { setModel } = useChat();
 
   // State for form values
   const [apiKey, setApiKey] = useState<string>('');
   const [apiURL, setApiURL] = useState<string>('');
   const [selectedTheme, setSelectedTheme] = useState<'dark' | 'light' | 'system'>(theme as any);
   const [selectedFontSize, setSelectedFontSize] = useState<'small' | 'medium' | 'large'>(fontSize as any);
-  const [model, setModel] = useState<string>('');
+  const [modelValue, setModelValue] = useState<string>('');
   const [maxTokens, setMaxTokens] = useState<number>(800);
   const [temperature, setTemperature] = useState<number>(0.7);
   const [topP, setTopP] = useState<number>(0.9);
@@ -106,7 +109,7 @@ export function EnhancedSettingsPanel({ onClose, open }: EnhancedSettingsPanelPr
       const savedMaxTokens = Number(localStorage.getItem('max-tokens') || '800');
       const savedTemperature = Number(localStorage.getItem('temperature') || '0.7');
       const savedTopP = Number(localStorage.getItem('top-p') || '0.9');
-      setModel(savedModel);
+      setModelValue(savedModel);
       setMaxTokens(savedMaxTokens);
       setTemperature(savedTemperature);
       setTopP(savedTopP);
@@ -146,7 +149,8 @@ export function EnhancedSettingsPanel({ onClose, open }: EnhancedSettingsPanelPr
       localStorage.setItem('autocomplete-enabled', String(autocompleteEnabled));
       
       // Model settings
-      localStorage.setItem('model', model);
+      localStorage.setItem('model', modelValue);
+      setModel(modelValue);
       localStorage.setItem('max-tokens', String(maxTokens));
       localStorage.setItem('temperature', String(temperature));
       localStorage.setItem('top-p', String(topP));
@@ -208,6 +212,7 @@ export function EnhancedSettingsPanel({ onClose, open }: EnhancedSettingsPanelPr
       localStorage.setItem('autocomplete-enabled', 'true');
 
       // Model settings
+      setModelValue(MODEL_OPTIONS[0].value);
       setModel(MODEL_OPTIONS[0].value);
       setMaxTokens(800);
       setTemperature(0.7);
@@ -482,8 +487,8 @@ export function EnhancedSettingsPanel({ onClose, open }: EnhancedSettingsPanelPr
                 <div className="space-y-2">
                   <Label htmlFor="model-select">Model</Label>
                   <Select
-                    value={model}
-                    onValueChange={setModel}
+                    value={modelValue}
+                    onValueChange={setModelValue}
                   >
                     <SelectTrigger id="model-select" className="w-full h-10">
                       <SelectValue placeholder="Select a model" />

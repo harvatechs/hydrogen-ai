@@ -161,7 +161,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
       className={cn(
         "py-5 first:pt-0 animate-fade-in", 
         message.isLoading && "opacity-70",
-        isUser ? "border-b border-white/10" : ""
+        isUser ? "border-b border-white/10" : "",
+        "message-assistant" // Add the enhanced styling class
       )}
       onMouseEnter={() => !isUser && setShowFeedback(true)}
       onMouseLeave={() => !isUser && setShowFeedback(false)}
@@ -169,11 +170,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
         <div className="mt-1 flex-shrink-0">
           {isUser ? (
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary ring-1 ring-primary/20">
               <User size={16} />
             </div>
           ) : (
-            <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow">
+            <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow ring-1 ring-gemini-yellow/20">
               <Bot size={16} />
             </div>
           )}
@@ -198,7 +199,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                       {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="left">
+                  <TooltipContent side="left" className="custom-tooltip">
                     {copied ? "Copied!" : "Copy message"}
                   </TooltipContent>
                 </Tooltip>
