@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Message } from '@/types/message';
+import { Message, MessageRole } from '@/types/message';
 import { useSettings } from './SettingsContext';
 import { generateConversationLabel } from '@/utils/conversationLabels';
 import { v4 as uuidv4 } from 'uuid';
@@ -140,9 +140,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Add user message
     const userMessage: Message = {
       id: uuidv4(),
-      role: 'user',
+      role: 'user' as MessageRole,
       content,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
       isLoading: false
     };
     
@@ -150,9 +150,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const assistantMessageId = uuidv4();
     const assistantMessage: Message = {
       id: assistantMessageId,
-      role: 'assistant',
+      role: 'assistant' as MessageRole,
       content: 'Thinking...',
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
       isLoading: true
     };
     
@@ -189,11 +189,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = `This is a simulated response to your message: "${content}".\n\nIn a real implementation, this would be replaced with an actual API call to the ${model} model.`;
       
       // Update the assistant message with the response
-      const finalMessages = [...messages, userMessage, {
+      const finalMessages: Message[] = [...messages, userMessage, {
         id: assistantMessageId,
-        role: 'assistant',
+        role: 'assistant' as MessageRole,
         content: response,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         isLoading: false
       }];
       
