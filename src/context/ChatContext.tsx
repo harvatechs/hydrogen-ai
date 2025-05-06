@@ -2,8 +2,18 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Message } from '@/types/message';
 import { useSettings } from './SettingsContext';
+import { generateConversationLabel } from '@/utils/conversationLabels';
+import { v4 as uuidv4 } from 'uuid';
 
 type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | null;
+
+// Define conversation interface
+interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  lastUpdatedAt: Date;
+}
 
 interface IChatContext {
   messages: Message[];
@@ -19,56 +29,127 @@ interface IChatContext {
   atomParams: string;
   setAtomParams: (params: string) => void;
   handleAtomResult: (result: string) => void;
+  // Add conversation-related properties
+  conversations: Conversation[];
+  currentConversationId: string | null;
+  setCurrentConversation: (id: string) => void;
+  updateConversationTitle: (id: string, title: string) => void;
+  clearConversation: (id: string) => void;
+  deleteConversation: (id: string) => void;
+  createNewConversation: () => void;
+  isProcessing: boolean;
+  apiKey: string;
+  setApiKey: (key: string) => void;
+  apiUrl: string;
+  setApiUrl: (url: string) => void;
+  setFontSize: (size: string) => void;
 }
 
 const ChatContext = createContext<IChatContext | undefined>(undefined);
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { theme, setTheme: setSettingsTheme, fontSize } = useSettings();
+  const { theme, setTheme: setSettingsTheme, fontSize, setFontSize } = useSettings();
   const [messages, setMessages] = useState<Message[]>([]);
   const [model, setModelState] = useState<string>(() => {
     return localStorage.getItem('model') || 'gemini-2.0-pro';
   });
   const [activeAtom, setActiveAtom] = useState<AtomType>(null);
   const [atomParams, setAtomParams] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('apiKey') || '');
+  const [apiUrl, setApiUrl] = useState<string>(() => localStorage.getItem('apiUrl') || 'https://api.openai.com/v1');
+
+  // Conversations state
+  const [conversations, setConversations] = useState<Conversation[]>(() => {
+    const savedConversations = localStorage.getItem('conversations');
+    if (savedConversations) {
+      try {
+        return JSON.parse(savedConversations);
+      } catch (e) {
+        console.error('Failed to parse saved conversations:', e);
+        return [];
+      }
+    }
+    return [];
+  });
+  
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(() => {
+    return localStorage.getItem('currentConversationId') || null;
+  });
 
   // Track if this is the first render
   const [isFirstRender, setIsFirstRender] = useState(true);
 
-  // Load saved messages from local storage
+  // Initialize with a default conversation if none exists
   useEffect(() => {
-    const savedMessages = localStorage.getItem('chat-messages');
-    if (savedMessages) {
-      try {
-        setMessages(JSON.parse(savedMessages));
-      } catch (e) {
-        console.error('Failed to parse saved messages:', e);
-      }
+    if (conversations.length === 0) {
+      const newId = uuidv4();
+      const newConversation: Conversation = {
+        id: newId,
+        title: 'New Conversation',
+        messages: [],
+        lastUpdatedAt: new Date()
+      };
+      
+      setConversations([newConversation]);
+      setCurrentConversationId(newId);
+      localStorage.setItem('currentConversationId', newId);
+    } else if (!currentConversationId || !conversations.find(c => c.id === currentConversationId)) {
+      setCurrentConversationId(conversations[0].id);
+      localStorage.setItem('currentConversationId', conversations[0].id);
     }
+    
     setIsFirstRender(false);
   }, []);
 
-  // Save messages to local storage when updated
+  // Save conversations to local storage when updated
   useEffect(() => {
     if (!isFirstRender) {
-      localStorage.setItem('chat-messages', JSON.stringify(messages));
+      localStorage.setItem('conversations', JSON.stringify(conversations));
     }
-  }, [messages, isFirstRender]);
+  }, [conversations, isFirstRender]);
+
+  // Save current conversation ID to local storage
+  useEffect(() => {
+    if (currentConversationId) {
+      localStorage.setItem('currentConversationId', currentConversationId);
+    }
+  }, [currentConversationId]);
+
+  // Update messages when current conversation changes
+  useEffect(() => {
+    if (currentConversationId) {
+      const currentConversation = conversations.find(c => c.id === currentConversationId);
+      if (currentConversation) {
+        setMessages(currentConversation.messages);
+      }
+    }
+  }, [currentConversationId, conversations]);
+
+  // Save API key and URL to local storage
+  useEffect(() => {
+    localStorage.setItem('apiKey', apiKey);
+  }, [apiKey]);
+
+  useEffect(() => {
+    localStorage.setItem('apiUrl', apiUrl);
+  }, [apiUrl]);
 
   const sendMessage = (content: string) => {
+    // Don't process empty messages
+    if (!content.trim()) return;
+    
     // Add user message
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: uuidv4(),
       role: 'user',
       content,
       timestamp: new Date().toISOString(),
       isLoading: false
     };
     
-    setMessages(prev => [...prev, userMessage]);
-    
     // Add assistant message with loading state
-    const assistantMessageId = (Date.now() + 1).toString();
+    const assistantMessageId = uuidv4();
     const assistantMessage: Message = {
       id: assistantMessageId,
       role: 'assistant',
@@ -77,24 +158,73 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isLoading: true
     };
     
-    setMessages(prev => [...prev, assistantMessage]);
+    // Update messages state and conversation
+    const updatedMessages = [...messages, userMessage, assistantMessage];
+    setMessages(updatedMessages);
+    setIsProcessing(true);
+    
+    // Update conversation in state
+    if (currentConversationId) {
+      const updatedConversations = conversations.map(conv => {
+        if (conv.id === currentConversationId) {
+          // Update title if this is the first message
+          let title = conv.title;
+          if (conv.messages.length === 0) {
+            title = generateConversationLabel([userMessage]);
+          }
+          
+          return {
+            ...conv,
+            messages: updatedMessages,
+            title,
+            lastUpdatedAt: new Date()
+          };
+        }
+        return conv;
+      });
+      
+      setConversations(updatedConversations);
+    }
     
     // Simulate AI response after delay
     setTimeout(() => {
       const response = `This is a simulated response to your message: "${content}".\n\nIn a real implementation, this would be replaced with an actual API call to the ${model} model.`;
       
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === assistantMessageId 
-            ? {...msg, content: response, isLoading: false} 
-            : msg
-        )
-      );
+      // Update the assistant message with the response
+      const finalMessages = messages.concat([userMessage, {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: response,
+        timestamp: new Date().toISOString(),
+        isLoading: false
+      }]);
+      
+      setMessages(finalMessages);
+      setIsProcessing(false);
+      
+      // Update conversation in state
+      if (currentConversationId) {
+        const updatedConversations = conversations.map(conv => {
+          if (conv.id === currentConversationId) {
+            return {
+              ...conv,
+              messages: finalMessages,
+              lastUpdatedAt: new Date()
+            };
+          }
+          return conv;
+        });
+        
+        setConversations(updatedConversations);
+      }
     }, 1500);
   };
   
   const clearMessages = () => {
     setMessages([]);
+    
+    // Also clear the current conversation's messages
+    clearConversation(currentConversationId || '');
   };
   
   const setTheme = (newTheme: 'dark' | 'light' | 'system') => {
@@ -114,6 +244,73 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAtomParams('');
   };
 
+  // Conversation management functions
+  const setCurrentConversation = (id: string) => {
+    setCurrentConversationId(id);
+  };
+
+  const updateConversationTitle = (id: string, title: string) => {
+    const updatedConversations = conversations.map(conv => {
+      if (conv.id === id) {
+        return {
+          ...conv,
+          title
+        };
+      }
+      return conv;
+    });
+    
+    setConversations(updatedConversations);
+  };
+
+  const clearConversation = (id: string) => {
+    if (!id) return;
+    
+    const updatedConversations = conversations.map(conv => {
+      if (conv.id === id) {
+        return {
+          ...conv,
+          messages: []
+        };
+      }
+      return conv;
+    });
+    
+    setConversations(updatedConversations);
+    
+    // If this is the current conversation, also clear the messages state
+    if (id === currentConversationId) {
+      setMessages([]);
+    }
+  };
+
+  const deleteConversation = (id: string) => {
+    const updatedConversations = conversations.filter(conv => conv.id !== id);
+    setConversations(updatedConversations);
+    
+    // If we deleted the current conversation, select another one
+    if (id === currentConversationId && updatedConversations.length > 0) {
+      setCurrentConversationId(updatedConversations[0].id);
+    } else if (updatedConversations.length === 0) {
+      // Create a new conversation if we deleted the last one
+      createNewConversation();
+    }
+  };
+
+  const createNewConversation = () => {
+    const newId = uuidv4();
+    const newConversation: Conversation = {
+      id: newId,
+      title: 'New Conversation',
+      messages: [],
+      lastUpdatedAt: new Date()
+    };
+    
+    setConversations(prev => [newConversation, ...prev]);
+    setCurrentConversationId(newId);
+    setMessages([]);
+  };
+
   return (
     <ChatContext.Provider 
       value={{
@@ -129,7 +326,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setActiveAtom,
         atomParams,
         setAtomParams,
-        handleAtomResult
+        handleAtomResult,
+        conversations,
+        currentConversationId,
+        setCurrentConversation,
+        updateConversationTitle,
+        clearConversation,
+        deleteConversation,
+        createNewConversation,
+        isProcessing,
+        apiKey,
+        setApiKey,
+        apiUrl,
+        setApiUrl,
+        setFontSize
       }}
     >
       {children}

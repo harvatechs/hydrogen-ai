@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: 1,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes instead of deprecated cacheTime
     },
   },
 });
@@ -93,8 +93,8 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <SettingsProvider>
         <TooltipProvider>
-          <Toaster position="top-center" />
-          <Sonner position="top-right" className="toaster-container" />
+          <Toaster />
+          <Sonner className="toaster-container" />
           <BrowserRouter>
             <div className="min-h-screen w-full">
               <Routes>
