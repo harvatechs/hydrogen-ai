@@ -66,10 +66,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
     if (message.isLoading) {
       return (
         <div className="space-y-2">
-          <Skeleton className="h-4 w-3/4 bg-white/10" />
-          <Skeleton className="h-4 w-1/2 bg-white/10" />
-          <Skeleton className="h-4 w-5/6 bg-white/10" />
-          <Skeleton className="h-4 w-2/3 bg-white/10" />
+          <Skeleton className="h-4 w-3/4 bg-gray-600/20" />
+          <Skeleton className="h-4 w-1/2 bg-gray-600/20" />
+          <Skeleton className="h-4 w-5/6 bg-gray-600/20" />
+          <Skeleton className="h-4 w-2/3 bg-gray-600/20" />
         </div>
       );
     }
@@ -84,7 +84,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         <div 
           ref={messageRef}
           className={cn(
-            "prose prose-invert prose-headings:text-gemini-yellow prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-muted-foreground prose-a:text-blue-400 prose-strong:text-white prose-strong:font-semibold prose-em:text-yellow-200 prose-blockquote:border-l-2 prose-blockquote:border-gemini-yellow/50 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground/80 max-w-none",
+            "prose dark:prose-invert max-w-none text-base",
             isError && "text-red-500",
             "chat-message-content"
           )}
@@ -94,8 +94,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
         
         {/* Reference links section */}
         {urls.length > 0 && (
-          <div className="pt-3 border-t border-white/10">
-            <h4 className="text-xs font-medium text-gemini-yellow mb-2 flex items-center">
+          <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+            <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 flex items-center">
               <ExternalLink size={12} className="mr-1" /> Sources
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     href={url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-black/30 hover:bg-black/50 text-blue-300 hover:text-blue-200 border border-white/10 transition-colors"
+                    className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors"
                   >
                     <ExternalLink size={10} className="mr-1" />
                     {displayUrl}
@@ -123,10 +123,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
         )}
         
         {/* Feedback section for assistant messages */}
-        {!isUser && !isError && (
-          <div className="flex items-center space-x-2 mt-2 text-xs text-muted-foreground">
+        {!isUser && !isError && showFeedback && (
+          <div className="flex items-center space-x-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
             {feedbackGiven ? (
-              <Badge variant="outline" className="text-xs bg-gemini-yellow/10 hover:bg-gemini-yellow/20 border-gemini-yellow/20">
+              <Badge variant="outline" className="text-xs bg-gray-100 dark:bg-gray-800">
                 {feedbackGiven === "positive" ? "Feedback: Helpful" : "Feedback: Not helpful"}
               </Badge>
             ) : (
@@ -135,7 +135,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 <Button 
                   size="icon" 
                   variant="ghost" 
-                  className="h-6 w-6 rounded-full hover:bg-green-500/20 hover:text-green-400" 
+                  className="h-6 w-6 rounded-full hover:bg-green-500/20 hover:text-green-500" 
                   onClick={() => handleFeedback("positive")}
                 >
                   <ThumbsUp className="h-3 w-3" />
@@ -143,7 +143,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 <Button 
                   size="icon" 
                   variant="ghost" 
-                  className="h-6 w-6 rounded-full hover:bg-red-500/20 hover:text-red-400" 
+                  className="h-6 w-6 rounded-full hover:bg-red-500/20 hover:text-red-500" 
                   onClick={() => handleFeedback("negative")}
                 >
                   <ThumbsDown className="h-3 w-3" />
@@ -159,21 +159,21 @@ export function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div 
       className={cn(
-        "py-5 first:pt-0 animate-fade-in", 
+        "py-6 px-4 chat-message", 
         message.isLoading && "opacity-70",
-        isUser ? "border-b border-white/10" : ""
+        isUser ? "user" : "assistant"
       )}
       onMouseEnter={() => !isUser && setShowFeedback(true)}
       onMouseLeave={() => !isUser && setShowFeedback(false)}
     >
-      <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
+      <div className="flex gap-4 max-w-4xl mx-auto">
         <div className="mt-1 flex-shrink-0">
           {isUser ? (
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <div className="h-8 w-8 rounded-sm bg-[#5436da]/10 flex items-center justify-center text-[#5436da]">
               <User size={16} />
             </div>
           ) : (
-            <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow">
+            <div className="h-8 w-8 rounded-sm bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]">
               <Bot size={16} />
             </div>
           )}
@@ -181,8 +181,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
         
         <div className="min-w-0 flex-1">
           <div className="flex justify-between items-center mb-1">
-            <div className="text-sm font-medium text-white/80">
-              {isUser ? "You" : "HydroGen AI"}
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {isUser ? "You" : "Assistant"}
             </div>
             
             {!isUser && !message.isLoading && (
@@ -192,7 +192,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-muted-foreground/70 hover:text-gemini-yellow hover:bg-gemini-yellow/10 rounded-full"
+                      className="h-7 w-7 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={handleCopy}
                     >
                       {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}

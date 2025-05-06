@@ -1,5 +1,5 @@
 
-/* Enhanced UI/UX styles for HydroGen AI */
+/* Enhanced UI/UX styles for ChatGPT-like interface */
 
 /* Improved button hover states */
 .sidebar-button:hover {
@@ -8,42 +8,73 @@
   transition: all 0.2s ease;
 }
 
-/* Improved input focus states */
-.enhanced-input:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2) !important;
+/* Chat message styling */
+.chat-message {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s;
 }
 
-/* Settings panel improvements */
-.settings-tab.active {
-  background-color: rgba(var(--primary-rgb), 0.1) !important;
-  color: var(--primary) !important;
-  border-bottom: 2px solid var(--primary) !important;
+.chat-message.user {
+  background-color: transparent;
 }
 
-.card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.chat-message.assistant {
+  background-color: rgba(247, 247, 248, 0.05);
 }
 
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.light .chat-message.assistant {
+  background-color: rgba(247, 247, 248, 0.7);
 }
 
-/* Animation for transitions */
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+/* Message input styling */
+.message-input {
+  border-radius: 0.75rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.light .message-input {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Code block styling */
+.chat-message-content pre {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  border-radius: 0.5rem !important;
+  padding: 1rem !important;
+  margin: 1rem 0 !important;
+  overflow-x: auto !important;
+}
+
+.light .chat-message-content pre {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.chat-message-content code {
+  font-family: "Söhne Mono", Monaco, "Andale Mono", "Ubuntu Mono", monospace !important;
+  font-size: 0.875rem !important;
+}
+
+/* Sidebar styling */
+.chatgpt-sidebar {
+  background-color: #202123;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .chatgpt-sidebar {
+  background-color: #f7f7f8;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* New conversation button styling */
+.new-chat-button {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.new-chat-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Improved scrollbars */
@@ -53,62 +84,55 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Dark mode specific styles */
-.dark {
-  --primary-rgb: 146, 95, 240;
-  --border-hover: rgba(255, 255, 255, 0.2);
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* Light mode specific styles */
-.light {
-  --primary-rgb: 124, 58, 237;
-  --border-hover: rgba(0, 0, 0, 0.2);
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
-/* Improved focus outline for accessibility */
-:focus-visible {
-  outline: 2px solid var(--primary) !important;
-  outline-offset: 2px;
-} 
+/* ChatGPT-like typography */
+body {
+  font-family: "Söhne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", sans-serif;
+  line-height: 1.5;
+}
 
 /* Enhanced content styling for chat messages */
 .chat-message-content h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
-  color: #f0c674;
-  border-bottom: 1px solid rgba(240, 198, 116, 0.3);
-  padding-bottom: 0.5rem;
+  color: inherit;
 }
 
 .chat-message-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   margin-top: 1.25rem;
   margin-bottom: 0.75rem;
-  color: #f0c674;
+  color: inherit;
 }
 
 .chat-message-content h3 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  color: #f0c674;
+  color: inherit;
 }
 
 .chat-message-content p {
@@ -132,49 +156,13 @@
   margin-bottom: 0.5rem;
 }
 
-.chat-message-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.chat-message-content th,
-.chat-message-content td {
-  padding: 0.75rem;
-  text-align: left;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.chat-message-content th {
-  background-color: rgba(240, 198, 116, 0.2);
-  font-weight: 600;
-}
-
-.chat-message-content tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.03);
-}
-
-.chat-message-content code {
-  font-family: "Fira Code", monospace;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-  font-size: 0.9em;
-}
-
-.chat-message-content pre {
-  background-color: rgba(0, 0, 0, 0.3);
-  padding: 1rem;
-  border-radius: 4px;
-  overflow-x: auto;
-  margin-bottom: 1rem;
+.chat-message-content a {
+  color: #10a37f;
+  text-decoration: underline;
 }
 
 .chat-message-content blockquote {
-  border-left: 3px solid rgba(240, 198, 116, 0.5);
+  border-left: 3px solid rgba(142, 142, 160, 0.5);
   padding-left: 1rem;
   margin-left: 0;
   margin-right: 0;
@@ -183,15 +171,11 @@
   font-style: italic;
 }
 
-/* Chart and diagram styles */
-.chat-diagram {
-  margin: 1.5rem 0;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.light .chat-message-content blockquote {
+  color: rgba(0, 0, 0, 0.7);
 }
 
+/* Voice input style */
 .voice-input-button {
   position: relative;
 }
@@ -202,12 +186,12 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(240, 198, 116, 0.4);
+    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(240, 198, 116, 0);
+    box-shadow: 0 0 0 10px rgba(16, 163, 127, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(240, 198, 116, 0);
+    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0);
   }
 }
