@@ -1,9 +1,8 @@
-
 import { useRef, useEffect, useState } from "react";
 import { useChat } from "@/context/ChatContext";
 import { ChatMessage } from "./ChatMessage";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Lightbulb } from "lucide-react";
+import { Search, Sparkles, Globe, BookOpen, FileText, PanelRight, Lightbulb, Zap, Code2, PenLine, Youtube, Brain, Calendar, Rocket, PackageOpen, FlaskConical, BookMarked, Dna } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -69,6 +68,18 @@ function generateRecommendedQuestions() {
     .slice(0, 8);
 }
 
+// Icons for the question buttons
+const questionIcons = [
+  Brain,
+  Zap,
+  Globe,
+  PenLine,
+  Rocket,
+  BookMarked,
+  FlaskConical,
+  Dna
+];
+
 export function ChatHistory() {
   const {
     messages,
@@ -86,82 +97,86 @@ export function ChatHistory() {
   }, [messages]);
   
   // Skeleton loader for when a response is being generated
-  const renderSkeletonLoader = () => (
-    <div className="py-6 px-4 chat-message assistant">
-      <div className="flex gap-4 max-w-4xl mx-auto">
+  const renderSkeletonLoader = () => <div className="py-4 animate-fade-in">
+      <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
         <div className="mt-1 flex-shrink-0">
-          <div className="h-8 w-8 rounded-sm bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]">
-            <Skeleton className="h-5 w-5 rounded-full bg-[#10a37f]/20" />
+          <div className="h-8 w-8 rounded-full bg-gemini-purple/20 flex items-center justify-center text-gemini-yellow">
+            <Skeleton className="h-5 w-5 rounded-full bg-white/20" />
           </div>
         </div>
         
         <div className="min-w-0 flex-1">
-          <Skeleton className="h-5 w-32 mb-3 bg-gray-300/20 dark:bg-gray-600/20" />
+          <Skeleton className="h-5 w-32 mb-3 bg-white/20" />
           
           <div className="space-y-3">
-            <Skeleton className="h-4 w-full bg-gray-300/20 dark:bg-gray-600/20" />
-            <Skeleton className="h-4 w-11/12 bg-gray-300/20 dark:bg-gray-600/20" />
-            <Skeleton className="h-4 w-3/4 bg-gray-300/20 dark:bg-gray-600/20" />
+            <Skeleton className="h-4 w-full bg-white/10" />
+            <Skeleton className="h-4 w-11/12 bg-white/10" />
+            <Skeleton className="h-4 w-3/4 bg-white/10" />
             <div className="pt-2"></div>
-            <Skeleton className="h-4 w-5/6 bg-gray-300/20 dark:bg-gray-600/20" />
-            <Skeleton className="h-4 w-4/5 bg-gray-300/20 dark:bg-gray-600/20" />
+            <Skeleton className="h-4 w-5/6 bg-white/10" />
+            <Skeleton className="h-4 w-4/5 bg-white/10" />
+            <div className="pt-2"></div>
+            <Skeleton className="h-4 w-11/12 bg-white/10" />
+            <Skeleton className="h-4 w-3/5 bg-white/10" />
+            <div className="pt-3"></div>
+            <div className="flex space-x-2">
+              <Skeleton className="h-7 w-20 rounded-md bg-white/10" />
+              <Skeleton className="h-7 w-24 rounded-md bg-white/10" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
     
   // Empty state with welcome message and recommended questions
-  const emptyStateContent = () => (
-    <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8">
-      <div className="w-16 h-16 mb-6 bg-[#10a37f]/10 rounded-full flex items-center justify-center">
-        <Sparkles className="h-8 w-8 text-[#10a37f]" />
+  const emptyStateContent = () => <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
+      <div className="w-16 h-16 mb-6 bg-gemini-yellow/20 rounded-full flex items-center justify-center">
+        <Sparkles className="h-8 w-8 text-gemini-yellow" />
       </div>
       
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        How can I help you today?
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
+        Welcome to HydroGen AI
       </h1>
       
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-xl">
-        Ask me anything, from explaining complex topics to helping with creative tasks.
-      </p>
+      <h3 className="text-lg text-gemini-yellow/90 font-medium mb-8">
+        Where Curiosity Meets AI Magic
+      </h3>
       
       <div className="w-full max-w-2xl mb-8">
-        <div className="rounded-xl p-5 mb-6">
-          <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-center">
-            <Lightbulb className="h-5 w-5 mr-2 flex-shrink-0 text-[#10a37f]" />
-            Examples
+        <div className="bg-black/30 backdrop-blur-sm rounded-xl p-5 border border-white/10 glass-morphism mb-6 shadow-lg">
+          <h3 className="text-lg font-medium text-gemini-yellow mb-4 flex items-center justify-center">
+            <Lightbulb className="h-5 w-5 mr-2 flex-shrink-0" />
+            Popular Questions
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {recommendedQuestions.slice(0, 4).map((question, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {recommendedQuestions.map((question, index) => (
               <Button 
                 key={index}
                 variant="outline" 
-                className="justify-start text-left border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300" 
+                className="justify-start text-left glass-morphism 
+                  hover:bg-gemini-yellow/10 hover:border-gemini-yellow/50 hover:text-white 
+                  hover:shadow-md hover:shadow-gemini-yellow/10 hover:scale-105
+                  transition-all duration-200" 
                 onClick={() => sendMessage(question)}
               >
-                {question.length > 45 ? `${question.substring(0, 45)}...` : question}
+                {React.createElement(questionIcons[index], { className: "h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" })}
+                <span className="truncate">{question.split('?')[0].length > 28 
+                  ? question.split('?')[0].substring(0, 28) + '...' 
+                  : question.split('?')[0]}</span>
               </Button>
             ))}
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
     
-  return (
-    <div className="flex-1 overflow-y-auto chat-history flex flex-col">
-      {!messages || messages.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center">
+  return <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col">
+      {!messages || messages.length === 0 || messages.length === 1 && messages[0].role === "assistant" ? <div className="flex-1 flex items-center justify-center">
           {emptyStateContent()}
-        </div>
-      ) : (
-        <div className="py-4 max-w-4xl mx-auto w-full">
+        </div> : <div className="py-4 max-w-4xl mx-auto w-full">
           {messages.map(message => <ChatMessage key={message.id} message={message} />)}
           {isProcessing && renderSkeletonLoader()}
           <div ref={messagesEndRef} />
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 }

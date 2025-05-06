@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -47,22 +46,11 @@ const App = () => {
     document.body.style.minHeight = '100vh';
     document.body.style.overflowX = 'hidden';
     
-    // Add ChatGPT-like font styles
-    const style = document.createElement('style');
-    style.textContent = `
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-      body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      }
-    `;
-    document.head.appendChild(style);
-    
     return () => {
       document.documentElement.style.scrollBehavior = '';
       document.documentElement.style.height = '';
       document.body.style.minHeight = '';
       document.body.style.overflowX = '';
-      document.head.removeChild(style);
     };
   }, []);
 

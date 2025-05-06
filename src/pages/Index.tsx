@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -124,12 +123,12 @@ const AppContent = () => {
   return <ThemeHandler>
       <SidebarProvider defaultOpen={window.innerWidth >= 768}>
         <div className={`flex w-full h-screen overflow-hidden 
-          dark:bg-[#343541] dark:from-[#343541] dark:via-[#343541] dark:to-[#343541]
-          light:bg-[#ffffff] light:from-[#ffffff] light:via-[#ffffff] light:to-[#ffffff]
+          dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
+          light:bg-gradient-to-br light:from-white light:via-white/95 light:to-white/90 
           font-size-${fontSize}`}>
           
-          {/* Sidebar integration */}
-          <ShadcnSidebar className="chatgpt-sidebar border-r border-[#4d4d4f] dark:bg-[#202123] light:bg-[#f7f7f8]">
+          {/* Properly integrate the UI sidebar with our custom Sidebar component */}
+          <ShadcnSidebar>
             <SidebarContent>
               <Sidebar collapsed={false} />
             </SidebarContent>
@@ -138,9 +137,14 @@ const AppContent = () => {
           {/* Main Content */}
           <div className="flex flex-col h-screen relative w-full">
             {/* Header with Sidebar Toggle */}
-            <div className="flex items-center border-b border-b-[#4d4d4f] dark:border-b-[#4d4d4f] light:border-b-[#e5e5e5] h-14 px-4">
-              <SidebarTrigger className="mr-2 dark:text-white light:text-[#202123] dark:hover:bg-white/10 light:hover:bg-black/10" />
+            <div className="flex items-center border-b border-b-white/10 light:border-b-black/10 h-14 px-4">
+              <SidebarTrigger className="mr-2 dark:text-white light:text-black dark:hover:bg-white/10 light:hover:bg-black/10" />
               <Header onOpenSettings={() => setShowSettings(true)} />
+            </div>
+            
+            <div className="absolute inset-0 pointer-events-none top-14">
+              <div className="absolute bottom-0 left-0 w-full h-1/2 dark:bg-gradient-to-t dark:from-black/30 dark:to-transparent light:bg-gradient-to-t light:from-white/30 light:to-transparent opacity-30"></div>
+              <div className="absolute top-0 right-0 w-1/3 h-1/3 dark:bg-black/20 light:bg-white/20 rounded-full blur-3xl"></div>
             </div>
             
             <div className="flex-1 relative overflow-hidden flex flex-col">
