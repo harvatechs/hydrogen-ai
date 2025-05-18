@@ -4,7 +4,7 @@ import { Settings, RefreshCw } from 'lucide-react';
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useSettings } from '../hooks/useSettingsForm';
+import { useSettingsForm } from '../hooks/useSettingsForm';
 
 export const AdvancedTab = {
   Icon: () => <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />,
@@ -14,7 +14,7 @@ export const AdvancedTab = {
       showDetailedResponse, setShowDetailedResponse,
       autocompleteEnabled, setAutocompleteEnabled,
       resetToDefaults
-    } = useSettings();
+    } = useSettingsForm();
 
     return (
       <div className="space-y-6">

@@ -9,12 +9,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useSettings } from '../hooks/useSettingsForm';
+import { useSettingsForm } from '../hooks/useSettingsForm';
 
 export const ApiTab = {
   Icon: () => <Key className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />,
   Content: () => {
-    const { apiKey, setApiKey, apiURL, setApiURL } = useSettings();
+    const { apiKey, setApiKey, apiURL, setApiURL } = useSettingsForm();
 
     return (
       <div className="space-y-6">

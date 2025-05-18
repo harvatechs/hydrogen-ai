@@ -3,7 +3,7 @@ import React from 'react';
 import { Palette, Sun, Moon, Monitor } from 'lucide-react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useSettings } from '../hooks/useSettingsForm';
+import { useSettingsForm } from '../hooks/useSettingsForm';
 
 export const AppearanceTab = {
   Icon: () => <Palette className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />,
@@ -15,7 +15,7 @@ export const AppearanceTab = {
       setSelectedFontSize,
       themeColors,
       setThemeColors
-    } = useSettings();
+    } = useSettingsForm();
 
     return (
       <div className="space-y-6">

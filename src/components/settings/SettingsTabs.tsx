@@ -12,14 +12,14 @@ import { AppearanceTab } from './tabs/AppearanceTab';
 import { ApiTab } from './tabs/ApiTab';
 import { ModelTab } from './tabs/ModelTab';
 import { AdvancedTab } from './tabs/AdvancedTab';
-import { useSettings } from './hooks/useSettingsForm';
+import { useSettingsForm } from './hooks/useSettingsForm';
 
 export interface SettingsTabsProps {
   onClose: () => void;
 }
 
 export function SettingsTabs({ onClose }: SettingsTabsProps) {
-  const { saveSettings } = useSettings();
+  const { saveSettings } = useSettingsForm();
   
   return (
     <>

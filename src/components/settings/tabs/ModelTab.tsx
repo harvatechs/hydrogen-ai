@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useSettings, MODEL_OPTIONS } from '../hooks/useSettingsForm';
+import { useSettingsForm, MODEL_OPTIONS } from '../hooks/useSettingsForm';
 
 export const ModelTab = {
   Icon: () => <Bot className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />,
@@ -24,7 +24,7 @@ export const ModelTab = {
       setTemperature,
       topP,
       setTopP
-    } = useSettings();
+    } = useSettingsForm();
 
     return (
       <div className="space-y-6">

@@ -113,7 +113,7 @@ const AppContent = () => {
       case 'websearch':
         return (
           <WebSearchAtom
-            initialQuery={atomParams}
+            query={atomParams}
             onClose={closeAtom}
             onSubmitResult={handleAtomSubmit}
           />
