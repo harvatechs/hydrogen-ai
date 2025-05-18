@@ -47,7 +47,6 @@ const WebSearchAtom: React.FC<WebSearchAtomProps> = ({ query: initialQuery, onCl
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const { handleAtomResult, setActiveAtom } = useChat();
 
   const handleSearch = useCallback(async () => {
     if (!query.trim()) return;

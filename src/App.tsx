@@ -5,10 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
+import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "./context/SettingsContext";
 import "./styles/enhanced-ui.css";
+import "./styles/chatgpt-theme.css";
 
 // Create QueryClient with improved error handling and retry logic
 const queryClient = new QueryClient({
@@ -98,8 +100,8 @@ const App = () => {
           <BrowserRouter>
             <div className="min-h-screen w-full">
               <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/app" element={<Navigate to="/" replace />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/app" element={<Index />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
