@@ -70,12 +70,14 @@
 .dark {
   --primary-rgb: 146, 95, 240;
   --border-hover: rgba(255, 255, 255, 0.2);
+  color-scheme: dark;
 }
 
 /* Light mode specific styles */
 .light {
   --primary-rgb: 124, 58, 237;
   --border-hover: rgba(0, 0, 0, 0.2);
+  color-scheme: light;
 }
 
 /* Improved focus outline for accessibility */
@@ -209,5 +211,63 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(240, 198, 116, 0);
+  }
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Better error states */
+.error-text {
+  color: #f87171;
+}
+
+.error-container {
+  border: 1px solid #f87171;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  background-color: rgba(248, 113, 113, 0.1);
+}
+
+/* Improved message loading states */
+.message-loading-indicator {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 3px solid rgba(var(--primary-rgb), 0.3);
+  border-top-color: rgba(var(--primary-rgb), 1);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Print styles for better document printing */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .chat-message-content {
+    break-inside: avoid;
   }
 }

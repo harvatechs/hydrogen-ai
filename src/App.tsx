@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,11 +10,22 @@ import { useEffect, useState } from "react";
 import { SettingsProvider } from "./context/SettingsContext";
 import "./styles/enhanced-ui.css";
 
+// Create QueryClient with improved error handling and retry logic
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Don't retry on 401/403 errors (auth issues)
+        if (error instanceof Error && 
+            error.message.includes('401') || 
+            error.message.includes('403')) {
+          return false;
+        }
+        // Only retry twice for other errors
+        return failureCount < 2;
+      },
+      staleTime: 60000, // 1 minute
     },
   },
 });
@@ -21,21 +33,44 @@ const queryClient = new QueryClient({
 const App = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   
-  // Check system preference and set initial theme
+  // Check system preference and set initial theme - with improved error handling
   useEffect(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
-    
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.add(savedTheme);
-    } else if (prefersDark) {
+    try {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
+      
+      // Sanitize saved theme to prevent XSS
+      const validThemes = ['dark', 'light'];
+      const safeTheme = savedTheme && validThemes.includes(savedTheme) ? savedTheme : null;
+      
+      if (safeTheme) {
+        setTheme(safeTheme);
+        document.documentElement.classList.add(safeTheme);
+      } else if (prefersDark) {
+        setTheme('dark');
+        document.documentElement.classList.add('dark');
+      } else {
+        setTheme('light');
+        document.documentElement.classList.add('light');
+      }
+    } catch (error) {
+      console.error("Error setting theme:", error);
+      // Fallback to dark theme if there's an error
       setTheme('dark');
       document.documentElement.classList.add('dark');
-    } else {
-      setTheme('light');
-      document.documentElement.classList.add('light');
     }
+  }, []);
+  
+  // Set Content Security Meta Tag
+  useEffect(() => {
+    const metaCSP = document.createElement('meta');
+    metaCSP.httpEquiv = 'Content-Security-Policy';
+    metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com; font-src 'self' data:";
+    document.head.appendChild(metaCSP);
+    
+    return () => {
+      document.head.removeChild(metaCSP);
+    };
   }, []);
   
   // Fix scrolling issues
