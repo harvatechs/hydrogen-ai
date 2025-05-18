@@ -13,6 +13,12 @@ interface SearchResult {
   snippet: string;
 }
 
+interface WebSearchAtomProps {
+  query: string;
+  onClose: () => void;
+  onSubmitResult: (result: string) => void;
+}
+
 const mockSearchResults = (query: string): Promise<SearchResult[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -37,8 +43,8 @@ const mockSearchResults = (query: string): Promise<SearchResult[]> => {
   });
 };
 
-const WebSearchAtom = () => {
-  const [query, setQuery] = useState('');
+const WebSearchAtom: React.FC<WebSearchAtomProps> = ({ query: initialQuery, onClose, onSubmitResult }) => {
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const { handleAtomResult, setActiveAtom } = useChat();
@@ -76,19 +82,18 @@ const WebSearchAtom = () => {
       .join('\n\n');
 
     const prompt = `I searched for "${query}" and found these results. Can you summarize the key information?\n\n${resultsText}`;
-    handleAtomResult(prompt);
-    setActiveAtom(null);
+    onSubmitResult(prompt);
     
     toast({
       title: 'Query Sent to AI',
       description: 'The search results have been sent to AI for analysis.'
     });
-  }, [query, results, handleAtomResult, setActiveAtom]);
+  }, [query, results, onSubmitResult]);
 
   return (
     <Card className="w-full max-w-3xl mx-auto overflow-hidden border border-border/50 bg-gradient-to-b from-background/80 to-background shadow-lg backdrop-blur-sm">
       <div className="p-4 md:p-6 space-y-4">
-        <SearchHeader onAskAI={handleAskAI} isLoading={isSearching} />
+        <SearchHeader onAskAI={handleAskAI} isLoading={isSearching} onClose={onClose} />
         
         <SearchBox 
           query={query} 

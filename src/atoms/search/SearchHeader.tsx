@@ -1,15 +1,17 @@
 
 import React from 'react';
-import { Bot, Globe } from 'lucide-react';
+import { Bot, Globe, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SearchHeaderProps {
   onAskAI: () => void;
+  onClose: () => void;
   isLoading: boolean;
 }
 
 export const SearchHeader: React.FC<SearchHeaderProps> = ({ 
   onAskAI, 
+  onClose,
   isLoading 
 }) => {
   return (
@@ -24,15 +26,26 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
         </div>
       </div>
       
-      <Button
-        size="sm"
-        onClick={onAskAI}
-        disabled={isLoading}
-        className="h-8 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all"
-      >
-        <Bot className="h-3.5 w-3.5 mr-2" />
-        Ask AI about this
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          onClick={onAskAI}
+          disabled={isLoading}
+          className="h-8 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all"
+        >
+          <Bot className="h-3.5 w-3.5 mr-2" />
+          Ask AI about this
+        </Button>
+        
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onClose}
+          className="h-8 w-8 p-0"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
