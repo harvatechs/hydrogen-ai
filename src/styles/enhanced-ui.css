@@ -4,24 +4,21 @@
 /* Improved button hover states */
 .sidebar-button:hover {
   color: white !important;
-  background-color: rgba(255, 255, 255, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
   transition: all 0.2s ease;
-  transform: translateY(-1px);
 }
 
 /* Improved input focus states */
 .enhanced-input:focus {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2) !important;
-  outline: none;
 }
 
 /* Settings panel improvements */
 .settings-tab.active {
-  background-color: rgba(var(--primary-rgb), 0.15) !important;
+  background-color: rgba(var(--primary-rgb), 0.1) !important;
   color: var(--primary) !important;
   border-bottom: 2px solid var(--primary) !important;
-  font-weight: 500;
 }
 
 .card-hover {
@@ -30,7 +27,7 @@
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Animation for transitions */
@@ -47,26 +44,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Glass morphism effect for cards and dialogs */
-.glass-card {
-  background-color: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.glass-button {
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.2s ease;
-}
-
-.glass-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
 }
 
 /* Improved scrollbars */
@@ -93,16 +70,12 @@
 .dark {
   --primary-rgb: 146, 95, 240;
   --border-hover: rgba(255, 255, 255, 0.2);
-  --gemini-purple: #9b87f5;
-  --gemini-yellow: #f0c674;
 }
 
 /* Light mode specific styles */
 .light {
   --primary-rgb: 124, 58, 237;
   --border-hover: rgba(0, 0, 0, 0.2);
-  --gemini-purple: #7d57e6;
-  --gemini-yellow: #e6a54d;
 }
 
 /* Improved focus outline for accessibility */
@@ -117,7 +90,7 @@
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--gemini-yellow);
+  color: #f0c674;
   border-bottom: 1px solid rgba(240, 198, 116, 0.3);
   padding-bottom: 0.5rem;
 }
@@ -127,7 +100,7 @@
   font-weight: 600;
   margin-top: 1.25rem;
   margin-bottom: 0.75rem;
-  color: var(--gemini-yellow);
+  color: #f0c674;
 }
 
 .chat-message-content h3 {
@@ -135,7 +108,7 @@
   font-weight: 600;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  color: var(--gemini-yellow);
+  color: #f0c674;
 }
 
 .chat-message-content p {
@@ -198,7 +171,6 @@
   border-radius: 4px;
   overflow-x: auto;
   margin-bottom: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .chat-message-content blockquote {
@@ -209,34 +181,6 @@
   margin-bottom: 1rem;
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
-}
-
-/* Dialog and panel styling */
-.settings-dialog {
-  background-color: rgba(30, 30, 30, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-}
-
-.dark .settings-dialog {
-  background-color: rgba(25, 25, 25, 0.95);
-}
-
-.light .settings-dialog {
-  background-color: rgba(245, 245, 245, 0.95);
-}
-
-/* Improved form elements */
-.form-input {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
-}
-
-.form-input:focus {
-  border-color: var(--gemini-purple);
-  box-shadow: 0 0 0 2px rgba(155, 135, 245, 0.25);
 }
 
 /* Chart and diagram styles */
@@ -266,60 +210,4 @@
   100% {
     box-shadow: 0 0 0 0 rgba(240, 198, 116, 0);
   }
-}
-
-/* Enhanced button effects */
-.btn-primary {
-  background: linear-gradient(135deg, var(--gemini-purple), #7d57e6);
-  border: none;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
-}
-
-/* Enhanced message appearance */
-.message-assistant {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-}
-
-.message-assistant:hover {
-  transform: translateY(-1px);
-}
-
-/* Toast styling */
-.toaster-container {
-  --bg-opacity: 0.95;
-  --backdrop-filter: blur(10px);
-}
-
-/* Enhanced tooltips */
-.custom-tooltip {
-  backdrop-filter: blur(8px);
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-/* Visual feedback for interactive elements */
-.interactive-hover {
-  transition: all 0.2s ease;
-}
-
-.interactive-hover:hover {
-  filter: brightness(1.1);
-  transform: scale(1.02);
-}
-
-/* Settings panel tab focus styles */
-.settings-tab:focus-visible {
-  box-shadow: 0 0 0 2px var(--gemini-purple);
 }

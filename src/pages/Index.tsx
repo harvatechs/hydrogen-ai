@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { ChatProvider, useChat } from "@/context/ChatContext";
 import { Header } from "@/components/Header";
@@ -161,7 +160,7 @@ const AppContent = () => {
           
           {renderAtomContent()}
           
-          {showSettings && <EnhancedSettingsPanel onClose={() => setShowSettings(false)} open={showSettings} />}
+          {showSettings && <EnhancedSettingsPanel onClose={() => setShowSettings(false)} />}
         </div>
       </SidebarProvider>
     </ThemeHandler>;

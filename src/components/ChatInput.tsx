@@ -333,7 +333,7 @@ export function ChatInput() {
               variant="ghost" 
               className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
               title="Web Search"
-              onClick={() => setActiveAtom('websearch')}
+              onClick={() => setActiveAtom('websearch', '')}
             >
               <Search className="h-4 w-4" />
             </Button>
