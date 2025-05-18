@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useSettings } from '@/context/SettingsContext';
+import { useSettings as useSettingsContext } from '@/context/SettingsContext';
 import { toast } from "@/components/ui/use-toast";
 
 export const MODEL_OPTIONS = [
@@ -10,8 +10,8 @@ export const MODEL_OPTIONS = [
   { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" }
 ];
 
-export function useSettings() {
-  const { theme, setTheme, fontSize, setFontSize } = useSettings();
+export function useSettingsForm() {
+  const { theme, setTheme, fontSize, setFontSize } = useSettingsContext();
 
   // State for form values
   const [apiKey, setApiKey] = useState<string>('');

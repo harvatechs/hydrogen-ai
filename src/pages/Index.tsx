@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { EnhancedSettingsPanel } from "@/components/EnhancedSettingsPanel";
 import { YouTubeSummarizer } from "@/atoms/YouTubeSummarizer";
 import { FlashcardMaker } from "@/atoms/FlashcardMaker";
-import { WebSearchAtom } from "@/atoms/WebSearchAtom";
+import WebSearchAtom from "@/atoms/WebSearchAtom";
 import { AISummarizer } from "@/atoms/AISummarizer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { notificationService } from "@/services/NotificationService";
