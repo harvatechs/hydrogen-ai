@@ -83,11 +83,17 @@ class NotificationService {
     }
     
     // Use Shadcn/UI toast for non-stacked notifications
+    // Map our notification types to shadcn/ui toast variant types
+    let toastVariant: "default" | "destructive" = "default";
+    if (type === "error") {
+      toastVariant = "destructive";
+    }
+    
     toast({
       title: title || this.getTitleFromType(type),
       description,
       duration: durationMs === Infinity ? undefined : durationMs,
-      variant: type === 'info' ? 'default' : type === 'success' ? 'default' : type
+      variant: toastVariant
     });
   }
   

@@ -185,7 +185,7 @@ const AppContent = () => {
             
             {renderAtomContent()}
             
-            {showSettings && <EnhancedSettingsPanel onClose={() => setShowSettings(false)} />}
+            {showSettings && <EnhancedSettingsPanel onClose={() => setShowSettings(false)} open={showSettings} />}
           </div>
         </SidebarProvider>
       </ErrorBoundary>

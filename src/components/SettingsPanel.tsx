@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
-import { Slider } from "@/components/ui/slider";
+import { EnhancedSlider } from "@/components/ui/enhanced-slider";
 import { Moon, Sun, Palette, Zap, Book, Globe, PenSquare, RefreshCw, Save, Eye, MessageSquareText, Info, FileText, 
   Laptop, Mic, Volume2, VolumeX, Bookmark, BellRing, HardDrive, Key, X, ChevronLeft, Trash2, Code } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -562,7 +562,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     </div>
                     <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full">{temperature[0].toFixed(1)}</span>
                   </div>
-                  <Slider
+                  <EnhancedSlider
                     value={temperature}
                     onValueChange={setTemperature}
                     min={0}
@@ -596,7 +596,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       {responseLength[0] <= 0.33 ? "Concise" : responseLength[0] <= 0.66 ? "Balanced" : "Detailed"}
                     </span>
                   </div>
-                  <Slider
+                  <EnhancedSlider
                     value={responseLength}
                     onValueChange={setResponseLength}
                     min={0}
@@ -676,7 +676,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       <Label className="text-sm font-medium">Voice Volume</Label>
                       <span className="text-xs text-muted-foreground">{Math.round(voiceVolume[0] * 100)}%</span>
                     </div>
-                    <Slider
+                    <EnhancedSlider
                       value={voiceVolume}
                       onValueChange={setVoiceVolume}
                       min={0}
