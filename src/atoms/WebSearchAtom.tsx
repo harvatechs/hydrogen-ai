@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -312,13 +313,15 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
         transition={{ duration: 0.15 }}
         className="w-full max-w-4xl h-[90vh] sm:h-[85vh] relative"
       >
-        <Card className="w-full h-full shadow-xl border-white/20 bg-background/95 flex flex-col overflow-hidden">
+        <Card className="w-full h-full shadow-xl border border-white/20 bg-background/95 backdrop-blur-md flex flex-col overflow-hidden rounded-lg">
           {/* Header section */}
-          <CardHeader className="p-3 sm:p-4 border-b border-white/10 flex-shrink-0 space-y-2">
+          <CardHeader className="p-3 sm:p-4 border-b border-white/10 flex-shrink-0 space-y-2 bg-black/30">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <ScanSearch className="h-5 w-5 text-primary" />
-                <CardTitle className="text-base sm:text-lg">Web Search</CardTitle>
+                <div className="bg-gradient-to-br from-primary/80 to-primary rounded-full p-1.5">
+                  <ScanSearch className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                </div>
+                <CardTitle className="text-base sm:text-lg font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">Web Search</CardTitle>
                 <Badge variant="outline" className="ml-1 bg-primary/10 border-primary/30 text-primary hidden sm:flex">
                   Atom
                 </Badge>
@@ -330,7 +333,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                       variant="ghost" 
                       size="icon" 
                       onClick={onClose}
-                      className="h-8 w-8 rounded-full hover:bg-white/10"
+                      className="h-8 w-8 rounded-full hover:bg-white/10 transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -339,7 +342,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <CardDescription className="text-xs sm:text-sm">Search the web and use results in your conversation</CardDescription>
+            <CardDescription className="text-xs sm:text-sm text-white/70">Search the web and use results in your conversation</CardDescription>
             
             <form onSubmit={handleSearch} className="mt-2">
               <div className="flex space-x-2">
@@ -350,7 +353,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Enter search query..."
-                    className="pl-10 pr-4 h-10 w-full bg-background border-white/20 focus-visible:ring-primary/50"
+                    className="pl-10 pr-4 h-10 w-full bg-white/5 border-white/20 focus-visible:ring-primary/50 rounded-lg"
                   />
                 </div>
                 <DropdownMenu open={isFilterMenuOpen} onOpenChange={setIsFilterMenuOpen}>
@@ -359,7 +362,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                       variant="outline" 
                       size="icon" 
                       className={cn(
-                        "h-10 w-10 border-white/20 relative",
+                        "h-10 w-10 border-white/20 relative rounded-lg",
                         getActiveFilterCount() > 0 && "bg-primary/10 border-primary/30"
                       )}
                     >
@@ -371,33 +374,33 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm border-white/20">
+                  <DropdownMenuContent align="end" className="bg-black/90 backdrop-blur-md border-white/20 rounded-lg p-1 animate-fade-in">
                     <DropdownMenuItem 
                       onClick={() => toggleFilter('news')}
-                      className="flex items-center justify-between cursor-pointer"
+                      className="flex items-center justify-between cursor-pointer hover:bg-white/10 rounded-md transition-colors"
                     >
                       <div className="flex items-center">
                         <Newspaper className="h-4 w-4 mr-2" />
                         <span>News Results</span>
                       </div>
-                      <Switch checked={activeFilters.news} className="ml-2" />
+                      <Switch checked={activeFilters.news} className="ml-2 data-[state=checked]:bg-primary" />
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => toggleFilter('recent')}
-                      className="flex items-center justify-between cursor-pointer"
+                      className="flex items-center justify-between cursor-pointer hover:bg-white/10 rounded-md transition-colors"
                     >
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 mr-2" />
                         <span>Recent Content</span>
                       </div>
-                      <Switch checked={activeFilters.recent} className="ml-2" />
+                      <Switch checked={activeFilters.recent} className="ml-2 data-[state=checked]:bg-primary" />
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button 
                   type="submit" 
                   disabled={isLoading || !searchQuery.trim()}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  className="bg-primary hover:bg-primary/90 text-white font-medium px-4 rounded-lg shadow transition-all"
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
                 </Button>
@@ -407,12 +410,12 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
           
           {/* Main content */}
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <div className="px-3 sm:px-4 border-b border-white/10">
-              <TabsList className="w-full justify-start border-b-0">
+            <div className="px-3 sm:px-4 border-b border-white/10 bg-black/20">
+              <TabsList className="w-full justify-start border-b-0 bg-transparent">
                 <TabsTrigger 
                   value="all" 
                   className={cn(
-                    "text-xs sm:text-sm data-[state=active]:bg-primary/10",
+                    "text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-white rounded-t-md transition-all",
                     results.length === 0 ? "opacity-50" : "opacity-100"
                   )}
                   disabled={results.length === 0}
@@ -424,7 +427,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                 <TabsTrigger 
                   value="saved" 
                   className={cn(
-                    "text-xs sm:text-sm data-[state=active]:bg-primary/10", 
+                    "text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-white rounded-t-md transition-all", 
                     Object.keys(savedResults).length === 0 ? "opacity-50" : "opacity-100"
                   )}
                   disabled={Object.keys(savedResults).length === 0}
@@ -433,7 +436,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                   <span className="hidden sm:inline">Saved</span>
                   <span className="sm:hidden">Saved</span>
                   {Object.keys(savedResults).length > 0 && (
-                    <Badge className="ml-1 h-5 min-w-5 flex items-center justify-center p-0 text-xs">
+                    <Badge className="ml-1 h-5 min-w-5 flex items-center justify-center p-0 text-xs bg-primary/20 text-white">
                       {Object.keys(savedResults).filter(k => savedResults[k]).length}
                     </Badge>
                   )}
@@ -441,7 +444,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                 <TabsTrigger 
                   value="summary" 
                   className={cn(
-                    "text-xs sm:text-sm data-[state=active]:bg-primary/10",
+                    "text-xs sm:text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-white rounded-t-md transition-all",
                     results.length === 0 ? "opacity-50" : "opacity-100"
                   )}
                   disabled={results.length === 0}
@@ -463,9 +466,14 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                     className="flex-1 flex items-center justify-center"
                   >
                     <div className="flex flex-col items-center">
-                      <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                      <p className="mt-4 text-sm text-muted-foreground">Searching the web with Google...</p>
-                      <p className="mt-2 text-xs text-muted-foreground/70">This may take a moment</p>
+                      <div className="relative">
+                        <div className="h-16 w-16 rounded-full border-4 border-primary/30 border-t-primary animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Search className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <p className="mt-6 text-sm text-white/80">Searching the web with Google...</p>
+                      <p className="mt-2 text-xs text-white/60">This may take a moment</p>
                     </div>
                   </motion.div>
                 ) : results.length > 0 ? (
@@ -478,9 +486,9 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setActiveTab('summary')}
-                          className="h-6 px-2 text-xs flex items-center gap-1"
-                          disabled={isSummarizing || summary !== ''}
+                          onClick={() => summary ? setActiveTab('summary') : generateSummary()}
+                          className="h-6 px-2 text-xs flex items-center gap-1 hover:bg-white/10 rounded-md"
+                          disabled={isSummarizing}
                         >
                           {summary ? (
                             <>View Summary</>
@@ -510,17 +518,17 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                               variant="ghost" 
                               size="sm" 
                               onClick={closeResultDetail}
-                              className="h-7 mr-2"
+                              className="h-7 mr-2 hover:bg-white/10"
                             >
                               <X className="h-3.5 w-3.5 mr-1" /> Back
                             </Button>
-                            <h3 className="text-sm font-medium truncate flex-1">{selectedResult.title}</h3>
+                            <h3 className="text-sm font-medium truncate flex-1 text-white/90">{selectedResult.title}</h3>
                           </div>
                           
-                          <ScrollArea className="flex-1">
+                          <ScrollArea className="flex-1 custom-scrollbar">
                             <div className="p-4 space-y-4">
                               <div className="space-y-2">
-                                <h2 className="text-lg font-semibold">{selectedResult.title}</h2>
+                                <h2 className="text-lg font-semibold text-white">{selectedResult.title}</h2>
                                 <a 
                                   href={selectedResult.link} 
                                   target="_blank" 
@@ -531,31 +539,32 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                   <ExternalLink className="h-3 w-3 ml-1" />
                                 </a>
                                 
-                                <Separator className="my-3" />
+                                <Separator className="my-3 bg-white/10" />
                                 
                                 {selectedResult.pagemap?.cse_image?.[0]?.src && (
                                   <div className="my-4 flex justify-center">
                                     <img 
                                       src={selectedResult.pagemap.cse_image[0].src}
                                       alt={selectedResult.title}
-                                      className="max-h-48 rounded-md border border-white/10"
+                                      className="max-h-48 rounded-lg border border-white/10 shadow-lg object-cover"
                                     />
                                   </div>
                                 )}
                                 
-                                <div className="text-sm leading-relaxed space-y-2">
+                                <div className="text-sm leading-relaxed space-y-2 text-white/90 bg-white/5 p-4 rounded-lg border border-white/10">
                                   <p>{selectedResult.snippet}</p>
                                 </div>
                               </div>
                             </div>
                           </ScrollArea>
                           
-                          <div className="border-t border-white/10 p-3 flex justify-between items-center">
-                            <div className="flex space-x-2">
+                          <div className="border-t border-white/10 p-3 flex justify-between items-center bg-black/20">
+                            <div className="flex space-x-1">
                               <Button 
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => handleSaveResult(`result-${results.indexOf(selectedResult)}`)}
+                                className="hover:bg-white/10 rounded-md"
                               >
                                 {savedResults[`result-${results.indexOf(selectedResult)}`] ? (
                                   <>
@@ -577,6 +586,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                   navigator.clipboard.writeText(selectedResult.snippet);
                                   toast({ title: "Copied to clipboard", duration: 2000 });
                                 }}
+                                className="hover:bg-white/10 rounded-md"
                               >
                                 <Copy className="h-4 w-4 mr-1.5" />
                                 Copy
@@ -590,7 +600,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                 handleUseResult(selectedResult);
                                 onClose();
                               }}
-                              className="bg-primary hover:bg-primary/90"
+                              className="bg-primary hover:bg-primary/90 text-white shadow-md rounded-md"
                             >
                               <CornerRightDown className="h-4 w-4 mr-1.5" />
                               Use in Chat
@@ -605,7 +615,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                           exit={{ opacity: 0 }}
                           className="h-full"
                         >
-                          <ScrollArea className="h-full">
+                          <ScrollArea className="h-full custom-scrollbar">
                             <div className="p-3 sm:p-4 space-y-3">
                               {results.map((result, index) => (
                                 <motion.div 
@@ -613,12 +623,12 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                   initial={{ opacity: 0, y: 10 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   transition={{ duration: 0.2, delay: index * 0.05 }}
-                                  className="group space-y-1.5 p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                                  className="group space-y-1.5 p-3 rounded-lg border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] hover:from-primary/10 hover:to-primary/5 transition-all cursor-pointer shadow-sm hover:shadow"
                                   onClick={() => openResultDetail(result)}
                                 >
                                   <div className="flex items-start justify-between">
                                     <h3 className="text-sm sm:text-base font-medium">
-                                      <span className="hover:underline text-primary line-clamp-1">
+                                      <span className="hover:underline text-primary line-clamp-1 group-hover:text-primary/90">
                                         {result.title}
                                       </span>
                                     </h3>
@@ -633,11 +643,11 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              className="h-7 w-7 p-0 rounded-full"
+                                              className="h-7 w-7 p-0 rounded-full hover:bg-white/10"
                                             >
                                               {savedResults[`result-${index}`] ? 
                                                 <BookmarkCheck className="h-3.5 w-3.5 text-primary" /> : 
-                                                <Bookmark className="h-3.5 w-3.5" />
+                                                <Bookmark className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100" />
                                               }
                                             </Button>
                                           </TooltipTrigger>
@@ -649,10 +659,10 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                     </div>
                                   </div>
                                   
-                                  <p className="text-xs text-muted-foreground truncate">{result.link}</p>
-                                  <p className="text-xs sm:text-sm line-clamp-2">{result.snippet}</p>
+                                  <p className="text-xs text-muted-foreground truncate opacity-70">{result.link}</p>
+                                  <p className="text-xs sm:text-sm line-clamp-2 text-white/80">{result.snippet}</p>
                                   
-                                  <div className="pt-1.5 flex justify-end">
+                                  <div className="pt-1.5 flex justify-end opacity-70 group-hover:opacity-100 transition-opacity">
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -661,7 +671,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                         handleUseResult(result);
                                         onClose();
                                       }}
-                                      className="h-7 text-xs bg-primary/10 hover:bg-primary/20 border-primary/30"
+                                      className="h-7 text-xs bg-primary/10 hover:bg-primary/20 border-primary/30 rounded-md shadow-sm"
                                     >
                                       <CornerRightDown className="h-3 w-3 mr-1" />
                                       Use in Chat
@@ -682,27 +692,31 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                     className="flex-1 flex items-center justify-center p-4"
                   >
                     <div className="text-center max-w-md mx-auto">
-                      <Search className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
-                      <h3 className="mt-4 text-lg font-medium">No search results yet</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <div className="bg-primary/10 rounded-full p-6 w-24 h-24 mx-auto flex items-center justify-center">
+                        <Search className="h-12 w-12 text-primary opacity-80" />
+                      </div>
+                      <h3 className="mt-6 text-lg font-medium text-white">No search results yet</h3>
+                      <p className="mt-2 text-sm text-white/70">
                         Enter a query and hit search to find information
                       </p>
-                      <div className="mt-4 space-y-2">
-                        <p className="text-xs text-muted-foreground">Try searching for:</p>
-                        {["latest news", "climate change solutions", "history of artificial intelligence", "best productivity tips"].map((suggestion, i) => (
-                          <Button 
-                            key={i}
-                            variant="outline" 
-                            size="sm"
-                            className="mx-1 text-xs border-white/10 hover:bg-white/10"
-                            onClick={() => {
-                              setSearchQuery(suggestion);
-                              performSearch(suggestion);
-                            }}
-                          >
-                            {suggestion}
-                          </Button>
-                        ))}
+                      <div className="mt-6 space-y-2">
+                        <p className="text-xs text-white/60">Try searching for:</p>
+                        <div className="flex flex-wrap justify-center gap-2">
+                          {["latest news", "climate change solutions", "history of artificial intelligence", "best productivity tips"].map((suggestion, i) => (
+                            <Button 
+                              key={i}
+                              variant="outline" 
+                              size="sm"
+                              className="text-xs border-white/10 hover:bg-white/10 shadow-sm rounded-full"
+                              onClick={() => {
+                                setSearchQuery(suggestion);
+                                performSearch(suggestion);
+                              }}
+                            >
+                              {suggestion}
+                            </Button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -711,7 +725,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
               
               {/* Saved Results Tab */}
               <TabsContent value="saved" className="h-full m-0 data-[state=active]:flex-1 flex flex-col">
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1 custom-scrollbar">
                   <div className="p-3 sm:p-4">
                     {Object.keys(savedResults).filter(k => savedResults[k]).length > 0 ? (
                       <div className="space-y-3">
@@ -723,7 +737,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.2, delay: index * 0.05 }}
-                              className="p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                              className="p-3 rounded-lg border border-white/10 bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-all cursor-pointer shadow-sm"
                               onClick={() => {
                                 const originalIndex = results.findIndex(r => r.link === result.link);
                                 if (originalIndex >= 0) {
@@ -740,7 +754,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-7 w-7 p-0 rounded-full ml-2"
+                                  className="h-7 w-7 p-0 rounded-full ml-2 hover:bg-white/10"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const originalIndex = results.findIndex(r => r.link === result.link);
@@ -753,7 +767,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                 </Button>
                               </div>
                               <p className="text-xs text-muted-foreground mt-1 truncate">{result.link}</p>
-                              <p className="text-xs sm:text-sm mt-1.5 line-clamp-2">{result.snippet}</p>
+                              <p className="text-xs sm:text-sm mt-1.5 line-clamp-2 text-white/80">{result.snippet}</p>
                               
                               <div className="mt-3 flex justify-end">
                                 <Button
@@ -764,7 +778,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                     handleUseResult(result);
                                     onClose();
                                   }}
-                                  className="h-7 text-xs bg-primary/10 hover:bg-primary/20 border-primary/30"
+                                  className="h-7 text-xs bg-primary/10 hover:bg-primary/20 border-primary/30 rounded-md"
                                 >
                                   <CornerRightDown className="h-3 w-3 mr-1" />
                                   Use in Chat
@@ -775,9 +789,11 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                       </div>
                     ) : (
                       <div className="text-center py-10">
-                        <Bookmark className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
-                        <h3 className="mt-4 text-lg font-medium">No saved results</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
+                        <div className="bg-primary/10 rounded-full p-6 w-24 h-24 mx-auto flex items-center justify-center">
+                          <Bookmark className="h-10 w-10 text-primary opacity-80" />
+                        </div>
+                        <h3 className="mt-6 text-lg font-medium text-white">No saved results</h3>
+                        <p className="mt-2 text-sm text-white/70">
                           Bookmark search results to save them for later
                         </p>
                       </div>
@@ -792,31 +808,36 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                   {results.length === 0 ? (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
-                        <h3 className="mt-4 text-lg font-medium">No search performed</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
+                        <div className="bg-primary/10 rounded-full p-6 w-24 h-24 mx-auto flex items-center justify-center">
+                          <FileText className="h-10 w-10 text-primary opacity-80" />
+                        </div>
+                        <h3 className="mt-6 text-lg font-medium text-white">No search performed</h3>
+                        <p className="mt-2 text-sm text-white/70">
                           Perform a search to generate an AI summary
                         </p>
                       </div>
                     </div>
                   ) : summary ? (
                     <div className="flex-1 flex flex-col p-3 sm:p-4">
-                      <Card className="flex-1 border border-white/10 bg-black/20 shadow-md">
-                        <CardHeader className="p-3 sm:p-4 pb-0 sm:pb-2">
+                      <Card className="flex-1 border border-white/10 bg-gradient-to-br from-black/60 to-primary/5 shadow-lg rounded-lg">
+                        <CardHeader className="p-3 sm:p-4 pb-0 sm:pb-2 border-b border-white/10">
                           <div className="flex items-center justify-between">
-                            <CardTitle className="text-base sm:text-lg">AI Summary</CardTitle>
+                            <CardTitle className="text-base sm:text-lg flex items-center">
+                              <FileText className="h-4 w-4 mr-2 text-primary" />
+                              AI Summary
+                            </CardTitle>
                             <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                               Based on top results
                             </Badge>
                           </div>
-                          <CardDescription className="text-xs sm:text-sm">Generated from search results for "{searchQuery}"</CardDescription>
+                          <CardDescription className="text-xs sm:text-sm mt-1">Generated from search results for "{searchQuery}"</CardDescription>
                         </CardHeader>
                         <CardContent className="p-3 sm:p-4 pt-2">
-                          <ScrollArea className="h-[30vh] sm:h-[35vh]">
-                            <div className="whitespace-pre-line text-sm leading-relaxed">{summary}</div>
+                          <ScrollArea className="h-[30vh] sm:h-[35vh] custom-scrollbar">
+                            <div className="whitespace-pre-line text-sm leading-relaxed text-white/90 bg-white/5 p-4 rounded-lg border border-white/10">{summary}</div>
                           </ScrollArea>
                         </CardContent>
-                        <CardFooter className="flex justify-between border-t border-white/10 p-3 sm:p-4">
+                        <CardFooter className="flex justify-between border-t border-white/10 p-3 sm:p-4 bg-black/30">
                           <div className="flex space-x-2">
                             <TooltipProvider>
                               <Tooltip>
@@ -824,7 +845,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
-                                    className="h-8 text-xs border-white/10"
+                                    className="h-8 text-xs border-white/10 hover:bg-white/10 rounded-md"
                                     onClick={() => {
                                       navigator.clipboard.writeText(summary);
                                       toast({ title: "Summary copied to clipboard", duration: 2000 });
@@ -844,7 +865,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
-                                    className="h-8 text-xs border-white/10"
+                                    className="h-8 text-xs border-white/10 hover:bg-white/10 rounded-md"
                                     onClick={() => {
                                       setSummary('');
                                       toast({ title: "Summary cleared", duration: 2000 });
@@ -865,7 +886,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                               useSummary();
                             }}
                             size="sm"
-                            className="h-8 text-xs bg-primary hover:bg-primary/90"
+                            className="h-8 text-xs bg-primary hover:bg-primary/90 shadow-md rounded-md"
                           >
                             <CornerRightDown className="h-3.5 w-3.5 mr-1.5" />
                             Use Summary in Chat
@@ -876,15 +897,17 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                   ) : (
                     <div className="flex-1 flex flex-col items-center justify-center p-4">
                       <div className="text-center max-w-md">
-                        <FileText className="h-16 w-16 mx-auto text-primary/20 mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Generate AI Summary</h3>
-                        <p className="text-sm text-muted-foreground mb-6">
+                        <div className="bg-primary/10 rounded-full p-6 w-24 h-24 mx-auto flex items-center justify-center mb-6">
+                          <FileText className="h-10 w-10 text-primary opacity-80" />
+                        </div>
+                        <h3 className="text-lg font-medium mb-2 text-white">Generate AI Summary</h3>
+                        <p className="text-sm text-white/70 mb-6">
                           Create a concise summary of your search results to quickly understand the main points
                         </p>
                         <Button 
                           onClick={generateSummary} 
                           disabled={isSummarizing || results.length === 0}
-                          className="bg-primary hover:bg-primary/90"
+                          className="bg-primary hover:bg-primary/90 text-white shadow-md rounded-md"
                         >
                           {isSummarizing ? (
                             <>
@@ -898,7 +921,7 @@ export function WebSearchAtom({ initialQuery, onClose, onSubmitResult }: WebSear
                             </>
                           )}
                         </Button>
-                        <p className="text-xs text-muted-foreground mt-4">
+                        <p className="text-xs text-white/50 mt-4">
                           AI will analyze the top search results to create a comprehensive summary
                         </p>
                       </div>
