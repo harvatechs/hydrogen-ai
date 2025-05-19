@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 import { Message } from "@/types/message";
 
@@ -191,5 +190,45 @@ export class ChatApiService {
     const generatedText = data.candidates[0]?.content?.parts[0]?.text || "No response generated.";
 
     return generatedText;
+  }
+
+  static async generateShortTitle(
+    apiUrl: string, 
+    apiKey: string, 
+    prompt: string
+  ): Promise<string> {
+    try {
+      const response = await fetch(`${apiUrl}?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 50,
+            topP: 0.9,
+            topK: 40
+          }
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API responded with status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedText = data.candidates[0]?.content?.parts[0]?.text || "";
+
+      return generatedText;
+    } catch (error) {
+      console.error("Error generating title:", error);
+      throw error;
+    }
   }
 }

@@ -6,6 +6,8 @@ import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { ConversationGroups } from "./sidebar/ConversationGroups";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { DeleteDialog } from "./sidebar/DeleteDialog";
+import { cn } from "@/lib/utils";
+import { Sparkles } from "lucide-react";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -21,7 +23,9 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     clearConversation,
     deleteConversation,
     createNewConversation,
-    sendMessage
+    sendMessage,
+    generateTitle,
+    apiKey,
   } = useChat();
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,6 +33,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const [editTitle, setEditTitle] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
+  const [generatingTitleFor, setGeneratingTitleFor] = useState<string | null>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
   const filteredConversations = conversations.filter(chat => 
@@ -117,6 +122,34 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     });
   };
 
+  const handleRegenerateTitle = async (id: string) => {
+    const conversation = conversations.find(c => c.id === id);
+    if (conversation && apiKey) {
+      setGeneratingTitleFor(id);
+      try {
+        await generateTitle(id, conversation.messages);
+        toast({
+          title: "Title Generated",
+          description: "Conversation title has been updated based on content."
+        });
+      } catch (error) {
+        toast({
+          title: "Title Generation Failed",
+          description: "Could not generate a title. Try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        setGeneratingTitleFor(null);
+      }
+    } else if (!apiKey) {
+      toast({
+        title: "API Key Required",
+        description: "Please set your Google Gemini API key in settings first.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10">
       <SidebarHeader 
@@ -138,6 +171,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             editingId={editingId}
             editTitle={editTitle}
             collapsed={collapsed}
+            generatingTitleFor={generatingTitleFor}
             setCurrentConversation={setCurrentConversation}
             handleStartEdit={handleStartEdit}
             handleSaveEdit={handleSaveEdit}
@@ -145,6 +179,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             handleKeyDown={handleKeyDown}
             setEditTitle={setEditTitle}
             handleDeleteClick={handleDeleteClick}
+            handleRegenerateTitle={handleRegenerateTitle}
           />
         )}
       </div>

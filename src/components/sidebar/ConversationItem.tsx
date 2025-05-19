@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Edit2, MessageSquare, Trash2, Check, X } from "lucide-react";
+import { Edit2, MessageSquare, Trash2, Check, X, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 interface ConversationItemProps {
   chat: {
@@ -19,6 +20,7 @@ interface ConversationItemProps {
   editingId: string | null;
   editTitle: string;
   collapsed: boolean;
+  isGeneratingTitle: boolean;
   onSelect: (id: string) => void;
   onStartEdit: (id: string, title: string) => void;
   onSaveEdit: () => void;
@@ -26,6 +28,7 @@ interface ConversationItemProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   onEditChange: (value: string) => void;
   onDeleteClick: (id: string) => void;
+  onRegenerateTitle: (id: string) => void;
 }
 
 export const ConversationItem: React.FC<ConversationItemProps> = ({
@@ -34,13 +37,15 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   editingId,
   editTitle,
   collapsed,
+  isGeneratingTitle,
   onSelect,
   onStartEdit,
   onSaveEdit,
   onCancelEdit,
   onKeyDown,
   onEditChange,
-  onDeleteClick
+  onDeleteClick,
+  onRegenerateTitle
 }) => {
   const editInputRef = useRef<HTMLInputElement>(null);
 
@@ -85,12 +90,22 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         withTooltip(
           <Button 
             variant={chat.id === currentConversationId ? "secondary" : "ghost"} 
-            className={`w-full justify-${collapsed ? 'center' : 'start'} text-left h-auto py-2 ${collapsed ? 'px-2' : 'px-3 pr-7'} rounded-md
-              ${chat.id === currentConversationId 
+            className={cn(
+              `w-full justify-${collapsed ? 'center' : 'start'} text-left h-auto py-2 relative`,
+              collapsed ? 'px-2' : 'px-3 pr-9',
+              'rounded-md',
+              chat.id === currentConversationId 
                 ? "dark:bg-white/10 dark:text-white light:bg-black/5 light:text-black" 
-                : "dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black transition-colors"}`} 
+                : "dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black transition-colors"
+            )}
             onClick={() => onSelect(chat.id)}
+            disabled={isGeneratingTitle}
           >
+            {isGeneratingTitle && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-md">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            )}
             <MessageSquare className={`${collapsed ? '' : 'mr-2'} h-4 w-4 flex-shrink-0`} />
             {!collapsed && (
               <span className="truncate">
@@ -102,8 +117,17 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         )
       )}
       
-      {!editingId && chat.id === currentConversationId && !collapsed && (
+      {!editingId && chat.id === currentConversationId && !collapsed && !isGeneratingTitle && (
         <div className="absolute right-1 top-1.5 hidden group-hover:flex space-x-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            onClick={() => onRegenerateTitle(chat.id)}
+            title="Generate a title based on the conversation content"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+          </Button>
           <Button 
             variant="ghost" 
             size="icon" 

@@ -15,6 +15,7 @@ interface ConversationGroupsProps {
   editingId: string | null;
   editTitle: string;
   collapsed: boolean;
+  generatingTitleFor: string | null;
   setCurrentConversation: (id: string) => void;
   handleStartEdit: (id: string, title: string) => void;
   handleSaveEdit: () => void;
@@ -22,6 +23,7 @@ interface ConversationGroupsProps {
   handleKeyDown: (e: React.KeyboardEvent) => void;
   setEditTitle: (title: string) => void;
   handleDeleteClick: (id: string) => void;
+  handleRegenerateTitle: (id: string) => void;
 }
 
 export const ConversationGroups: React.FC<ConversationGroupsProps> = ({
@@ -30,15 +32,17 @@ export const ConversationGroups: React.FC<ConversationGroupsProps> = ({
   editingId,
   editTitle,
   collapsed,
+  generatingTitleFor,
   setCurrentConversation,
   handleStartEdit,
   handleSaveEdit,
   handleCancelEdit,
   handleKeyDown,
   setEditTitle,
-  handleDeleteClick
+  handleDeleteClick,
+  handleRegenerateTitle
 }) => {
-  const renderConversationItem = (chat: any) => {
+  const renderConversationItem = (chat: Conversation) => {
     return (
       <ConversationItem
         key={chat.id}
@@ -47,6 +51,7 @@ export const ConversationGroups: React.FC<ConversationGroupsProps> = ({
         editingId={editingId}
         editTitle={editTitle}
         collapsed={collapsed}
+        isGeneratingTitle={generatingTitleFor === chat.id}
         onSelect={setCurrentConversation}
         onStartEdit={handleStartEdit}
         onSaveEdit={handleSaveEdit}
@@ -54,6 +59,7 @@ export const ConversationGroups: React.FC<ConversationGroupsProps> = ({
         onKeyDown={handleKeyDown}
         onEditChange={(value) => setEditTitle(value)}
         onDeleteClick={handleDeleteClick}
+        onRegenerateTitle={handleRegenerateTitle}
       />
     );
   };

@@ -66,4 +66,5 @@ export interface ChatContextProps {
   handleAtomResult: (result: string) => void;
   conversationLabel: string;
   setConversationLabel: (label: string) => void;
+  generateTitle: (conversationId: string, messages: Message[]) => Promise<string | undefined>;
 }

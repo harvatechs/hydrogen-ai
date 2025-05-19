@@ -1,4 +1,3 @@
-
 import { useReducer, useState, useEffect, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "@/components/ui/use-toast";
@@ -39,6 +38,29 @@ export const useChatActions = (): ChatContextProps => {
   useEffect(() => {
     localStorage.setItem("conversations", JSON.stringify(state.conversations));
   }, [state.conversations]);
+
+  // Auto-title generation for new conversations when they reach 3+ messages
+  useEffect(() => {
+    const autoGenerateTitle = async () => {
+      if (state.currentConversationId && state.apiKey) {
+        const currentConversation = state.conversations.find(c => c.id === state.currentConversationId);
+        
+        if (currentConversation && 
+            currentConversation.title === "New chat" && 
+            currentConversation.messages.length >= 3 && 
+            currentConversation.messages.some(m => m.role === 'user')) {
+          
+          try {
+            await generateTitle(state.currentConversationId, currentConversation.messages);
+          } catch (error) {
+            console.error("Failed to auto-generate title:", error);
+          }
+        }
+      }
+    };
+    
+    autoGenerateTitle();
+  }, [state.messages, state.currentConversationId]);
 
   // Update conversation label when messages change
   useEffect(() => {
@@ -250,6 +272,52 @@ export const useChatActions = (): ChatContextProps => {
     }
   }, [state.apiKey, state.apiUrl, state.model, state.messages]);
 
+  // Generate title using Gemini API based on conversation content
+  const generateTitle = useCallback(async (conversationId: string, messages: Message[]) => {
+    if (!state.apiKey) {
+      throw new Error("API key is required");
+    }
+    
+    // Filter out system messages and keep only user and assistant messages
+    const relevantMessages = messages
+      .filter(m => m.role === 'user' || m.role === 'assistant')
+      .map(m => `${m.role === 'user' ? 'Human' : 'AI'}: ${m.content.replace(/<[^>]*>/g, '').substring(0, 200)}`)
+      .slice(-6)  // Only use most recent messages for context
+      .join('\n');
+    
+    if (relevantMessages.length === 0) {
+      return;
+    }
+    
+    try {
+      const titlePrompt = `Based on this conversation, generate a very short, concise title (maximum 40 characters) that captures the main topic. The title should be descriptive but brief, like "Travel Plan to Japan" or "Python Error Debugging". DO NOT include any quotation marks, formatting, or prefixes in your response. Just respond with the title text directly.
+
+Conversation:
+${relevantMessages}`;
+
+      const generatedTitle = await ChatApiService.generateShortTitle(
+        state.apiUrl,
+        state.apiKey,
+        titlePrompt
+      );
+      
+      // Cleanup and format the title
+      const cleanTitle = generatedTitle
+        .replace(/^["']|["']$/g, '')  // Remove any quotes
+        .replace(/^Title: /i, '')     // Remove any "Title:" prefix
+        .replace(/[\n\r]/g, '')       // Remove line breaks
+        .trim();
+        
+      if (cleanTitle) {
+        dispatch({ type: "UPDATE_CONVERSATION_TITLE", id: conversationId, title: cleanTitle });
+        return cleanTitle;
+      }
+    } catch (error) {
+      console.error("Failed to generate title:", error);
+      throw error;
+    }
+  }, [state.apiKey, state.apiUrl]);
+
   return {
     messages: state.messages,
     apiKey: state.apiKey,
@@ -278,5 +346,6 @@ export const useChatActions = (): ChatContextProps => {
     handleAtomResult,
     conversationLabel,
     setConversationLabel,
+    generateTitle,
   };
 };
