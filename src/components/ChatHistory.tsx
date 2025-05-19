@@ -9,77 +9,14 @@ import React from "react";
 
 // Generate 8 randomized questions from our pool of interesting questions
 function generateRecommendedQuestions() {
-  const allQuestions = [
-    "What causes a recession?",
-    "Are we alone in the universe?",
-    "What is the blockchain used for?",
-    "Why did the dinosaurs go extinct?",
-    "How does machine learning impact finance?",
-    "Can you help me learn Python?", 
-    "What are the latest breakthroughs in fusion energy?",
-    "How do black holes work?",
-    "What is quantum computing?",
-    "How does the human brain create memories?",
-    "What causes climate change?",
-    "How do mRNA vaccines work?",
-    "What is artificial general intelligence?",
-    "How do solid-state batteries work?",
-    "What is dark matter?",
-    "Can we reverse aging?",
-    "How do psychedelics affect consciousness?",
-    "What is the future of space colonization?",
-    "How does quantum entanglement work?",
-    "What are parallel universes?",
-    "How do plants communicate?",
-    "What is the origin of consciousness?",
-    "How do self-driving cars make decisions?",
-    "What are supervolcanoes?",
-    "How do coral reefs survive?",
-    "What causes northern lights?",
-    "How do birds navigate?",
-    "What is the future of human evolution?",
-    "How do tardigrades survive extreme conditions?",
-    "What are gravitational waves?",
-    "Could advanced civilizations exist in other dimensions?",
-    "How might the universe ultimately end?",
-    "What existed before the Big Bang?",
-    "Is time travel theoretically possible?",
-    "Could we upload human consciousness to computers?",
-    "Are we living in a simulation?",
-    "What lies at the bottom of Earth's deepest oceans?",
-    "How do animals experience emotions?",
-    "Could humans develop new senses?",
-    "What happens inside a quantum computer?",
-    "How did life first begin on Earth?",
-    "Could we terraform other planets?",
-    "What is dark energy's true nature?",
-    "How does quantum tunneling work?",
-    "Could we achieve immortality through technology?",
-    "What causes déjà vu?",
-    "How do migrating animals navigate?",
-    "What lies beneath Europa's icy surface?",
-    "Could we harness zero-point energy?",
-    "How do quantum computers maintain coherence?"
-  ];
-    
+  const allQuestions = ["What causes a recession?", "Are we alone in the universe?", "What is the blockchain used for?", "Why did the dinosaurs go extinct?", "How does machine learning impact finance?", "Can you help me learn Python?", "What are the latest breakthroughs in fusion energy?", "How do black holes work?", "What is quantum computing?", "How does the human brain create memories?", "What causes climate change?", "How do mRNA vaccines work?", "What is artificial general intelligence?", "How do solid-state batteries work?", "What is dark matter?", "Can we reverse aging?", "How do psychedelics affect consciousness?", "What is the future of space colonization?", "How does quantum entanglement work?", "What are parallel universes?", "How do plants communicate?", "What is the origin of consciousness?", "How do self-driving cars make decisions?", "What are supervolcanoes?", "How do coral reefs survive?", "What causes northern lights?", "How do birds navigate?", "What is the future of human evolution?", "How do tardigrades survive extreme conditions?", "What are gravitational waves?", "Could advanced civilizations exist in other dimensions?", "How might the universe ultimately end?", "What existed before the Big Bang?", "Is time travel theoretically possible?", "Could we upload human consciousness to computers?", "Are we living in a simulation?", "What lies at the bottom of Earth's deepest oceans?", "How do animals experience emotions?", "Could humans develop new senses?", "What happens inside a quantum computer?", "How did life first begin on Earth?", "Could we terraform other planets?", "What is dark energy's true nature?", "How does quantum tunneling work?", "Could we achieve immortality through technology?", "What causes déjà vu?", "How do migrating animals navigate?", "What lies beneath Europa's icy surface?", "Could we harness zero-point energy?", "How do quantum computers maintain coherence?"];
+
   // Shuffle array and take first 8 items
-  return allQuestions
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 8);
+  return allQuestions.sort(() => Math.random() - 0.5).slice(0, 8);
 }
 
 // Icons for the question buttons
-const questionIcons = [
-  Brain,
-  Zap,
-  Globe,
-  PenLine,
-  Rocket,
-  BookMarked,
-  FlaskConical,
-  Dna
-];
-
+const questionIcons = [Brain, Zap, Globe, PenLine, Rocket, BookMarked, FlaskConical, Dna];
 export function ChatHistory() {
   const {
     messages,
@@ -95,7 +32,7 @@ export function ChatHistory() {
       behavior: "smooth"
     });
   }, [messages]);
-  
+
   // Skeleton loader for when a response is being generated
   const renderSkeletonLoader = () => <div className="py-4 animate-fade-in">
       <div className="flex gap-4 max-w-4xl mx-auto px-4 md:px-6">
@@ -127,12 +64,10 @@ export function ChatHistory() {
         </div>
       </div>
     </div>;
-    
+
   // Empty state with welcome message and recommended questions
-  const emptyStateContent = () => <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 py-8 animate-fade-in">
-      <div className="w-16 h-16 mb-6 bg-gemini-yellow/20 rounded-full flex items-center justify-center">
-        <Sparkles className="h-8 w-8 text-gemini-yellow" />
-      </div>
+  const emptyStateContent = () => <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 animate-fade-in py-[16px]">
+      
       
       <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
         Welcome to HydroGen AI
@@ -149,27 +84,19 @@ export function ChatHistory() {
             Popular Questions
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {recommendedQuestions.map((question, index) => (
-              <Button 
-                key={index}
-                variant="outline" 
-                className="justify-start text-left glass-morphism 
+            {recommendedQuestions.map((question, index) => <Button key={index} variant="outline" className="justify-start text-left glass-morphism 
                   hover:bg-gemini-yellow/10 hover:border-gemini-yellow/50 hover:text-white 
                   hover:shadow-md hover:shadow-gemini-yellow/10 hover:scale-105
-                  transition-all duration-200" 
-                onClick={() => sendMessage(question)}
-              >
-                {React.createElement(questionIcons[index], { className: "h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow" })}
-                <span className="truncate">{question.split('?')[0].length > 28 
-                  ? question.split('?')[0].substring(0, 28) + '...' 
-                  : question.split('?')[0]}</span>
-              </Button>
-            ))}
+                  transition-all duration-200" onClick={() => sendMessage(question)}>
+                {React.createElement(questionIcons[index], {
+              className: "h-4 w-4 mr-2 flex-shrink-0 text-gemini-yellow"
+            })}
+                <span className="truncate">{question.split('?')[0].length > 28 ? question.split('?')[0].substring(0, 28) + '...' : question.split('?')[0]}</span>
+              </Button>)}
           </div>
         </div>
       </div>
     </div>;
-    
   return <div className="flex-1 overflow-y-auto chat-history px-2 md:px-4 flex flex-col">
       {!messages || messages.length === 0 || messages.length === 1 && messages[0].role === "assistant" ? <div className="flex-1 flex items-center justify-center">
           {emptyStateContent()}
