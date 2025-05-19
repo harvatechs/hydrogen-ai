@@ -5,6 +5,7 @@ import {
   Sidebar as ShadcnSidebar, 
   SidebarContent, 
   SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/Sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,24 +15,23 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  // Function to dispatch an event when sidebar state changes
-  const handleSidebarStateChange = (open: boolean) => {
-    const event = new CustomEvent("sidebar-state-changed", { 
-      detail: { open }
-    });
-    window.dispatchEvent(event);
-  };
+// Create a component to handle sidebar state changes
+const SidebarStateHandler = () => {
+  const { state, open, setOpen } = useSidebar();
   
   useEffect(() => {
-    // Initial state based on viewport width
-    const isInitiallyOpen = window.innerWidth >= 768;
-    handleSidebarStateChange(isInitiallyOpen);
+    // Dispatch the event when sidebar state changes
+    const event = new CustomEvent("sidebar-state-changed", { 
+      detail: { open, state }
+    });
+    window.dispatchEvent(event);
     
     // Function to handle viewport resize
     const handleResize = () => {
       const shouldBeOpen = window.innerWidth >= 768;
-      handleSidebarStateChange(shouldBeOpen);
+      if (shouldBeOpen !== open) {
+        setOpen(shouldBeOpen);
+      }
     };
     
     // Add event listener for window resize
@@ -41,13 +41,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [open, state, setOpen]);
+  
+  return null; // This component doesn't render anything
+};
+
+export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  // Default to open on desktop, closed on mobile
+  const defaultOpen = window.innerWidth >= 768;
 
   return (
-    <SidebarProvider 
-      defaultOpen={window.innerWidth >= 768}
-      onOpenChange={handleSidebarStateChange}
-    >
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <SidebarStateHandler />
       <div className="flex w-full h-screen overflow-hidden 
         dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black/95 
         light:bg-gradient-to-br light:from-white light:via-white/95 light:to-white/90">
@@ -55,7 +60,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* Properly integrate the UI sidebar with our custom Sidebar component */}
         <ShadcnSidebar className="z-30">
           <SidebarContent>
-            <Sidebar collapsed={false} />
+            <Sidebar />
           </SidebarContent>
         </ShadcnSidebar>
         

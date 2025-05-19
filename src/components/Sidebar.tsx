@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
@@ -8,12 +7,18 @@ import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { DeleteDialog } from "./sidebar/DeleteDialog";
 import { cn } from "@/lib/utils";
 import { Sparkles } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface SidebarProps {
   collapsed?: boolean;
 }
 
-export function Sidebar({ collapsed = false }: SidebarProps) {
+export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
+  // Get the sidebar state from the Shadcn sidebar context
+  const { state } = useSidebar();
+  // Use the state to determine if sidebar is collapsed
+  const isCollapsed = state === "collapsed";
+  
   const {
     clearMessages,
     conversations,
@@ -150,16 +155,39 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     }
   };
 
+  // Add event listener for sidebar state changes
+  useEffect(() => {
+    const handleSidebarStateChange = (event: CustomEvent) => {
+      // This is just for debugging, no need to set state here as we use `state` directly
+      console.log("Sidebar state changed:", event.detail.open);
+    };
+
+    // Add event listener for custom event
+    window.addEventListener("sidebar-state-changed", handleSidebarStateChange as EventListener);
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener("sidebar-state-changed", handleSidebarStateChange as EventListener);
+    };
+  }, []);
+
   return (
-    <div className="w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10">
+    <div className={cn(
+      "w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10",
+      isCollapsed && "items-center" // Center items when collapsed
+    )}>
       <SidebarHeader 
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handleSearchKeyDown={handleSearchKeyDown}
         createNewConversation={createNewConversation}
+        collapsed={isCollapsed}
       />
       
-      <div className="flex-1 overflow-auto p-2">
+      <div className={cn(
+        "flex-1 overflow-auto p-2",
+        isCollapsed && "w-full"
+      )}>
         {filteredConversations.length === 0 && searchTerm ? (
           <div className="text-sm text-center text-muted-foreground p-4">
             No conversations matching "{searchTerm}"
@@ -170,7 +198,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             currentConversationId={currentConversationId}
             editingId={editingId}
             editTitle={editTitle}
-            collapsed={collapsed}
+            collapsed={isCollapsed}
             generatingTitleFor={generatingTitleFor}
             setCurrentConversation={setCurrentConversation}
             handleStartEdit={handleStartEdit}
@@ -187,6 +215,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
       <SidebarFooter 
         currentConversationId={currentConversationId}
         clearConversation={clearConversation}
+        collapsed={isCollapsed}
       />
       
       <DeleteDialog 
