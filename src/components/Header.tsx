@@ -5,12 +5,10 @@ import { Settings, User, Zap, Moon, Sun, LogOut } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-
 interface HeaderProps {
   children?: React.ReactNode;
   onOpenSettings: () => void;
 }
-
 export function Header({
   children,
   onOpenSettings
@@ -36,7 +34,6 @@ export function Header({
         return "Gemini";
     }
   };
-
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
     toast({
@@ -44,9 +41,7 @@ export function Header({
       description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
     });
   };
-
-  return (
-    <div className="flex items-center justify-between w-full backdrop-blur-md">
+  return <div className="flex items-center justify-between w-full backdrop-blur-md">
       <div className="flex items-center gap-2">
         {children}
         
@@ -79,14 +74,7 @@ export function Header({
         
         <ApiKeyDialog />
         
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="h-8 w-8 border-white/10 dark:border-white/10 light:border-black/10"
-          onClick={onOpenSettings}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
+        
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -112,6 +100,5 @@ export function Header({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
-  );
+    </div>;
 }
