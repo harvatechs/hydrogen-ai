@@ -9,7 +9,6 @@ import { AIVoiceInput } from "@/components/ui/ai-voice-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { parseAtomCommand, AtomType } from "@/types/atoms";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
@@ -25,52 +24,43 @@ export function ChatInput() {
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recognition, setRecognition] = useState<any>(null);
-
-  const quickCommands = [
-    {
-      icon: <Youtube className="h-4 w-4 text-red-500" />,
-      title: "YouTube Summary",
-      description: "Summarize any YouTube video",
-      command: "/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      color: "bg-red-500/10 text-red-400 border-red-500/30"
-    },
-    {
-      icon: <FileText className="h-4 w-4 text-blue-500" />,
-      title: "Flashcards",
-      description: "Create study flashcards",
-      command: "/flashcard The principles of quantum physics",
-      color: "bg-blue-500/10 text-blue-400 border-blue-500/30"
-    },
-    {
-      icon: <Globe className="h-4 w-4 text-green-500" />,
-      title: "Web Search",
-      description: "Search the web for current info",
-      command: "/web Latest AI research breakthroughs",
-      color: "bg-green-500/10 text-green-400 border-green-500/30"
-    },
-    {
-      icon: <Sparkles className="h-4 w-4 text-purple-500" />,
-      title: "AI Summarizer",
-      description: "Summarize any text content",
-      command: "/summarize Paste your text to get a concise summary",
-      color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
-    },
-    {
-      icon: <Brain className="h-4 w-4 text-orange-500" />,
-      title: "Compare & Contrast",
-      description: "Compare two concepts",
-      command: "Compare quantum computing and classical computing",
-      color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
-    },
-    {
-      icon: <BookOpen className="h-4 w-4 text-yellow-500" />,
-      title: "Explain Like I'm 5",
-      description: "Simple explanation of complex topics",
-      command: "Explain quantum entanglement like I'm 5 years old",
-      color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
-    }
-  ];
-
+  const quickCommands = [{
+    icon: <Youtube className="h-4 w-4 text-red-500" />,
+    title: "YouTube Summary",
+    description: "Summarize any YouTube video",
+    command: "/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    color: "bg-red-500/10 text-red-400 border-red-500/30"
+  }, {
+    icon: <FileText className="h-4 w-4 text-blue-500" />,
+    title: "Flashcards",
+    description: "Create study flashcards",
+    command: "/flashcard The principles of quantum physics",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/30"
+  }, {
+    icon: <Globe className="h-4 w-4 text-green-500" />,
+    title: "Web Search",
+    description: "Search the web for current info",
+    command: "/web Latest AI research breakthroughs",
+    color: "bg-green-500/10 text-green-400 border-green-500/30"
+  }, {
+    icon: <Sparkles className="h-4 w-4 text-purple-500" />,
+    title: "AI Summarizer",
+    description: "Summarize any text content",
+    command: "/summarize Paste your text to get a concise summary",
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
+  }, {
+    icon: <Brain className="h-4 w-4 text-orange-500" />,
+    title: "Compare & Contrast",
+    description: "Compare two concepts",
+    command: "Compare quantum computing and classical computing",
+    color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
+  }, {
+    icon: <BookOpen className="h-4 w-4 text-yellow-500" />,
+    title: "Explain Like I'm 5",
+    description: "Simple explanation of complex topics",
+    command: "Explain quantum entanglement like I'm 5 years old",
+    color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
+  }];
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -115,11 +105,9 @@ export function ChatInput() {
       }
     };
   }, []);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
-
     const atomCommand = parseAtomCommand(message.trim());
     if (atomCommand) {
       setActiveAtom(atomCommand.type, atomCommand.params);
@@ -133,7 +121,6 @@ export function ChatInput() {
       inputRef.current?.focus();
     }, 0);
   };
-
   const handleWebSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) {
       toast({
@@ -142,15 +129,12 @@ export function ChatInput() {
       });
       return;
     }
-
     setActiveAtom('websearch', searchTerm);
     setMessage("");
   };
-
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
-
   const toggleVoiceRecognition = () => {
     if (!recognition) {
       toast({
@@ -176,14 +160,12 @@ export function ChatInput() {
       }
     }
   };
-
   const handleVoiceStart = useCallback(() => {
     toast({
       title: "Voice recording started",
       description: "Speak clearly and we'll convert your speech to text."
     });
   }, []);
-
   const handleVoiceStop = useCallback((duration: number) => {
     if (duration > 0) {
       toast({
@@ -195,11 +177,9 @@ export function ChatInput() {
       setShowVoiceInput(false);
     }
   }, []);
-
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -220,7 +200,6 @@ export function ChatInput() {
       }, 1500);
     }
   };
-
   const handleProSearch = () => {
     if (!message.trim()) {
       toast({
@@ -238,12 +217,10 @@ export function ChatInput() {
       setMessage("");
     }, 800);
   };
-
   const handleClearInput = () => {
     setMessage("");
     inputRef.current?.focus();
   };
-
   const applyQuickCommand = (command: string) => {
     setMessage(command);
     setShowQuickCommands(false);
@@ -251,7 +228,6 @@ export function ChatInput() {
       inputRef.current?.focus();
     }, 0);
   };
-
   const getCommandBadge = () => {
     if (message.trim().startsWith('/web') || message.trim().startsWith('/search')) {
       return <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
@@ -272,7 +248,6 @@ export function ChatInput() {
     }
     return null;
   };
-
   return <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
     <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
       <div className="rounded-xl border glass-card shadow-lg transition-all duration-300 hover:shadow-xl">
@@ -280,26 +255,11 @@ export function ChatInput() {
           <div className="flex items-center space-x-1 ml-2">
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.json,.md" />
             
-            <Button 
-              type="button" 
-              size="icon" 
-              variant="ghost" 
-              className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-              title="Add Files"
-              onClick={handleFileUpload}
-            >
-              <FileUp className="h-4 w-4" />
-            </Button>
+            
             
             <Popover open={showQuickCommands} onOpenChange={setShowQuickCommands}>
               <PopoverTrigger asChild>
-                <Button 
-                  type="button" 
-                  size="icon" 
-                  variant="ghost" 
-                  className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                  title="Quick Commands"
-                >
+                <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Quick Commands">
                   <Sparkles className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
@@ -309,32 +269,18 @@ export function ChatInput() {
                   <p className="text-xs text-muted-foreground">Select a template to get started</p>
                 </div>
                 <div className="max-h-80 overflow-y-auto p-2">
-                  {quickCommands.map((cmd, index) => (
-                    <Button
-                      key={index}
-                      variant="ghost"
-                      className={`w-full justify-start mb-1 p-2 hover:${cmd.color.split(' ')[0]}/20`}
-                      onClick={() => applyQuickCommand(cmd.command)}
-                    >
+                  {quickCommands.map((cmd, index) => <Button key={index} variant="ghost" className={`w-full justify-start mb-1 p-2 hover:${cmd.color.split(' ')[0]}/20`} onClick={() => applyQuickCommand(cmd.command)}>
                       <div className={`p-2 rounded-full mr-3 ${cmd.color}`}>{cmd.icon}</div>
                       <div className="text-left">
                         <div className="font-medium text-sm">{cmd.title}</div>
                         <div className="text-xs text-muted-foreground">{cmd.description}</div>
                       </div>
-                    </Button>
-                  ))}
+                    </Button>)}
                 </div>
               </PopoverContent>
             </Popover>
             
-            <Button 
-              type="button" 
-              size="icon" 
-              variant="ghost" 
-              className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-              title="Web Search"
-              onClick={() => setActiveAtom('websearch', '')}
-            >
+            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Web Search" onClick={() => setActiveAtom('websearch', '')}>
               <Search className="h-4 w-4" />
             </Button>
             
@@ -343,14 +289,7 @@ export function ChatInput() {
           
           <div className="relative flex-grow">
             <div className="flex items-center">
-              <Input 
-                ref={inputRef} 
-                placeholder="Ask anything or use a quick command..." 
-                value={message} 
-                onChange={handleInputChange} 
-                className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-4 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300" 
-                disabled={isProcessing} 
-              />
+              <Input ref={inputRef} placeholder="Ask anything or use a quick command..." value={message} onChange={handleInputChange} className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-4 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300" disabled={isProcessing} />
             </div>
             
             {message && <Button type="button" size="icon" variant="ghost" onClick={handleClearInput} className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 dark:hover:text-white light:hover:text-black">
@@ -360,19 +299,7 @@ export function ChatInput() {
           
           <div className="flex items-center space-x-1 mr-2">
             <Dialog open={showVoiceInput} onOpenChange={setShowVoiceInput}>
-              <Button 
-                type="button" 
-                size="icon" 
-                variant={isListening ? "default" : "ghost"} 
-                className={cn(
-                  "h-9 w-9 rounded-full transition-all duration-300",
-                  isListening 
-                    ? "bg-gemini-yellow text-black voice-input-button active" 
-                    : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
-                )} 
-                title="Voice input" 
-                onClick={toggleVoiceRecognition}
-              >
+              <Button type="button" size="icon" variant={isListening ? "default" : "ghost"} className={cn("h-9 w-9 rounded-full transition-all duration-300", isListening ? "bg-gemini-yellow text-black voice-input-button active" : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black")} title="Voice input" onClick={toggleVoiceRecognition}>
                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
               <DialogContent className="sm:max-w-md glass-card">
@@ -395,16 +322,14 @@ export function ChatInput() {
             </div>
           </div>}
         
-        {isListening && (
-          <div className="px-4 py-2 text-xs text-gemini-yellow bg-gemini-yellow/10 border-t border-gemini-yellow/20 rounded-b-xl">
+        {isListening && <div className="px-4 py-2 text-xs text-gemini-yellow bg-gemini-yellow/10 border-t border-gemini-yellow/20 rounded-b-xl">
             <div className="flex items-center justify-between">
               <span>Listening... Speak clearly into your microphone</span>
               <Button size="sm" variant="ghost" className="h-5 px-2 text-xs" onClick={() => setIsListening(false)}>
                 <X className="h-3 w-3 mr-1" /> Stop
               </Button>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
       <div className="mt-1 text-xs text-center text-muted-foreground/50">
         HydroGen AI may display inaccurate info, including about people, places, or facts
