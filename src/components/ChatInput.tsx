@@ -248,7 +248,7 @@ export function ChatInput() {
     }
     return null;
   };
-  return <div className="sticky bottom-0 z-10 w-full bg-gradient-to-t from-background via-background/95 to-transparent pb-4 pt-2">
+  return <div className="fixed bottom-0 left-0 right-0 z-20 pb-4 pt-2 bg-gradient-to-t from-background via-background/95 to-transparent">
     <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
       <div className="rounded-xl border glass-card shadow-lg transition-all duration-300 hover:shadow-xl">
         <div className="flex items-center">
