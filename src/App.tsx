@@ -63,15 +63,41 @@ const App = () => {
     }
   }, []);
   
+  // Add Google Fonts for enhanced typography
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap';
+    document.head.appendChild(link);
+    
+    document.body.style.fontFamily = "'Inter', sans-serif";
+    
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+  
   // Set Content Security Meta Tag
   useEffect(() => {
     const metaCSP = document.createElement('meta');
     metaCSP.httpEquiv = 'Content-Security-Policy';
-    metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com; font-src 'self' data:";
+    metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://fonts.gstatic.com; font-src 'self' data: https://fonts.gstatic.com;";
     document.head.appendChild(metaCSP);
     
     return () => {
       document.head.removeChild(metaCSP);
+    };
+  }, []);
+  
+  // Add viewport meta for responsive design
+  useEffect(() => {
+    const metaViewport = document.createElement('meta');
+    metaViewport.name = 'viewport';
+    metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    document.head.appendChild(metaViewport);
+    
+    return () => {
+      document.head.removeChild(metaViewport);
     };
   }, []);
   
