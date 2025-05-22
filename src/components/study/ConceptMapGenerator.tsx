@@ -144,6 +144,7 @@ export const ConceptMapGenerator: React.FC<ConceptMapGeneratorProps> = ({
             borderRadius: '8px',
             padding: '8px 16px',
             width: 150,
+            fontWeight: 'normal', // Added the missing fontWeight property here
           },
         });
       }
@@ -327,3 +328,4 @@ export const ConceptMapGenerator: React.FC<ConceptMapGeneratorProps> = ({
     </div>
   );
 };
+
