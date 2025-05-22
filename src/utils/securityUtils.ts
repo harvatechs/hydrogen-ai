@@ -1,6 +1,6 @@
 
-import { ValidationRule, ValidationResult, SecurityAuditEntry } from "@/types/security";
 import DOMPurify from 'dompurify';
+import { ValidationRule, ValidationResult, SecurityAuditEntry, SecurityAuditType } from "@/types/security";
 
 // Common security rules for input validation
 const commonValidationRules: ValidationRule[] = [
