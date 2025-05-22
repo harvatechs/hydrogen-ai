@@ -12,7 +12,7 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, BookOpen, Cards, Plus, Download, X } from "lucide-react";
+import { Loader2, BookOpen, BookText, Plus, Download, X } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { generateFlashcards, Flashcard } from "@/utils/studyAids";
 import { validateAndSanitizeInput } from "@/utils/securityUtils";
