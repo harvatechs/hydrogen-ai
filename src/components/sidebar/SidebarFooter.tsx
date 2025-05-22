@@ -4,7 +4,6 @@ import { AlertCircle, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSidebar } from "@/components/ui/sidebar/provider";
 
 interface SidebarFooterProps {
   currentConversationId: string | null;
@@ -14,11 +13,9 @@ interface SidebarFooterProps {
 
 export const SidebarFooter: React.FC<SidebarFooterProps> = ({ 
   currentConversationId, 
-  clearConversation
+  clearConversation,
+  collapsed = false
 }) => {
-  const { state } = useSidebar();
-  const collapsed = state === 'collapsed';
-  
   if (!currentConversationId) return null;
   
   if (collapsed) {
@@ -36,7 +33,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
               <span className="sr-only">Clear conversation</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">Clear conversation</TooltipContent>
+          <TooltipContent>Clear conversation</TooltipContent>
         </Tooltip>
       </div>
     );

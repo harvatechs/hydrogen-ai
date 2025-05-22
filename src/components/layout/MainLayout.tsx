@@ -37,15 +37,9 @@ const SidebarStateHandler = () => {
     // Add event listener for window resize
     window.addEventListener('resize', handleResize);
     
-    // Set body data attribute for CSS targeting
-    document.body.dataset.sidebarState = state;
-    document.body.dataset.sidebarOpen = open.toString();
-    
     // Cleanup on unmount
     return () => {
       window.removeEventListener('resize', handleResize);
-      delete document.body.dataset.sidebarState;
-      delete document.body.dataset.sidebarOpen;
     };
   }, [open, state, setOpen]);
   
