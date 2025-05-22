@@ -95,6 +95,13 @@ export function ChatInput() {
       color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
     },
     {
+      icon: <Network className="h-4 w-4 text-cyan-500" />,
+      title: "Interactive Diagram",
+      description: "Create process & relationship diagrams",
+      command: "/diagram",
+      color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+    },
+    {
       icon: <Brain className="h-4 w-4 text-orange-500" />,
       title: "Compare & Contrast",
       description: "Compare two concepts",
@@ -339,6 +346,10 @@ export function ChatInput() {
     } else if (message.trim().startsWith('/pdf')) {
       return <span className="text-xs text-orange-400 bg-orange-500/10 px-2 py-1 rounded-full">
         PDF Summarizer Mode
+      </span>;
+    } else if (message.trim().startsWith('/diagram') || message.trim().startsWith('/mermaid')) {
+      return <span className="text-xs text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded-full">
+        Diagram Mode
       </span>;
     }
     return null;

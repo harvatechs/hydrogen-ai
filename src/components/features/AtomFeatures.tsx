@@ -8,6 +8,7 @@ import { FlashcardGenerator } from "@/components/study/FlashcardGenerator";
 import { Summarizer } from "@/components/study/Summarizer";
 import { ConceptMapGenerator } from "@/components/study/ConceptMapGenerator";
 import { PDFSummarizer } from "@/components/study/PDFSummarizer";
+import { MermaidGenerator } from "@/components/diagrams/MermaidGenerator";
 import { AtomType } from "@/types/atoms";
 import { Button } from "@/components/ui/button";
 import { notificationService } from "@/services/NotificationService";
@@ -90,6 +91,14 @@ export const AtomFeatures: React.FC<AtomFeaturesProps> = ({
           initialTopic={atomParams}
           onClose={onClose}
           onSubmitMap={handleAtomSubmit}
+        />
+      );
+    case 'diagram':
+      return (
+        <MermaidGenerator
+          initialDiagram={atomParams}
+          onClose={onClose}
+          onSubmitDiagram={handleAtomSubmit}
         />
       );
     default:

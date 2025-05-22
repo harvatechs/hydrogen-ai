@@ -1,5 +1,5 @@
 
-export type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | 'studyguide' | 'mindmap' | 'conceptmap' | 'pdfsummarizer' | null;
+export type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | 'studyguide' | 'mindmap' | 'conceptmap' | 'pdfsummarizer' | 'diagram' | null;
 
 export interface AtomCommand {
   type: AtomType;
@@ -47,6 +47,11 @@ export function parseAtomCommand(message: string): AtomCommand | null {
       message.substring(15).trim() : 
       message.substring(5).trim();
     return { type: 'pdfsummarizer', params };
+  } else if (message.startsWith('/diagram') || message.startsWith('/mermaid')) {
+    const params = message.startsWith('/diagram') ? 
+      message.substring(9).trim() : 
+      message.substring(9).trim();
+    return { type: 'diagram', params };
   }
   return null;
 }

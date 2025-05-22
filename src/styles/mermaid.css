@@ -1,0 +1,102 @@
+
+/* Mermaid Diagrams Styling */
+.mermaid {
+  font-family: inherit;
+}
+
+/* Light mode */
+:root {
+  --mermaid-bg: rgba(255, 255, 255, 0.7);
+  --mermaid-edge: #333;
+  --mermaid-node: #ececff;
+  --mermaid-node-border: #9370db;
+  --mermaid-text: #333;
+  --mermaid-label-bg: #e8e8e8;
+}
+
+/* Dark mode */
+.dark {
+  --mermaid-bg: rgba(0, 0, 0, 0.2);
+  --mermaid-edge: #ccc;
+  --mermaid-node: rgba(75, 75, 170, 0.2);
+  --mermaid-node-border: #6554C0;
+  --mermaid-text: #eee;
+  --mermaid-label-bg: #333;
+}
+
+.mermaid svg {
+  max-width: 100%;
+}
+
+/* General overrides for better dark mode compatibility */
+.dark .messageBox {
+  fill: var(--mermaid-node) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+.dark .actor {
+  fill: var(--mermaid-node) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+.dark .labelBox {
+  fill: var(--mermaid-node) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+.dark .classGroup rect {
+  fill: var(--mermaid-node) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+.dark .classGroup line {
+  stroke: var(--mermaid-edge) !important;
+}
+
+.dark text.classText {
+  fill: var(--mermaid-text) !important;
+}
+
+.dark .node rect,
+.dark .node circle,
+.dark .node ellipse,
+.dark .node polygon,
+.dark .node path {
+  fill: var(--mermaid-node) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+.dark #flowchart-pointEnd,
+.dark #flowchart-pointStart,
+.dark #flowchart-crossEnd,
+.dark #flowchart-crossStart,
+.dark #flowchart-circleEnd,
+.dark #flowchart-circleStart {
+  fill: var(--mermaid-edge) !important;
+  stroke: var(--mermaid-edge) !important;
+}
+
+.dark .edgePath .path,
+.dark line {
+  stroke: var(--mermaid-edge) !important;
+}
+
+.dark text {
+  fill: var(--mermaid-text) !important;
+}
+
+.dark .edgeLabel {
+  color: var(--mermaid-text) !important;
+  background-color: var(--mermaid-label-bg) !important;
+}
+
+.dark .cluster rect {
+  fill: var(--mermaid-bg) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+/* Fix for mindmaps */
+.dark .mindmap-node rect {
+  fill: var(--mermaid-node) !important;
+  stroke: var(--mermaid-node-border) !important;
+}
