@@ -7,6 +7,7 @@ import { AISummarizer } from "@/atoms/AISummarizer";
 import { FlashcardGenerator } from "@/components/study/FlashcardGenerator";
 import { Summarizer } from "@/components/study/Summarizer";
 import { ConceptMapGenerator } from "@/components/study/ConceptMapGenerator";
+import { PDFSummarizer } from "@/components/study/PDFSummarizer";
 import { AtomType } from "@/types/atoms";
 import { Button } from "@/components/ui/button";
 import { notificationService } from "@/services/NotificationService";
@@ -71,6 +72,13 @@ export const AtomFeatures: React.FC<AtomFeaturesProps> = ({
         />
       ) : (
         <Summarizer
+          onClose={onClose}
+          onSubmitSummary={handleAtomSubmit}
+        />
+      );
+    case 'pdfsummarizer':
+      return (
+        <PDFSummarizer
           onClose={onClose}
           onSubmitSummary={handleAtomSubmit}
         />

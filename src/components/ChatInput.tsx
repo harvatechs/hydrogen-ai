@@ -1,8 +1,7 @@
-
 import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, Sparkles, BookOpen, Brain, Globe, Youtube, FileText, Network } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, Sparkles, BookOpen, Brain, Globe, Youtube, FileText, Network, FilePdf } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -87,6 +86,13 @@ export function ChatInput() {
       description: "Visualize concepts and relationships",
       command: "/mindmap Artificial Intelligence fundamentals",
       color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
+    },
+    {
+      icon: <FilePdf className="h-4 w-4 text-orange-500" />,
+      title: "PDF Summarizer",
+      description: "Upload and summarize PDF documents",
+      command: "/pdf",
+      color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
     },
     {
       icon: <Brain className="h-4 w-4 text-orange-500" />,
@@ -249,6 +255,15 @@ export function ChatInput() {
     if (files && files.length > 0) {
       setIsUploading(true);
       
+      // Check for PDF files
+      if (files[0].type === 'application/pdf') {
+        setIsUploading(false);
+        // Directly activate the PDF summarizer
+        setActiveAtom('pdfsummarizer', '');
+        e.target.value = '';
+        return;
+      }
+      
       setTimeout(() => {
         setIsUploading(false);
         toast({
@@ -321,6 +336,10 @@ export function ChatInput() {
       return <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-full">
         Concept Map Mode
       </span>;
+    } else if (message.trim().startsWith('/pdf')) {
+      return <span className="text-xs text-orange-400 bg-orange-500/10 px-2 py-1 rounded-full">
+        PDF Summarizer Mode
+      </span>;
     }
     return null;
   };
@@ -378,6 +397,17 @@ export function ChatInput() {
                 onClick={() => setActiveAtom('websearch', '')}
               >
                 <Search className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                type="button" 
+                size="icon" 
+                variant="ghost" 
+                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
+                title="PDF Summarizer" 
+                onClick={() => setActiveAtom('pdfsummarizer', '')}
+              >
+                <FilePdf className="h-4 w-4" />
               </Button>
               
               {getCommandBadge()}
