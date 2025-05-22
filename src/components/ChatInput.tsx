@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, Sparkles, BookOpen, Brain, Globe, Youtube, FileText, Network, FilePdf } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, Sparkles, BookOpen, Brain, Globe, Youtube, FileText, Network } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -88,7 +88,7 @@ export function ChatInput() {
       color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
     },
     {
-      icon: <FilePdf className="h-4 w-4 text-orange-500" />,
+      icon: <FileText className="h-4 w-4 text-orange-500" />,
       title: "PDF Summarizer",
       description: "Upload and summarize PDF documents",
       command: "/pdf",
@@ -407,7 +407,7 @@ export function ChatInput() {
                 title="PDF Summarizer" 
                 onClick={() => setActiveAtom('pdfsummarizer', '')}
               >
-                <FilePdf className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
               </Button>
               
               {getCommandBadge()}
