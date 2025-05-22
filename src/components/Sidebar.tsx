@@ -181,7 +181,6 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
         setSearchTerm={setSearchTerm}
         handleSearchKeyDown={handleSearchKeyDown}
         createNewConversation={createNewConversation}
-        collapsed={isCollapsed}
       />
       
       <div className={cn(
@@ -215,7 +214,6 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
       <SidebarFooter 
         currentConversationId={currentConversationId}
         clearConversation={clearConversation}
-        collapsed={isCollapsed}
       />
       
       <DeleteDialog 

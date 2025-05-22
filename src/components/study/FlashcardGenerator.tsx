@@ -132,7 +132,7 @@ export const FlashcardGenerator: React.FC<FlashcardGeneratorProps> = ({
         <CardHeader className="border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Cards className="h-5 w-5 text-blue-400" />
+              <BookText className="h-5 w-5 text-blue-400" />
               <CardTitle>Flashcard Generator</CardTitle>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>

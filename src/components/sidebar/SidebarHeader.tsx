@@ -24,7 +24,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   createNewConversation,
 }) => {
   const { state } = useSidebar();
-  const collapsed = state === "closed";
+  const collapsed = state === "collapsed";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const validation = validateAndSanitizeInput(e.target.value);

@@ -16,7 +16,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   clearConversation
 }) => {
   const { state } = useSidebar();
-  const collapsed = state === "closed";
+  const collapsed = state === "collapsed";
   
   if (!currentConversationId) return null;
   
