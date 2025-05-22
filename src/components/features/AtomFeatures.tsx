@@ -6,6 +6,7 @@ import WebSearchAtom from "@/atoms/WebSearchAtom";
 import { AISummarizer } from "@/atoms/AISummarizer";
 import { FlashcardGenerator } from "@/components/study/FlashcardGenerator";
 import { Summarizer } from "@/components/study/Summarizer";
+import { ConceptMapGenerator } from "@/components/study/ConceptMapGenerator";
 import { AtomType } from "@/types/atoms";
 import { Button } from "@/components/ui/button";
 import { notificationService } from "@/services/NotificationService";
@@ -72,6 +73,15 @@ export const AtomFeatures: React.FC<AtomFeaturesProps> = ({
         <Summarizer
           onClose={onClose}
           onSubmitSummary={handleAtomSubmit}
+        />
+      );
+    case 'mindmap':
+    case 'conceptmap':
+      return (
+        <ConceptMapGenerator
+          initialTopic={atomParams}
+          onClose={onClose}
+          onSubmitMap={handleAtomSubmit}
         />
       );
     default:

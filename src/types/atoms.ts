@@ -1,5 +1,5 @@
 
-export type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | 'studyguide' | 'mindmap' | null;
+export type AtomType = 'youtube' | 'flashcard' | 'websearch' | 'summarize' | 'studyguide' | 'mindmap' | 'conceptmap' | null;
 
 export interface AtomCommand {
   type: AtomType;
@@ -32,6 +32,11 @@ export function parseAtomCommand(message: string): AtomCommand | null {
       message.substring(9).trim() : 
       message.substring(4).trim();
     return { type: 'mindmap', params };
+  } else if (message.startsWith('/conceptmap') || message.startsWith('/cm')) {
+    const params = message.startsWith('/conceptmap') ? 
+      message.substring(12).trim() : 
+      message.substring(4).trim();
+    return { type: 'conceptmap', params };
   } else if (message.startsWith('/studyguide') || message.startsWith('/sg')) {
     const params = message.startsWith('/studyguide') ? 
       message.substring(12).trim() : 

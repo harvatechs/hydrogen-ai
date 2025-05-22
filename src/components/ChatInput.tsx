@@ -1,7 +1,8 @@
+
 import { useState, ChangeEvent, FormEvent, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, Sparkles, BookOpen, Brain, Globe, Youtube, FileText } from "lucide-react";
+import { Mic, SendHorizontal, FileUp, X, Zap, MicOff, Loader2, Search, Sparkles, BookOpen, Brain, Globe, Youtube, FileText, Network } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -79,7 +80,14 @@ export function ChatInput() {
       description: "Summarize any text content",
       command: "/summarize Paste your text to get a concise summary",
       color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
-    }, 
+    },
+    {
+      icon: <Network className="h-4 w-4 text-indigo-500" />,
+      title: "Concept Map",
+      description: "Visualize concepts and relationships",
+      command: "/mindmap Artificial Intelligence fundamentals",
+      color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
+    },
     {
       icon: <Brain className="h-4 w-4 text-orange-500" />,
       title: "Compare & Contrast",
@@ -308,6 +316,10 @@ export function ChatInput() {
     } else if (message.trim().startsWith('/summarize') || message.trim().startsWith('/sum')) {
       return <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full">
         AI Summarizer Mode
+      </span>;
+    } else if (message.trim().startsWith('/mindmap') || message.trim().startsWith('/mm')) {
+      return <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-full">
+        Concept Map Mode
       </span>;
     }
     return null;
