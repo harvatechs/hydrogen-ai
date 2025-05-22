@@ -1,141 +1,144 @@
 
-/**
- * Security utility functions for HydroGen AI
- */
+import { ValidationRule, ValidationResult, SecurityAuditEntry } from "@/types/security";
+import DOMPurify from 'dompurify';
 
-/**
- * Sanitizes user input to prevent XSS attacks
- */
-export const sanitizeInput = (input: string): string => {
-  if (!input) return '';
-  
-  // Replace potentially dangerous characters
-  return input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-    .replace(/`/g, '&#x60;');
-};
-
-/**
- * Validates API keys to ensure they match expected formats
- */
-export const validateApiKey = (key: string): boolean => {
-  if (!key) return false;
-  
-  // Check for minimum length
-  if (key.length < 20) return false;
-  
-  // For Google Gemini keys specifically
-  if (key.startsWith('AIza')) {
-    // Simple validation for Google API key format
-    return /^AIza[A-Za-z0-9_-]{35}$/.test(key);
-  }
-  
-  // General validation for other API keys
-  return /^[A-Za-z0-9_-]{20,}$/.test(key);
-};
-
-/**
- * Validates API URLs to ensure they are from trusted domains
- */
-export const validateApiUrl = (url: string): boolean => {
-  if (!url) return false;
-  
-  try {
-    const urlObj = new URL(url);
-    
-    // List of allowed API domains
-    const allowedDomains = [
-      'generativelanguage.googleapis.com',
-      'api.openai.com',
-      'api.anthropic.com'
-    ];
-    
-    return allowedDomains.some(domain => urlObj.hostname === domain || urlObj.hostname.endsWith('.' + domain));
-  } catch (e) {
-    return false;
-  }
-};
-
-/**
- * Safely stores sensitive data in localStorage with expiration
- */
-export const secureStore = {
-  set: (key: string, value: string, expirationInHours = 24): void => {
-    const item = {
-      value,
-      expiry: new Date().getTime() + expirationInHours * 60 * 60 * 1000,
-    };
-    localStorage.setItem(key, JSON.stringify(item));
+// Common security rules for input validation
+const commonValidationRules: ValidationRule[] = [
+  {
+    pattern: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    message: "Script tags are not allowed for security reasons"
   },
-  
-  get: (key: string): string | null => {
-    const itemStr = localStorage.getItem(key);
-    if (!itemStr) return null;
-    
-    try {
-      const item = JSON.parse(itemStr);
-      const now = new Date().getTime();
-      
-      // Check if the item has expired
-      if (now > item.expiry) {
-        localStorage.removeItem(key);
-        return null;
-      }
-      
-      return item.value;
-    } catch (e) {
-      // If there's an error parsing, return the raw value
-      // This handles backward compatibility
-      return itemStr;
-    }
+  {
+    pattern: /javascript:/gi,
+    message: "JavaScript protocol in URLs is not allowed"
   },
-  
-  remove: (key: string): void => {
-    localStorage.removeItem(key);
+  {
+    pattern: /data:/gi,
+    message: "Data URIs may contain malicious content"
+  },
+  {
+    pattern: /on\w+\s*=\s*["']?[^"']*["']?/gi,
+    message: "Inline event handlers are not allowed"
   }
-};
+];
 
 /**
- * Rate limiting utility to prevent API abuse
+ * Validates input against security rules and sanitizes it
+ * @param input The user input to validate
+ * @param additionalRules Optional additional validation rules
+ * @returns Validation result with sanitized input if valid
  */
-export class RateLimiter {
-  private requests: number[] = [];
-  private maxRequests: number;
-  private timeWindow: number; // in milliseconds
-  
-  constructor(maxRequests = 5, timeWindowInSeconds = 60) {
-    this.maxRequests = maxRequests;
-    this.timeWindow = timeWindowInSeconds * 1000;
+export function validateAndSanitizeInput(
+  input: string,
+  additionalRules: ValidationRule[] = []
+): ValidationResult {
+  // Skip validation for empty inputs
+  if (!input || input.trim() === '') {
+    return { isValid: true, sanitizedInput: '' };
   }
-  
-  canMakeRequest(): boolean {
-    const now = Date.now();
-    
-    // Remove timestamps outside the window
-    this.requests = this.requests.filter(timestamp => 
-      now - timestamp < this.timeWindow
-    );
-    
-    // Check if we've reached the limit
-    if (this.requests.length >= this.maxRequests) {
-      return false;
+
+  // Combine rules
+  const allRules = [...commonValidationRules, ...additionalRules];
+
+  // Check against validation rules
+  for (const rule of allRules) {
+    if (rule.pattern.test(input)) {
+      // Log security audit event
+      logSecurityAudit('input-validation', `Blocked input matching pattern: ${rule.pattern}`, 'medium');
+      
+      return {
+        isValid: false,
+        message: rule.message
+      };
     }
-    
-    // Add current timestamp
-    this.requests.push(now);
+  }
+
+  // If passed all rules, sanitize the input
+  const sanitizedInput = DOMPurify.sanitize(input);
+  
+  return {
+    isValid: true,
+    sanitizedInput
+  };
+}
+
+/**
+ * Securely store sensitive data in memory
+ * Uses a closure to prevent direct access to the data
+ */
+export function createSecureStorage() {
+  const secureData = new Map<string, any>();
+
+  return {
+    set: (key: string, value: any): void => {
+      secureData.set(key, value);
+    },
+    get: (key: string): any => {
+      return secureData.get(key);
+    },
+    remove: (key: string): boolean => {
+      return secureData.delete(key);
+    },
+    clear: (): void => {
+      secureData.clear();
+    }
+  };
+}
+
+/**
+ * Security audit logging
+ */
+const securityAuditLog: SecurityAuditEntry[] = [];
+
+export function logSecurityAudit(
+  type: SecurityAuditType,
+  details: string,
+  severity: 'low' | 'medium' | 'high' = 'low'
+): void {
+  const entry: SecurityAuditEntry = {
+    type,
+    timestamp: new Date(),
+    details,
+    severity
+  };
+  
+  securityAuditLog.push(entry);
+  
+  // For high severity issues, also log to console
+  if (severity === 'high') {
+    console.warn(`Security audit [${type}]: ${details}`);
+  }
+}
+
+export function getSecurityAuditLog(): SecurityAuditEntry[] {
+  return [...securityAuditLog];
+}
+
+/**
+ * Rate limiting utility
+ */
+const requestCounts = new Map<string, { count: number, resetTime: number }>();
+
+export function checkRateLimit(identifier: string, maxRequests: number, windowMs: number = 60000): boolean {
+  const now = Date.now();
+  const userRequests = requestCounts.get(identifier);
+  
+  // If no previous requests or window expired, reset counter
+  if (!userRequests || now > userRequests.resetTime) {
+    requestCounts.set(identifier, {
+      count: 1,
+      resetTime: now + windowMs
+    });
     return true;
   }
   
-  getTimeUntilNextAllowed(): number {
-    if (this.requests.length === 0) return 0;
-    
-    const now = Date.now();
-    const oldestTimestamp = this.requests[0];
-    const timeUntilExpiry = this.timeWindow - (now - oldestTimestamp);
-    
-    return Math.max(0, timeUntilExpiry);
+  // Check if under rate limit
+  if (userRequests.count < maxRequests) {
+    userRequests.count++;
+    return true;
   }
+  
+  // Rate limit exceeded
+  logSecurityAudit('rate-limit', `Rate limit exceeded for ${identifier}`, 'medium');
+  return false;
 }

@@ -11,6 +11,9 @@ export interface SecuritySettings {
   maxRequestsPerMinute: number;
   contentFiltering: boolean;
   sanitizeUserInput: boolean;
+  enableInputValidation: boolean;
+  enableXSSProtection: boolean;
+  blockedPatterns: string[];
 }
 
 export interface ApiKeyValidationResult {
@@ -28,4 +31,27 @@ export interface UserAccess {
   canChangeModel: boolean;
   isApiKeyAdmin: boolean;
   permissionLevel: PermissionLevel;
+}
+
+/**
+ * Input validation utility types
+ */
+export interface ValidationRule {
+  pattern: RegExp;
+  message: string;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  sanitizedInput?: string;
+  message?: string;
+}
+
+export type SecurityAuditType = 'key-usage' | 'input-validation' | 'rate-limit' | 'suspicious-activity';
+
+export interface SecurityAuditEntry {
+  type: SecurityAuditType;
+  timestamp: Date;
+  details: string;
+  severity: 'low' | 'medium' | 'high';
 }

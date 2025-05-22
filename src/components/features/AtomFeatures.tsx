@@ -4,6 +4,8 @@ import { YouTubeSummarizer } from "@/atoms/YouTubeSummarizer";
 import { FlashcardMaker } from "@/atoms/FlashcardMaker";
 import WebSearchAtom from "@/atoms/WebSearchAtom";
 import { AISummarizer } from "@/atoms/AISummarizer";
+import { FlashcardGenerator } from "@/components/study/FlashcardGenerator";
+import { Summarizer } from "@/components/study/Summarizer";
 import { AtomType } from "@/types/atoms";
 import { Button } from "@/components/ui/button";
 import { notificationService } from "@/services/NotificationService";
@@ -39,11 +41,16 @@ export const AtomFeatures: React.FC<AtomFeaturesProps> = ({
         />
       );
     case 'flashcard':
-      return (
+      return atomParams ? (
         <FlashcardMaker 
           initialQuery={atomParams} 
           onClose={onClose} 
           onSubmitResult={handleAtomSubmit}
+        />
+      ) : (
+        <FlashcardGenerator 
+          onClose={onClose}
+          onSubmitFlashcards={handleAtomSubmit}
         />
       );
     case 'websearch':
@@ -55,11 +62,16 @@ export const AtomFeatures: React.FC<AtomFeaturesProps> = ({
         />
       );
     case 'summarize':
-      return (
+      return atomParams ? (
         <AISummarizer
           initialText={atomParams}
           onClose={onClose}
           onSubmitResult={handleAtomSubmit}
+        />
+      ) : (
+        <Summarizer
+          onClose={onClose}
+          onSubmitSummary={handleAtomSubmit}
         />
       );
     default:
