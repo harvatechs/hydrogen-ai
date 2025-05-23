@@ -1,104 +1,114 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ApiKeyDialog } from "./ApiKeyDialog";
-import { Settings, User, Zap, Moon, Sun, LogOut } from "lucide-react";
-import { useChat } from "@/context/ChatContext";
-import { toast } from "@/components/ui/use-toast";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-interface HeaderProps {
-  children?: React.ReactNode;
-  onOpenSettings: () => void;
-}
-export function Header({
-  children,
-  onOpenSettings
-}: HeaderProps) {
-  const {
-    theme,
-    setTheme,
-    model
-  } = useChat();
 
-  // Get model display name
-  const getModelDisplayName = () => {
-    switch (model) {
-      case "gemini-2.0-pro":
-        return "Gemini 2.0 Pro";
-      case "gemini-2.0-flash":
-        return "Gemini 2.0 Flash";
-      case "gemini-1.5-pro":
-        return "Gemini 1.5 Pro";
-      case "gemini-1.5-flash":
-        return "Gemini 1.5 Flash";
-      default:
-        return "Gemini";
-    }
+import { useState, useEffect } from 'react';
+import { Button } from './ui/button';
+import { ThemeToggle } from './theme/ThemeToggle';
+import { MobileMenu } from './MobileMenu';
+import { BookOpenIcon, HomeIcon, LogOutIcon, MessageCircleIcon, Settings2Icon } from 'lucide-react';
+import { useChat } from '@/context/ChatContext';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+
+interface HeaderProps {
+  onSettingsClick?: () => void;
+}
+
+export const Header = ({ onSettingsClick }: HeaderProps) => {
+  const { user, signOut } = useAuth();
+  const { activeAtom, setActiveAtom } = useChat();
+  const [isScrolled, setIsScrolled] = useState(false);
+  
+  // Detect scroll for shadow effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  const handleLogout = async () => {
+    await signOut();
   };
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-    toast({
-      title: `${theme === 'dark' ? 'Light' : 'Dark'} mode activated`,
-      description: `Using ${theme === 'dark' ? 'light' : 'dark'} theme now`
-    });
-  };
-  return <div className="flex items-center justify-between w-full backdrop-blur-md">
-      <div className="flex items-center gap-2">
-        {children}
+  
+  const headerItems = [
+    { id: 'chat', label: 'Chat', icon: MessageCircleIcon },
+    { id: 'search', label: 'Search Web', icon: HomeIcon },
+    { id: 'youtube', label: 'YouTube', icon: BookOpenIcon },
+  ];
+  
+  return (
+    <header
+      className={cn(
+        'sticky top-0 z-40 flex w-full items-center justify-between border-b bg-background/80 py-3 px-4 backdrop-blur-md transition-shadow duration-300 md:px-6',
+        isScrolled ? 'shadow-md' : ''
+      )}
+    >
+      <div className="flex items-center gap-2 sm:gap-4">
+        <h1 className="text-lg font-semibold tracking-tight bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent hidden md:block">
+          HydroGen AI
+        </h1>
         
-        <div className="flex items-center">
-          <span className="font-semibold text-white mr-1 dark:text-white light:text-black">HydroGen</span>
-          <span className="bg-black/20 text-white text-xs px-1.5 py-0.5 rounded-full dark:text-white light:text-black light:bg-black/10">Beta</span>
+        <div className="hidden md:flex gap-2">
+          {headerItems.map((item) => (
+            <Button
+              key={item.id}
+              variant={activeAtom === item.id ? 'default' : 'ghost'}
+              size="sm"
+              className="hidden sm:flex items-center gap-2"
+              onClick={() => setActiveAtom(item.id as any)}
+            >
+              <item.icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </Button>
+          ))}
         </div>
       </div>
       
-      <div className="flex items-center gap-1">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="h-8 w-8 border-white/10 dark:border-white/10 light:border-black/10">
-              <Zap className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-black/90 border-white/10 dark:bg-black/90 light:bg-white/95 light:border-black/10 light:text-black">
-            <DropdownMenuLabel className="text-white light:text-black">AI Model</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/10 light:bg-black/10" />
-            <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white group dark:text-white dark:focus:bg-white/10 light:text-black light:focus:bg-black/5">
-              <div className="flex flex-col">
-                <span className="font-medium">Current: {getModelDisplayName()}</span>
-                <span className="text-xs text-muted-foreground group-hover:text-white/70 light:group-hover:text-black/70">
-                  Change model in settings
-                </span>
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
         
-        <ApiKeyDialog />
+        {user && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            title="Sign out"
+            className="hidden sm:flex"
+          >
+            <LogOutIcon className="h-5 w-5" />
+            <span className="sr-only">Sign out</span>
+          </Button>
+        )}
         
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onSettingsClick}
+          title="Settings"
+        >
+          <Settings2Icon className="h-5 w-5" />
+          <span className="sr-only">Settings</span>
+        </Button>
         
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="h-8 w-8 border-white/10 dark:border-white/10 light:border-black/10">
-              <User className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-black/90 border-white/10 dark:bg-black/90 light:bg-white/95 light:border-black/10 light:text-black">
-            <DropdownMenuLabel className="text-white light:text-black">My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/10 light:bg-black/10" />
-            <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white dark:text-white dark:focus:bg-white/10 light:text-black light:focus:bg-black/5">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white dark:text-white dark:focus:bg-white/10 light:text-black light:focus:bg-black/5">
-              Help & Support
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/10 light:bg-black/10" />
-            <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <MobileMenu
+          items={[
+            ...headerItems.map(item => ({
+              label: item.label,
+              icon: item.icon,
+              action: () => setActiveAtom(item.id as any),
+              active: activeAtom === item.id
+            })),
+            {
+              label: 'Sign Out',
+              icon: LogOutIcon,
+              action: handleLogout,
+              danger: true
+            }
+          ]}
+          className="md:hidden"
+        />
       </div>
-    </div>;
-}
+    </header>
+  );
+};

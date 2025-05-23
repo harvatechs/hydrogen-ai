@@ -4,8 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { AuthGuard } from "./components/auth/AuthGuard";
 import Index from "./pages/Index";
-import LandingPage from "./pages/LandingPage";
+import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "./context/SettingsContext";
@@ -81,7 +83,7 @@ const App = () => {
   useEffect(() => {
     const metaCSP = document.createElement('meta');
     metaCSP.httpEquiv = 'Content-Security-Policy';
-    metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://fonts.gstatic.com; font-src 'self' data: https://fonts.gstatic.com;";
+    metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://fonts.gstatic.com https://onapxxjqygvokkaciigb.supabase.co; font-src 'self' data: https://fonts.gstatic.com;";
     document.head.appendChild(metaCSP);
     
     return () => {
@@ -119,21 +121,30 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner position="top-right" className="toaster-container" />
-          <BrowserRouter>
-            <div className="min-h-screen w-full">
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/app" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </SettingsProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <SettingsProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner position="top-right" className="toaster-container" />
+              <div className="min-h-screen w-full">
+                <Routes>
+                  <Route path="/" element={<AuthPage />} />
+                  <Route
+                    path="/app"
+                    element={
+                      <AuthGuard>
+                        <Index />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </TooltipProvider>
+          </SettingsProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
