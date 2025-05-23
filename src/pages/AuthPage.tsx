@@ -56,27 +56,10 @@ const AuthPage = () => {
           <CardContent>
             <AuthForm />
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4 pt-0 border-t border-border/40 mt-4">
-            <div className="text-xs text-muted-foreground text-center">
-              Unlock the full potential of AI assistance
-            </div>
-          </CardFooter>
+          
         </Card>
         
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          By signing in, you agree to our{' '}
-          <Button variant="link" className="p-0 h-auto" asChild>
-            <a href="#" className="font-medium">
-              Terms of Service
-            </a>
-          </Button>{' '}
-          and{' '}
-          <Button variant="link" className="p-0 h-auto" asChild>
-            <a href="#" className="font-medium">
-              Privacy Policy
-            </a>
-          </Button>
-        </p>
+        
       </div>
     </div>;
 };
