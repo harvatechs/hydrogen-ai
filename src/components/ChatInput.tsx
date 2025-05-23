@@ -9,7 +9,6 @@ import { AIVoiceInput } from "@/components/ui/ai-voice-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { parseAtomCommand, AtomType } from "@/types/atoms";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
 export function ChatInput() {
   const [message, setMessage] = useState("");
   const [showVoiceInput, setShowVoiceInput] = useState(false);
@@ -17,106 +16,91 @@ export function ChatInput() {
   const [isListening, setIsListening] = useState(false);
   const [showQuickCommands, setShowQuickCommands] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
-  
   const {
     sendMessage,
     isProcessing,
     theme,
     setActiveAtom
   } = useChat();
-  
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recognition, setRecognition] = useState<any>(null);
-  
+
   // Track sidebar state changes
   useEffect(() => {
     const handleResize = () => {
       setSidebarOpen(window.innerWidth >= 768);
     };
-    
+
     // Listen for window resize
     window.addEventListener('resize', handleResize);
-    
+
     // Listen for sidebar toggle events
     const handleSidebarChange = (e: CustomEvent) => {
       setSidebarOpen(e.detail.open);
     };
-    
     window.addEventListener('sidebar-state-changed', handleSidebarChange as EventListener);
-    
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('sidebar-state-changed', handleSidebarChange as EventListener);
     };
   }, []);
-  
-  const quickCommands = [
-    {
-      icon: <Youtube className="h-4 w-4 text-red-500" />,
-      title: "YouTube Summary",
-      description: "Summarize any YouTube video",
-      command: "/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      color: "bg-red-500/10 text-red-400 border-red-500/30"
-    }, 
-    {
-      icon: <FileText className="h-4 w-4 text-blue-500" />,
-      title: "Flashcards",
-      description: "Create study flashcards",
-      command: "/flashcard The principles of quantum physics",
-      color: "bg-blue-500/10 text-blue-400 border-blue-500/30"
-    }, 
-    {
-      icon: <Globe className="h-4 w-4 text-green-500" />,
-      title: "Web Search",
-      description: "Search the web for current info",
-      command: "/web Latest AI research breakthroughs",
-      color: "bg-green-500/10 text-green-400 border-green-500/30"
-    }, 
-    {
-      icon: <Sparkles className="h-4 w-4 text-purple-500" />,
-      title: "AI Summarizer",
-      description: "Summarize any text content",
-      command: "/summarize Paste your text to get a concise summary",
-      color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
-    },
-    {
-      icon: <Network className="h-4 w-4 text-indigo-500" />,
-      title: "Concept Map",
-      description: "Visualize concepts and relationships",
-      command: "/mindmap Artificial Intelligence fundamentals",
-      color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-    },
-    {
-      icon: <FileText className="h-4 w-4 text-orange-500" />,
-      title: "PDF Summarizer",
-      description: "Upload and summarize PDF documents",
-      command: "/pdf",
-      color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
-    },
-    {
-      icon: <Network className="h-4 w-4 text-cyan-500" />,
-      title: "Interactive Diagram",
-      description: "Create process & relationship diagrams",
-      command: "/diagram",
-      color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
-    },
-    {
-      icon: <Brain className="h-4 w-4 text-orange-500" />,
-      title: "Compare & Contrast",
-      description: "Compare two concepts",
-      command: "Compare quantum computing and classical computing",
-      color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
-    }, 
-    {
-      icon: <BookOpen className="h-4 w-4 text-yellow-500" />,
-      title: "Explain Like I'm 5",
-      description: "Simple explanation of complex topics",
-      command: "Explain quantum entanglement like I'm 5 years old",
-      color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
-    }
-  ];
-  
+  const quickCommands = [{
+    icon: <Youtube className="h-4 w-4 text-red-500" />,
+    title: "YouTube Summary",
+    description: "Summarize any YouTube video",
+    command: "/youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    color: "bg-red-500/10 text-red-400 border-red-500/30"
+  }, {
+    icon: <FileText className="h-4 w-4 text-blue-500" />,
+    title: "Flashcards",
+    description: "Create study flashcards",
+    command: "/flashcard The principles of quantum physics",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/30"
+  }, {
+    icon: <Globe className="h-4 w-4 text-green-500" />,
+    title: "Web Search",
+    description: "Search the web for current info",
+    command: "/web Latest AI research breakthroughs",
+    color: "bg-green-500/10 text-green-400 border-green-500/30"
+  }, {
+    icon: <Sparkles className="h-4 w-4 text-purple-500" />,
+    title: "AI Summarizer",
+    description: "Summarize any text content",
+    command: "/summarize Paste your text to get a concise summary",
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/30"
+  }, {
+    icon: <Network className="h-4 w-4 text-indigo-500" />,
+    title: "Concept Map",
+    description: "Visualize concepts and relationships",
+    command: "/mindmap Artificial Intelligence fundamentals",
+    color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
+  }, {
+    icon: <FileText className="h-4 w-4 text-orange-500" />,
+    title: "PDF Summarizer",
+    description: "Upload and summarize PDF documents",
+    command: "/pdf",
+    color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
+  }, {
+    icon: <Network className="h-4 w-4 text-cyan-500" />,
+    title: "Interactive Diagram",
+    description: "Create process & relationship diagrams",
+    command: "/diagram",
+    color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+  }, {
+    icon: <Brain className="h-4 w-4 text-orange-500" />,
+    title: "Compare & Contrast",
+    description: "Compare two concepts",
+    command: "Compare quantum computing and classical computing",
+    color: "bg-orange-500/10 text-orange-400 border-orange-500/30"
+  }, {
+    icon: <BookOpen className="h-4 w-4 text-yellow-500" />,
+    title: "Explain Like I'm 5",
+    description: "Simple explanation of complex topics",
+    command: "Explain quantum entanglement like I'm 5 years old",
+    color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
+  }];
+
   // Speech recognition setup
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -126,7 +110,6 @@ export function ChatInput() {
         recognitionInstance.continuous = false;
         recognitionInstance.interimResults = true;
         recognitionInstance.lang = 'en-US';
-        
         recognitionInstance.onstart = () => {
           setIsListening(true);
           toast({
@@ -134,15 +117,10 @@ export function ChatInput() {
             description: "Speak clearly into your microphone"
           });
         };
-        
         recognitionInstance.onresult = (event: any) => {
-          const transcript = Array.from(event.results)
-            .map((result: any) => result[0])
-            .map(result => result.transcript)
-            .join('');
+          const transcript = Array.from(event.results).map((result: any) => result[0]).map(result => result.transcript).join('');
           setMessage(transcript);
         };
-        
         recognitionInstance.onerror = (event: any) => {
           console.error("Speech recognition error", event.error);
           setIsListening(false);
@@ -152,15 +130,12 @@ export function ChatInput() {
             variant: "destructive"
           });
         };
-        
         recognitionInstance.onend = () => {
           setIsListening(false);
         };
-        
         setRecognition(recognitionInstance);
       }
     }
-    
     return () => {
       if (recognition) {
         try {
@@ -171,18 +146,15 @@ export function ChatInput() {
       }
     };
   }, []);
-  
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isProcessing) return;
-    
     const atomCommand = parseAtomCommand(message.trim());
     if (atomCommand) {
       setActiveAtom(atomCommand.type, atomCommand.params);
       setMessage("");
       return;
     }
-    
     const currentMessage = message;
     setMessage("");
     await sendMessage(currentMessage);
@@ -190,7 +162,6 @@ export function ChatInput() {
       inputRef.current?.focus();
     }, 0);
   };
-
   const handleWebSearch = async (searchTerm: string) => {
     if (!searchTerm.trim()) {
       toast({
@@ -202,11 +173,9 @@ export function ChatInput() {
     setActiveAtom('websearch', searchTerm);
     setMessage("");
   };
-
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
-
   const toggleVoiceRecognition = () => {
     if (!recognition) {
       toast({
@@ -216,7 +185,6 @@ export function ChatInput() {
       });
       return;
     }
-    
     if (isListening) {
       recognition.stop();
       setIsListening(false);
@@ -233,14 +201,12 @@ export function ChatInput() {
       }
     }
   };
-
   const handleVoiceStart = useCallback(() => {
     toast({
       title: "Voice recording started",
       description: "Speak clearly and we'll convert your speech to text."
     });
   }, []);
-
   const handleVoiceStop = useCallback((duration: number) => {
     if (duration > 0) {
       toast({
@@ -252,16 +218,14 @@ export function ChatInput() {
       setShowVoiceInput(false);
     }
   }, []);
-
   const handleFileUpload = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       setIsUploading(true);
-      
+
       // Check for PDF files
       if (files[0].type === 'application/pdf') {
         setIsUploading(false);
@@ -270,14 +234,12 @@ export function ChatInput() {
         e.target.value = '';
         return;
       }
-      
       setTimeout(() => {
         setIsUploading(false);
         toast({
           title: "File uploaded successfully",
           description: `Analyzing ${files[0].name} (${(files[0].size / 1024).toFixed(1)} KB)`
         });
-        
         setTimeout(() => {
           setMessage(prev => prev + (prev ? " " : "") + `Analyze the content of this ${files[0].name} file.`);
           e.target.value = '';
@@ -288,7 +250,6 @@ export function ChatInput() {
       }, 1500);
     }
   };
-
   const handleProSearch = () => {
     if (!message.trim()) {
       toast({
@@ -297,23 +258,19 @@ export function ChatInput() {
       });
       return;
     }
-    
     toast({
       title: "Advanced research in progress",
       description: `Deep analysis for: "${message}"`
     });
-    
     setTimeout(() => {
       sendMessage(`Conduct comprehensive research on: ${message}`);
       setMessage("");
     }, 800);
   };
-
   const handleClearInput = () => {
     setMessage("");
     inputRef.current?.focus();
   };
-
   const applyQuickCommand = (command: string) => {
     setMessage(command);
     setShowQuickCommands(false);
@@ -321,7 +278,6 @@ export function ChatInput() {
       inputRef.current?.focus();
     }, 0);
   };
-
   const getCommandBadge = () => {
     if (message.trim().startsWith('/web') || message.trim().startsWith('/search')) {
       return <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
@@ -356,13 +312,8 @@ export function ChatInput() {
   };
 
   // Calculate dynamic styles based on sidebar state
-  const containerStyle = cn(
-    "fixed bottom-0 left-0 right-0 z-20 pb-4 pt-2 bg-gradient-to-t from-background via-background/95 to-transparent",
-    sidebarOpen ? "md:pl-[280px]" : ""
-  );
-
-  return (
-    <div className={containerStyle}>
+  const containerStyle = cn("fixed bottom-0 left-0 right-0 z-20 pb-4 pt-2 bg-gradient-to-t from-background via-background/95 to-transparent", sidebarOpen ? "md:pl-[280px]" : "");
+  return <div className={containerStyle}>
       <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto px-4">
         <div className="rounded-xl border glass-card shadow-lg transition-all duration-300 hover:shadow-xl">
           <div className="flex items-center">
@@ -381,89 +332,39 @@ export function ChatInput() {
                     <p className="text-xs text-muted-foreground">Select a template to get started</p>
                   </div>
                   <div className="max-h-80 overflow-y-auto p-2">
-                    {quickCommands.map((cmd, index) => (
-                      <Button 
-                        key={index} 
-                        variant="ghost" 
-                        className={`w-full justify-start mb-1 p-2 hover:${cmd.color.split(' ')[0]}/20`} 
-                        onClick={() => applyQuickCommand(cmd.command)}
-                      >
+                    {quickCommands.map((cmd, index) => <Button key={index} variant="ghost" className={`w-full justify-start mb-1 p-2 hover:${cmd.color.split(' ')[0]}/20`} onClick={() => applyQuickCommand(cmd.command)}>
                         <div className={`p-2 rounded-full mr-3 ${cmd.color}`}>{cmd.icon}</div>
                         <div className="text-left">
                           <div className="font-medium text-sm">{cmd.title}</div>
                           <div className="text-xs text-muted-foreground">{cmd.description}</div>
                         </div>
-                      </Button>
-                    ))}
+                      </Button>)}
                   </div>
                 </PopoverContent>
               </Popover>
               
-              <Button 
-                type="button" 
-                size="icon" 
-                variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                title="Web Search" 
-                onClick={() => setActiveAtom('websearch', '')}
-              >
+              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" title="Web Search" onClick={() => setActiveAtom('websearch', '')}>
                 <Search className="h-4 w-4" />
               </Button>
               
-              <Button 
-                type="button" 
-                size="icon" 
-                variant="ghost" 
-                className="h-9 w-9 rounded-full text-muted-foreground transition-all duration-300 dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black" 
-                title="PDF Summarizer" 
-                onClick={() => setActiveAtom('pdfsummarizer', '')}
-              >
-                <FileText className="h-4 w-4" />
-              </Button>
+              
               
               {getCommandBadge()}
             </div>
             
             <div className="relative flex-grow">
               <div className="flex items-center">
-                <Input 
-                  ref={inputRef} 
-                  placeholder="Ask anything or use a quick command..." 
-                  value={message} 
-                  onChange={handleInputChange} 
-                  className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-4 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300" 
-                  disabled={isProcessing} 
-                />
+                <Input ref={inputRef} placeholder="Ask anything or use a quick command..." value={message} onChange={handleInputChange} className="flex-grow border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-3 py-6 pl-4 dark:text-white light:text-black placeholder:text-muted-foreground/70 transition-all duration-300" disabled={isProcessing} />
               </div>
               
-              {message && (
-                <Button 
-                  type="button" 
-                  size="icon" 
-                  variant="ghost" 
-                  onClick={handleClearInput} 
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 dark:hover:text-white light:hover:text-black"
-                >
+              {message && <Button type="button" size="icon" variant="ghost" onClick={handleClearInput} className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground/70 dark:hover:text-white light:hover:text-black">
                   <X className="h-3 w-3" />
-                </Button>
-              )}
+                </Button>}
             </div>
             
             <div className="flex items-center space-x-1 mr-2">
               <Dialog open={showVoiceInput} onOpenChange={setShowVoiceInput}>
-                <Button 
-                  type="button" 
-                  size="icon" 
-                  variant={isListening ? "default" : "ghost"} 
-                  className={cn(
-                    "h-9 w-9 rounded-full transition-all duration-300", 
-                    isListening 
-                      ? "bg-gemini-yellow text-black voice-input-button active" 
-                      : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black"
-                  )} 
-                  title="Voice input" 
-                  onClick={toggleVoiceRecognition}
-                >
+                <Button type="button" size="icon" variant={isListening ? "default" : "ghost"} className={cn("h-9 w-9 rounded-full transition-all duration-300", isListening ? "bg-gemini-yellow text-black voice-input-button active" : "text-muted-foreground dark:hover:bg-white/5 dark:hover:text-white light:hover:bg-black/5 light:hover:text-black")} title="Voice input" onClick={toggleVoiceRecognition}>
                   {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </Button>
                 <DialogContent className="sm:max-w-md glass-card">
@@ -474,47 +375,31 @@ export function ChatInput() {
                 </DialogContent>
               </Dialog>
               
-              <Button 
-                type="submit" 
-                size="icon" 
-                className={cn(
-                  "h-9 w-9 rounded-full transition-all duration-200", 
-                  message.trim() && !isProcessing 
-                    ? "dark:bg-gemini-purple dark:text-white dark:hover:opacity-90 light:bg-gemini-purple light:text-white light:hover:opacity-90" 
-                    : "bg-gemini-purple/20 text-gemini-purple/50 cursor-not-allowed"
-                )} 
-                disabled={!message.trim() || isProcessing} 
-                title="Send message"
-              >
+              <Button type="submit" size="icon" className={cn("h-9 w-9 rounded-full transition-all duration-200", message.trim() && !isProcessing ? "dark:bg-gemini-purple dark:text-white dark:hover:opacity-90 light:bg-gemini-purple light:text-white light:hover:opacity-90" : "bg-gemini-purple/20 text-gemini-purple/50 cursor-not-allowed")} disabled={!message.trim() || isProcessing} title="Send message">
                 <SendHorizontal className="h-4 w-4" />
               </Button>
             </div>
           </div>
           
-          {isProcessing && (
-            <div className="px-4 py-1 text-xs text-muted-foreground/70 border-t dark:border-white/5 light:border-black/5 dark:bg-black/20 light:bg-black/5">
+          {isProcessing && <div className="px-4 py-1 text-xs text-muted-foreground/70 border-t dark:border-white/5 light:border-black/5 dark:bg-black/20 light:bg-black/5">
               <div className="flex items-center">
                 <div className="mr-2 typing-animation w-24 h-3 dark:bg-white/20 light:bg-black/10 rounded-full"></div>
                 <span>Generating response...</span>
               </div>
-            </div>
-          )}
+            </div>}
           
-          {isListening && (
-            <div className="px-4 py-2 text-xs text-gemini-yellow bg-gemini-yellow/10 border-t border-gemini-yellow/20 rounded-b-xl">
+          {isListening && <div className="px-4 py-2 text-xs text-gemini-yellow bg-gemini-yellow/10 border-t border-gemini-yellow/20 rounded-b-xl">
               <div className="flex items-center justify-between">
                 <span>Listening... Speak clearly into your microphone</span>
                 <Button size="sm" variant="ghost" className="h-5 px-2 text-xs" onClick={() => setIsListening(false)}>
                   <X className="h-3 w-3 mr-1" /> Stop
                 </Button>
               </div>
-            </div>
-          )}
+            </div>}
         </div>
         <div className="mt-1 text-xs text-center text-muted-foreground/50">
           HydroGen AI may display inaccurate info, including about people, places, or facts
         </div>
       </form>
-    </div>
-  );
+    </div>;
 }
