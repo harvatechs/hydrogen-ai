@@ -7,7 +7,15 @@ export function ThemeToggle() {
   const { theme, setTheme } = useSettings();
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    
+    // Apply theme to document
+    document.documentElement.classList.remove("dark", "light");
+    document.documentElement.classList.add(newTheme);
+    
+    // Save preference to localStorage
+    localStorage.setItem("theme", newTheme);
   };
 
   return (

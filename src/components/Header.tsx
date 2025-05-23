@@ -7,6 +7,7 @@ import { BookOpenIcon, HomeIcon, LogOutIcon, MessageCircleIcon, Settings2Icon } 
 import { useChat } from '@/context/ChatContext';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onSettingsClick?: () => void;
@@ -16,6 +17,7 @@ export const Header = ({ onSettingsClick }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const { activeAtom, setActiveAtom } = useChat();
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
   
   // Detect scroll for shadow effect
   useEffect(() => {
@@ -29,6 +31,7 @@ export const Header = ({ onSettingsClick }: HeaderProps) => {
   
   const handleLogout = async () => {
     await signOut();
+    navigate('/');
   };
   
   const headerItems = [

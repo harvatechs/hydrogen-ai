@@ -10,6 +10,8 @@ import {
 import { Sidebar } from "@/components/Sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Header } from "@/components/Header";
+import { useState } from "react";
+import { EnhancedSettingsPanel } from "@/components/EnhancedSettingsPanel";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -49,6 +51,11 @@ const SidebarStateHandler = () => {
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Default to open on desktop, closed on mobile
   const defaultOpen = window.innerWidth >= 768;
+  const [showSettings, setShowSettings] = useState(false);
+
+  const handleSettingsClick = () => {
+    setShowSettings(!showSettings);
+  };
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
@@ -69,7 +76,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {/* Header with Sidebar Toggle */}
           <div className="flex items-center border-b border-b-white/10 light:border-b-black/10 h-14 px-4 z-20">
             <SidebarTrigger className="mr-2 dark:text-white light:text-black dark:hover:bg-white/10 light:hover:bg-black/10" />
-            <Header onSettingsClick={() => {}} />
+            <Header onSettingsClick={handleSettingsClick} />
           </div>
           
           <div className="absolute inset-0 pointer-events-none top-14">
@@ -84,6 +91,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </div>
             </ScrollArea>
           </div>
+
+          {showSettings && (
+            <EnhancedSettingsPanel 
+              onClose={() => setShowSettings(false)} 
+              open={showSettings} 
+            />
+          )}
         </div>
       </div>
     </SidebarProvider>

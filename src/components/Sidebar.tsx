@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@/context/ChatContext";
 import { toast } from "@/components/ui/use-toast";
@@ -6,8 +7,8 @@ import { ConversationGroups } from "./sidebar/ConversationGroups";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { DeleteDialog } from "./sidebar/DeleteDialog";
 import { cn } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -18,6 +19,8 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
   const { state } = useSidebar();
   // Use the state to determine if sidebar is collapsed
   const isCollapsed = state === "collapsed";
+  
+  const { user } = useAuth();
   
   const {
     clearMessages,
@@ -119,14 +122,6 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
     setConversationToDelete(null);
   };
 
-  const handleClear = () => {
-    clearMessages();
-    toast({
-      title: "Chat Cleared",
-      description: "All messages have been cleared."
-    });
-  };
-
   const handleRegenerateTitle = async (id: string) => {
     const conversation = conversations.find(c => c.id === id);
     if (conversation && apiKey) {
@@ -158,7 +153,6 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
   // Add event listener for sidebar state changes
   useEffect(() => {
     const handleSidebarStateChange = (event: CustomEvent) => {
-      // This is just for debugging, no need to set state here as we use `state` directly
       console.log("Sidebar state changed:", event.detail.open);
     };
 
@@ -170,6 +164,13 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
       window.removeEventListener("sidebar-state-changed", handleSidebarStateChange as EventListener);
     };
   }, []);
+
+  // Ensure we create a new conversation if there are none
+  useEffect(() => {
+    if (conversations.length === 0 && user) {
+      createNewConversation();
+    }
+  }, [conversations.length, createNewConversation, user]);
 
   return (
     <div className={cn(

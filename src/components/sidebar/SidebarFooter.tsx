@@ -1,78 +1,97 @@
 
-import React from 'react';
-import { AlertCircle, Trash, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSidebar } from "@/components/ui/sidebar";
+import { ArrowLeftRight, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from '@/context/AuthContext';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SidebarFooterProps {
   currentConversationId: string | null;
   clearConversation: (id: string) => void;
 }
 
-export const SidebarFooter: React.FC<SidebarFooterProps> = ({ 
-  currentConversationId, 
-  clearConversation
-}) => {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
-  
-  if (!currentConversationId) return null;
-  
-  if (collapsed) {
-    return (
-      <div className="p-2 flex flex-col items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => clearConversation(currentConversationId)}
-              className="w-10 h-10 rounded-full border-white/10 dark:border-white/10 dark:hover:bg-white/5 dark:hover:text-white light:border-black/10 light:hover:bg-black/5 light:hover:text-black bg-transparent text-inherit transition-colors"
-            >
-              <Trash className="h-4 w-4" />
-              <span className="sr-only">Clear conversation</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Clear conversation</TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="w-10 h-10 rounded-full border-white/10 dark:border-white/10 dark:hover:bg-white/5 dark:hover:text-white light:border-black/10 light:hover:bg-black/5 light:hover:text-black bg-transparent text-inherit transition-colors"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              <span className="sr-only">Security enabled</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Security features enabled</TooltipContent>
-        </Tooltip>
-      </div>
-    );
-  }
+export const SidebarFooter = ({ 
+  currentConversationId,
+  clearConversation 
+}: SidebarFooterProps) => {
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const { user } = useAuth();
+
+  const handleClearClick = () => {
+    setClearDialogOpen(true);
+  };
+
+  const handleConfirmClear = () => {
+    if (currentConversationId) {
+      clearConversation(currentConversationId);
+    }
+    setClearDialogOpen(false);
+  };
 
   return (
-    <div className="p-2 border-t border-white/10 dark:border-white/10 light:border-black/10 space-y-2">
-      <Button
-        variant="ghost"
-        onClick={() => clearConversation(currentConversationId)}
-        className="w-full justify-start text-left hover:bg-destructive/10 hover:text-destructive transition-colors dark:text-zinc-400 light:text-zinc-600 dark:hover:text-destructive light:hover:text-destructive"
-      >
-        <Trash className="mr-2 h-4 w-4" />
-        Clear conversation
-      </Button>
-      
-      <Button
-        variant="ghost"
-        className="w-full justify-start text-left hover:bg-blue-500/10 hover:text-blue-500 transition-colors dark:text-zinc-400 light:text-zinc-600"
-      >
-        <ShieldCheck className="mr-2 h-4 w-4" />
-        Security features enabled
-      </Button>
+    <div className="p-2 border-t border-border">
+      <div className="flex flex-col gap-2">
+        {user && (
+          <div className="flex items-center space-x-2 px-2 py-1.5">
+            <div className="flex-1 truncate">
+              <p className="text-xs text-muted-foreground truncate">Signed in as:</p>
+              <p className="text-xs font-medium truncate">{user.email}</p>
+            </div>
+          </div>
+        )}
+        
+        <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full justify-start text-muted-foreground hover:text-destructive"
+              onClick={handleClearClick}
+              disabled={!currentConversationId}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Clear conversation</span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Clear conversation</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will delete all messages in the current conversation.
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleConfirmClear}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                Clear
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start text-muted-foreground"
+        >
+          <ArrowLeftRight className="mr-2 h-4 w-4" />
+          <span>Switch model</span>
+        </Button>
+      </div>
     </div>
   );
 };

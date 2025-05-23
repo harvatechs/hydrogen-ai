@@ -11,6 +11,7 @@ import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "./context/SettingsContext";
+import { LoadingScreen } from "./components/LoadingScreen";
 import "./styles/enhanced-ui.css";
 import "./styles/chatgpt-theme.css";
 
@@ -36,6 +37,7 @@ const queryClient = new QueryClient({
 
 const App = () => {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [isLoading, setIsLoading] = useState(true);
   
   // Check system preference and set initial theme - with improved error handling
   useEffect(() => {
@@ -57,11 +59,19 @@ const App = () => {
         setTheme('light');
         document.documentElement.classList.add('light');
       }
+      
+      // Simulate app loading
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1200);
+      
+      return () => clearTimeout(timer);
     } catch (error) {
       console.error("Error setting theme:", error);
       // Fallback to dark theme if there's an error
       setTheme('dark');
       document.documentElement.classList.add('dark');
+      setIsLoading(false);
     }
   }, []);
   
@@ -76,18 +86,6 @@ const App = () => {
     
     return () => {
       document.head.removeChild(link);
-    };
-  }, []);
-  
-  // Set Content Security Meta Tag
-  useEffect(() => {
-    const metaCSP = document.createElement('meta');
-    metaCSP.httpEquiv = 'Content-Security-Policy';
-    metaCSP.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https://generativelanguage.googleapis.com https://fonts.gstatic.com https://onapxxjqygvokkaciigb.supabase.co; font-src 'self' data: https://fonts.gstatic.com;";
-    document.head.appendChild(metaCSP);
-    
-    return () => {
-      document.head.removeChild(metaCSP);
     };
   }, []);
   
@@ -119,11 +117,15 @@ const App = () => {
     };
   }, []);
 
+  if (isLoading) {
+    return <LoadingScreen message="Starting HydroGen AI" />;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <SettingsProvider>
+          <SettingsProvider initialTheme={theme}>
             <TooltipProvider>
               <Toaster />
               <Sonner position="top-right" className="toaster-container" />
@@ -131,7 +133,7 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<AuthPage />} />
                   <Route
-                    path="/app"
+                    path="/app/*"
                     element={
                       <AuthGuard>
                         <Index />
