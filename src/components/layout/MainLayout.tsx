@@ -69,7 +69,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {/* Header with Sidebar Toggle */}
           <div className="flex items-center border-b border-b-white/10 light:border-b-black/10 h-14 px-4 z-20">
             <SidebarTrigger className="mr-2 dark:text-white light:text-black dark:hover:bg-white/10 light:hover:bg-black/10" />
-            <Header onOpenSettings={() => {}} />
+            <Header onSettingsClick={() => {}} />
           </div>
           
           <div className="absolute inset-0 pointer-events-none top-14">
