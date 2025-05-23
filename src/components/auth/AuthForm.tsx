@@ -201,7 +201,18 @@ export function AuthForm() {
             
             <FormField control={signupForm.control} name="fullName" render={({
             field
-          }) => {}} />
+          }) => (
+              <FormItem>
+                <FormLabel className="text-foreground/70">Full Name (optional)</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Your full name" {...field} className="pl-10" disabled={isLoading} />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
             
             <FormField control={signupForm.control} name="password" render={({
             field
