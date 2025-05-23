@@ -37,14 +37,9 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
       if (diagramRef.current) {
         try {
           diagramRef.current.innerHTML = '';
-          await mermaid.run({
-            nodes: [
-              {
-                id: uniqueId,
-                innerHTML: chart
-              }
-            ]
-          });
+          // Fix: Use mermaid.render() instead of mermaid.run() with the proper API
+          const { svg } = await mermaid.render(uniqueId, chart);
+          diagramRef.current.innerHTML = svg;
         } catch (error) {
           console.error("Failed to render Mermaid diagram:", error);
           if (diagramRef.current) {
@@ -85,9 +80,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
       </div>
       
       <div className="p-4 overflow-auto max-h-96 diagram-container">
-        <div id={uniqueId} ref={diagramRef} className="mermaid">
-          {chart}
-        </div>
+        <div id={uniqueId} ref={diagramRef} className="mermaid"></div>
       </div>
 
       <Dialog open={expanded} onOpenChange={setExpanded}>
@@ -99,7 +92,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
             </Button>
           </div>
           <div className="overflow-auto h-full p-4 border rounded-lg">
-            <div className="mermaid">
+            <div id={`${uniqueId}-expanded`} className="mermaid">
               {chart}
             </div>
           </div>

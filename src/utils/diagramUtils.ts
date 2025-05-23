@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for working with diagrams
  */
@@ -126,7 +125,7 @@ export function getDiagramExample(type: 'flowchart' | 'sequence' | 'class' | 'er
  */
 export async function validateMermaidSyntax(code: string): Promise<{ isValid: boolean; error?: string }> {
   try {
-    const { parser } = await mermaid.parseSync(code);
+    await mermaid.parse(code);
     return { isValid: true };
   } catch (error) {
     return { 
