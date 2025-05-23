@@ -1,70 +1,43 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle,
-  CardFooter 
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ZapIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
 const AuthPage = () => {
-  const { user, loading } = useAuth();
+  const {
+    user,
+    loading
+  } = useAuth();
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
-  
   useEffect(() => {
     setMounted(true);
   }, []);
-
   useEffect(() => {
     if (user && !loading) {
       navigate('/app');
     }
   }, [user, loading, navigate]);
-
   const [bgClass, setBgClass] = useState('from-background');
-  
+
   // Random gradient background on each mount
   useEffect(() => {
-    const gradients = [
-      'from-background to-background/80 via-blue-500/5',
-      'from-background to-background/80 via-purple-500/5',
-      'from-background to-background/80 via-indigo-500/5',
-      'from-background to-background/80 via-pink-500/5',
-      'from-background to-background/80 via-cyan-500/5',
-    ];
-    
+    const gradients = ['from-background to-background/80 via-blue-500/5', 'from-background to-background/80 via-purple-500/5', 'from-background to-background/80 via-indigo-500/5', 'from-background to-background/80 via-pink-500/5', 'from-background to-background/80 via-cyan-500/5'];
     setBgClass(gradients[Math.floor(Math.random() * gradients.length)]);
   }, []);
-
-  return (
-    <div className={cn(
-      "flex min-h-screen flex-col items-center justify-center px-4 sm:px-6 bg-gradient-to-tr transition-all duration-1000", 
-      bgClass,
-      !mounted && "opacity-0"
-    )}>
-      <div 
-        className="absolute inset-0 bg-grid-small-white/[0.2] bg-[size:20px_20px] pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '30px 30px',
-          opacity: 0.4,
-        }}
-      />
+  return <div className={cn("flex min-h-screen flex-col items-center justify-center px-4 sm:px-6 bg-gradient-to-tr transition-all duration-1000", bgClass, !mounted && "opacity-0")}>
+      <div className="absolute inset-0 bg-grid-small-white/[0.2] bg-[size:20px_20px] pointer-events-none" style={{
+      backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+      backgroundSize: '30px 30px',
+      opacity: 0.4
+    }} />
       
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="flex flex-col items-center space-y-2 text-center">
-          <div className="h-14 w-14 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white mb-1">
-            <ZapIcon size={28} />
-          </div>
+          
           <CardTitle className="text-4xl font-extrabold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
             HydroGen AI
           </CardTitle>
@@ -105,8 +78,6 @@ const AuthPage = () => {
           </Button>
         </p>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AuthPage;
