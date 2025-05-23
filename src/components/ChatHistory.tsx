@@ -66,7 +66,7 @@ export function ChatHistory() {
     </div>;
 
   // Empty state with welcome message and recommended questions
-  const emptyStateContent = () => <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 animate-fade-in py-[16px]">
+  const emptyStateContent = () => <div className="h-full flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4 animate-fade-in py-[12px]">
       
       
       <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
