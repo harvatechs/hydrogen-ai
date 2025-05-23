@@ -12,10 +12,18 @@ interface SettingsContextType {
   setFontSize: (size: FontSizeType) => void;
 }
 
+interface SettingsProviderProps {
+  children: React.ReactNode;
+  initialTheme?: ThemeType;
+}
+
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
-export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Get stored theme or use default
+export const SettingsProvider: React.FC<SettingsProviderProps> = ({ 
+  children, 
+  initialTheme 
+}) => {
+  // Get stored theme or use default/provided initialTheme
   const getStoredTheme = (): ThemeType => {
     if (typeof localStorage !== 'undefined') {
       const saved = localStorage.getItem('app-theme');
@@ -23,7 +31,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return saved;
       }
     }
-    return 'dark';
+    return initialTheme || 'dark';
   };
 
   // Get stored font size or use default
