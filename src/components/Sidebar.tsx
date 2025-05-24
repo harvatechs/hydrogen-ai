@@ -14,11 +14,28 @@ interface SidebarProps {
   collapsed?: boolean;
 }
 
+// Hook to detect mobile devices
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+  
+  return isMobile;
+};
+
 export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
-  // Get the sidebar state from the Shadcn sidebar context
   const { state } = useSidebar();
-  // Use the state to determine if sidebar is collapsed
-  const isCollapsed = state === "collapsed";
+  const isMobile = useIsMobile();
+  const isCollapsed = state === "collapsed" && !isMobile;
   
   const { user } = useAuth();
   
@@ -156,10 +173,8 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
       console.log("Sidebar state changed:", event.detail.open);
     };
 
-    // Add event listener for custom event
     window.addEventListener("sidebar-state-changed", handleSidebarStateChange as EventListener);
 
-    // Clean up event listener
     return () => {
       window.removeEventListener("sidebar-state-changed", handleSidebarStateChange as EventListener);
     };
@@ -174,22 +189,31 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
 
   return (
     <div className={cn(
-      "w-full h-full flex flex-col bg-background border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10",
-      isCollapsed && "items-center" // Center items when collapsed
+      "w-full h-full flex flex-col bg-background",
+      "border-r border-white/10 dark:bg-background light:bg-white/95 light:border-black/10",
+      isCollapsed && !isMobile && "items-center",
+      isMobile && "mobile-sidebar"
     )}>
       <SidebarHeader 
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handleSearchKeyDown={handleSearchKeyDown}
         createNewConversation={createNewConversation}
+        className={cn(
+          isMobile && "mobile-nav safe-top"
+        )}
       />
       
       <div className={cn(
-        "flex-1 overflow-auto p-2",
-        isCollapsed && "w-full"
+        "flex-1 overflow-auto mobile-scroll",
+        isMobile ? "p-2" : "p-3",
+        isCollapsed && !isMobile && "w-full px-2"
       )}>
         {filteredConversations.length === 0 && searchTerm ? (
-          <div className="text-sm text-center text-muted-foreground p-4">
+          <div className={cn(
+            "text-sm text-center text-muted-foreground",
+            isMobile ? "p-4" : "p-6"
+          )}>
             No conversations matching "{searchTerm}"
           </div>
         ) : (
@@ -208,6 +232,9 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
             setEditTitle={setEditTitle}
             handleDeleteClick={handleDeleteClick}
             handleRegenerateTitle={handleRegenerateTitle}
+            className={cn(
+              isMobile && "conversation-list-mobile"
+            )}
           />
         )}
       </div>
@@ -215,6 +242,9 @@ export function Sidebar({ collapsed: collapsedProp = false }: SidebarProps) {
       <SidebarFooter 
         currentConversationId={currentConversationId}
         clearConversation={clearConversation}
+        className={cn(
+          isMobile && "safe-bottom p-4"
+        )}
       />
       
       <DeleteDialog 
