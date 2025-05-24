@@ -84,3 +84,4 @@ class SecurityMonitor {
 }
 
 export const securityMonitor = new SecurityMonitor();
+export type { SecurityEvent, SecurityLog };

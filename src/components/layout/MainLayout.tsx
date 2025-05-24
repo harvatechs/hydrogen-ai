@@ -74,19 +74,19 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* Main Content */}
         <div className="flex flex-col h-screen relative w-full">
           {/* Header with Sidebar Toggle */}
-          <div className="flex items-center border-b border-b-white/10 light:border-b-black/10 h-14 px-4 z-20 bg-background">
-            <SidebarTrigger className="mr-2 dark:text-white light:text-black dark:hover:bg-white/10 light:hover:bg-black/10" />
+          <div className="flex items-center border-b border-b-white/10 light:border-b-black/10 h-12 sm:h-14 px-2 sm:px-4 z-20 bg-background">
+            <SidebarTrigger className="mr-1 sm:mr-2 dark:text-white light:text-black dark:hover:bg-white/10 light:hover:bg-black/10 h-8 w-8 sm:h-9 sm:w-9" />
             <Header onSettingsClick={handleSettingsClick} />
           </div>
           
-          <div className="absolute inset-0 pointer-events-none top-14">
+          <div className="absolute inset-0 pointer-events-none top-12 sm:top-14">
             <div className="absolute bottom-0 left-0 w-full h-1/2 dark:bg-gradient-to-t dark:from-black/30 dark:to-transparent light:bg-gradient-to-t light:from-white/30 light:to-transparent opacity-30"></div>
             <div className="absolute top-0 right-0 w-1/3 h-1/3 dark:bg-black/20 light:bg-white/20 rounded-full blur-3xl"></div>
           </div>
           
           <div className="flex-1 relative overflow-hidden flex flex-col">
-            <ScrollArea className="h-[calc(100vh-130px)] flex-1 flex flex-col pb-32">
-              <div className="flex-1 flex flex-col">
+            <ScrollArea className="h-[calc(100vh-120px)] sm:h-[calc(100vh-130px)] flex-1 flex flex-col pb-24 sm:pb-32">
+              <div className="flex-1 flex flex-col px-2 sm:px-4">
                 {children}
               </div>
             </ScrollArea>
