@@ -71,6 +71,9 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Add custom gemini colors
+        "gemini-yellow": "#fbbc04",
+        "gemini-purple": "#a142f4",
       },
       borderRadius: {
         lg: "var(--radius)",
