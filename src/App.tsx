@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { AuthGuard } from "./components/auth/AuthGuard";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
+import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import { SettingsProvider } from "./context/SettingsContext";
@@ -131,7 +132,8 @@ const App = () => {
               <Sonner position="top-right" className="toaster-container" />
               <div className="min-h-screen w-full">
                 <Routes>
-                  <Route path="/" element={<AuthPage />} />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
                   <Route
                     path="/app/*"
                     element={
