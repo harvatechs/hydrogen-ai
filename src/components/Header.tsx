@@ -82,6 +82,29 @@ export const Header = ({
   // Set default model
   const [currentModel, setCurrentModel] = useState(modelOptions[0]);
 
+  // Mobile menu items
+  const mobileMenuItems = [
+    {
+      label: 'Chat',
+      icon: MessageCircleIcon,
+      action: () => console.log('Chat clicked'),
+      active: false
+    },
+    {
+      label: 'Settings',
+      icon: Settings2Icon,
+      action: onSettingsClick || (() => {}),
+      active: false
+    },
+    {
+      label: 'Sign out',
+      icon: LogOutIcon,
+      action: handleLogout,
+      active: false,
+      danger: true
+    }
+  ];
+
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center">
@@ -151,7 +174,7 @@ export const Header = ({
         </DropdownMenu>
         
         <div className="md:hidden">
-          <MobileMenu />
+          <MobileMenu items={mobileMenuItems} />
         </div>
       </div>
     </div>
